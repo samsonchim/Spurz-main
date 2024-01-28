@@ -1,0 +1,472 @@
+@import url(https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css);
+@import url('https://fonts.googleapis.com/css2?family=Fira+Sans&display=swap');
+body {
+    font-family: 'Fira Sans', sans-serif;
+    background-color: #DEDEDE;
+    margin: 0;
+}
+
+#loader {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.8);
+    z-index: 1000;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f0f0f0;
+    padding: 18px;
+    border-bottom: 1px solid #ccc;
+}
+
+.left-section {
+    display: flex;
+    align-items: center;
+}
+
+.logo {
+    width: 25px;
+    height: 25px;
+    margin-right: 10px;
+}
+
+.business_name {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.business_name img {
+    width: 25px;
+    height: 25px;
+    margin-right: 5px;
+    border-radius: 50%;
+}
+
+.right-section {
+    display: flex;
+    align-items: center;
+}
+
+.right-section a {
+    margin-right: 20px;
+    color: rgb(133, 133, 133);
+    text-decoration: none;
+}
+
+.right-section a:hover {
+    text-decoration: underline;
+}
+
+
+.sidebar {
+    height: 100%;
+    width: 250px;
+    position: fixed;
+    top: 60px; /* Adjusted top value to account for the header height */
+    left: 0;
+    overflow-x: hidden;
+    padding-top: 20px;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid #ccc;
+}
+
+.message-icon {
+    color: red;
+    font-size: 70%; /* Adjust the font size as needed */
+    vertical-align: top;
+    position: relative;
+    top: -0.4em; /* Adjust the value to control the vertical position */
+}
+
+
+.sidebar ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.sidebar li {
+    padding: 12px;
+    text-align: left;
+    margin-left: 30px;
+    
+}
+
+.sidebar a {
+    text-decoration: none;
+    font-size: 18px;
+    text-align: left;
+    color:rgb(133, 133, 133);
+    margin-left: 10px;
+}
+
+.sidebar a.active-side {
+    text-decoration: none;
+    color: black;
+    font-size: 18px;
+    text-align: left;
+    margin-left: 10px;
+    font-weight: bold; 
+    padding-bottom: 8px !important; 
+    border-bottom: 3px solid  hsl(351, 61%, 24%) !important; 
+}
+
+
+
+
+.toggle-btn, .mobile-bottom-navigation {
+    display: none;
+}
+
+
+@media screen and (max-width: 600px) {
+.mobile-bottom-navigation {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 500px;
+    margin: auto;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 5px 0;
+    box-shadow: 0 0 10px hsla(0, 0%, 0%, 0.25);
+    z-index: 5;
+  }
+  
+  .mobile-bottom-navigation .action-btn {
+    position: relative;
+    font-size: 26px;
+    color: var(--eerie-black);
+    padding: 10px;
+  }
+  
+  .mobile-bottom-navigation .count {
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-size: 12px;
+    font-weight: var(--weight-500);
+    line-height: 1;
+    padding: 2px 4px;
+  }
+  
+  .mobile-navigation-menu {
+    background: var(--white);
+    position: fixed;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    max-width: 320px;
+    height: 100vh;
+    padding: 20px;
+    box-shadow: 0 0 10px hsla(0, 0%, 0%, 0.1);
+    overflow-y: scroll;
+    overscroll-behavior: contain;
+    visibility: hidden;
+    transition: 0.5s ease;
+    z-index: 20;
+  }
+  
+  .mobile-navigation-menu.active {
+    left: 0;
+    visibility: visible;
+  }
+  
+}
+
+.toggles {
+    display: flex;
+    margin-bottom: 10px; /* Add margin for spacing */
+}
+
+.toggles .menu-option {
+    text-decoration: none;
+    color: #333;
+    padding: 8px 20px; /* Adjust padding for reduced spacing */
+    position: relative;
+    cursor: pointer;
+}
+
+.toggles .menu-option.active {
+    color: hsl(351, 61%, 24%);
+
+}
+
+.toggles .menu-option.active::after {
+    content: '';
+    display: block;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px; /* Adjust the line height */
+    background-color: hsl(351, 61%, 24%);
+}
+
+.main-body{
+    width: 90%;
+    padding-top: 40px;
+
+}
+
+.add-product{
+    margin: 0 auto;
+    height: 20%;
+    width: 20%;
+    cursor: pointer;
+}
+
+.add-product:hover {
+    transform: scale(1.1); /* Adjust the scale factor as needed for the desired zoom level */
+    transition: transform 0.3s ease; /* Add a smooth transition for a better visual effect */
+}
+
+
+.add-product-text{
+    text-align: center!important;
+    font-size: 10px;
+    color:#b8afaf;
+}
+
+.product-number{
+    color:hsl(351, 61%, 24%);
+}
+    
+
+
+.report{
+    text-align: center!important ;
+    font-size: 12px;
+}
+
+    @media screen and (max-width: 600px) {
+        .toggle-btn {
+            display: block;
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            font-size: 20px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: #333;
+            z-index: 1;
+        }
+    .sidebar {
+        width: 0;
+        transition: width 0.5s; 
+        background-color: #DEDEDE;
+    }
+
+
+    .sidebar ul {
+        margin: 0;
+        padding: 0;
+    }
+
+    .sidebar li {
+        display: block;
+    }
+
+    .sidebar.open {
+        width: 50%; /* Adjusted width to 70% when open */
+    }
+
+    .toggle-btn.open {
+        color: hsl(351, 61%, 24%);
+    }
+}
+@media (max-width: 600px) {
+    .logo {
+        width: 25px;
+        height: 25px;
+    }
+
+  .right-section a{
+    font-size: 12px;
+  }
+    .sellbizzhub {
+        display: none;
+    }
+
+    .business_name {
+        font-size: 14px;
+        margin-right: 5px;
+    }
+}
+
+
+.bottom-bar {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+    padding: 10px 0;
+    border: 1px solid #ccc;
+}
+
+.bottom-bar a {
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 18px;
+    margin: 0 8px;
+    color: hsl(351, 61%, 24%);
+}
+
+.bottom-bar a.active {
+    color: hsl(351, 61%, 24%);
+}
+
+.bottom-bar a:hover {
+    background-color: #ddd;
+    color: black;
+}
+
+@media (max-width: 600px) {
+    .bottom-bar a {
+        font-size: 14px;
+        color: white;
+    }
+
+    .bottom-bar a.active {
+        color: white;
+    }
+
+    .bottom-bar {
+        background-color: hsl(351, 61%, 24%);
+    }
+}
+
+.contents {
+    position: fixed !important;
+    top: 80px; /* Adjusted top value to account for the header height */
+    left: 60%; /* Centering at 40% of the page */
+    transform: translateX(-50%); /* Centering using transform */
+    padding: 10px;
+    width: 60%; /* Adjust the width as needed */
+    z-index: 999; /* Make sure it's above other elements */
+}
+
+@media screen and (max-width: 600px) {
+    /* Your existing media query styles */
+
+    /* Adjust the styles for small screens */
+    .contents {
+    position: fixed;
+    
+
+    width: 100%; /* Adjust the width as needed */
+   z-index: -999 !important;
+    }
+}
+
+
+.bg{
+    background-color: hsl(0deg 0% 94.12%);
+    padding: 20px;
+    border-radius: 10px;
+    margin: 10px;
+}
+
+@media screen and (max-width: 600px) {
+    .bg{
+         width: 90%;
+         }
+}
+
+
+ .popup-container {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+}
+
+
+
+.popup-container {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    border-radius: 8px; /* Add border radius for rounded corners */
+    max-height: 80vh; /* Set maximum height for the popup */
+    overflow-y: auto; /* Add a scrollbar for overflow content */
+}
+
+.popup-container p {
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.popup-container form {
+    display: grid;
+    gap: 15px;
+}
+
+.popup-container label {
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.popup-container input[type="text"],
+.popup-container input[type="number"],
+.popup-container input[type="file"],
+.popup-container input[type="submit"] {
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.popup-container input[type="checkbox"],
+.popup-container input[type="radio"] {
+    margin-right: 5px;
+}
+
+#imagePreviewContainer {
+    margin-top: 10px;
+}
+
+.popup-container button {
+    background-color: #3498db;
+    color: #fff;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.popup-container button:hover {
+    background-color: #2980b9;
+}
