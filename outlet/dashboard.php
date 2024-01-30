@@ -83,6 +83,7 @@ mysqli_close($conn);
     </div>
 
     <div id="content" style="display: none;">
+    
         <div class="header">
             <div class="left-section">
                 <img src="../assets/images/logo/sellbizzhub.png" alt="" class="logo">
@@ -122,6 +123,93 @@ mysqli_close($conn);
 
     </div>
       <div class="popup-overlay"></div>
+      <div class="popup-container" id="popupContainer">
+     
+     <p><b>FILL PRODUCT DETAILS</b></p> 
+    
+     <button class="close-button" onclick="closePopup()">Close</button>
+     
+     <form id="productForm" action="add_product.php" method="post" enctype="multipart/form-data">
+     
+     <label for="product_name"><b>Product Name:</b></label>
+    <input type="text" id="product_name" name="product_name" required>
+
+    <div class="checkbox-container">
+    <label><b>Product Category:</b></label>
+    <div class="checkbox-item">
+        <input type="checkbox" id="categoryFashion" name="product_category[]" value="Fashion">
+        <label for="categoryFashion">Fashion</label>
+    </div>
+
+    <div class="checkbox-item">
+        <input type="checkbox" id="categoryElectronics" name="product_category[]" value="Electronics">
+        <label for="categoryElectronics">Electronics</label>
+    </div>
+
+    <div class="checkbox-item">
+        <input type="checkbox" id="categoryHome" name="product_category[]" value="Home">
+        <label for="categoryHome">Home</label>
+    </div>
+
+    <div class="checkbox-item">
+        <input type="checkbox" id="categoryBeauty" name="product_category[]" value="Beauty">
+        <label for="categoryBeauty">Beauty</label>
+    </div>
+
+    <div class="checkbox-item">
+        <input type="checkbox" id="categoryOutdoors" name="product_category[]" value="Outdoors">
+        <label for="categoryOutdoors">Outdoors</label>
+    </div>
+
+    <div class="checkbox-item">
+        <input type="checkbox" id="categoryHandmade" name="product_category[]" value="Handmade">
+        <label for="categoryHandmade">Handmade</label>
+    </div>
+
+    <div class="checkbox-item">
+        <input type="checkbox" id="categoryEdibles" name="product_category[]" value="Edibles">
+        <label for="categoryEdibles">Edibles</label>
+    </div>
+
+    <div class="checkbox-item">
+        <input type="checkbox" id="categoryOthers" name="product_category[]" value="Others">
+        <label for="categoryOthers">Others</label>
+    </div>
+</div>
+
+
+    <label for="items_in_stock"><b>Items in Stock:</b></label>
+    <input type="number" id="items_in_stock" name="items_in_stock" required>
+
+    <label for="price"><b>Price per one (In Naira):</b></label>
+    <input type="number" id="price" name="price" required>
+
+    <div class="checkbox-container">
+        <label><b>Retail or Wholesale:</b></label>
+        <div class="checkbox-item">
+            <input type="radio" id="product_type_retail" name="product_type" value="Retail">
+            <label for="product_type_retail">Retail</label>
+        </div>
+        <div class="checkbox-item">
+            <input type="radio" id="product_type_wholesale" name="product_type" value="Wholesale">
+            <label for="product_type_wholesale">Wholesale</label>
+        </div>
+    </div>
+ <br>
+
+ 
+ <label for="productImages"><b>Product Images (Max 3):</b></label>
+<input type="file" id="productImages" name="productImages[]" accept="image/*" multiple>
+
+ <!-- Image preview container -->
+ <p style="text-align: center;">Double Click an Image to remove</p>
+ <div id="imagePreviewContainer"></div>
+ <div class="error-message" id="response-message"></div>
+ <input class="submit-button" type="submit" value="Submit">
+
+</form>
+
+ </div>
     <div class="main-body">
     <div id="menu1Content" class="content">
         <div class="bg">
@@ -132,92 +220,7 @@ mysqli_close($conn);
 
       
         <!-- Pop-up container -->
-        <div class="popup-container" id="popupContainer">
-     
-        <p><b>FILL PRODUCT DETAILS</b></p> 
-        <button class="close-button" onclick="closePopup()">Close</button>
-        
-        <form id="productForm">
-    <label for="productName"><b>Product Name:</b></label>
-    <input type="text" id="productName" name="productName" required>
-
-  
-
-    <div class="checkbox-container">
-    <label><b>Product Category:</b></label>
-        <div class="checkbox-item">
-            <input type="checkbox" id="checkbox1" name="checkbox1">
-            <label for="checkbox1">Fashion</label>
-        </div>
-
-        <div class="checkbox-item">
-            <input type="checkbox" id="checkbox1" name="checkbox1">
-            <label for="checkbox1">Electronics</label>
-        </div>
-
-        <div class="checkbox-item">
-            <input type="checkbox" id="checkbox1" name="checkbox1">
-            <label for="checkbox1">Home </label>
-        </div>
-
-        <div class="checkbox-item">
-            <input type="checkbox" id="checkbox1" name="checkbox1">
-            <label for="checkbox1">Beauty </label>
-        </div>
-
-        <div class="checkbox-item">
-            <input type="checkbox" id="checkbox1" name="checkbox1">
-            <label for="checkbox1">Outdoors </label>
-        </div>
-
-        <div class="checkbox-item">
-            <input type="checkbox" id="checkbox1" name="checkbox1">
-            <label for="checkbox1">Handmade </label>
-        </div>
-
-        <div class="checkbox-item">
-            <input type="checkbox" id="checkbox1" name="checkbox1">
-            <label for="checkbox1">Edibles </label>
-        </div>
-
-        <div class="checkbox-item">
-            <input type="checkbox" id="checkbox1" name="checkbox1">
-            <label for="checkbox1">Others</label>
-        </div>
-
-    </div>
-           
-
-    <label for="itemsInStock"><b>Items in Stock:</b></label>
-    <input type="number" id="itemsInStock" name="itemsInStock" required>
-
-    <label for="price"><b>Price per one (In Naira):</b></label>
-    <input type="number" id="price" name="price" required>
-    <div class="checkbox-container">
-    <label><b>Retail or Wholesale:</b></label>
-        <div class="checkbox-item">
-            <input type="radio" id="checkbox1" name="checkbox1">
-            <label for="checkbox1">Retail </label>
-        </div>
-
-        <div class="checkbox-item">
-            <input type="radio" id="checkbox1" name="checkbox1">
-            <label for="checkbox1">Wholesale </label>
-        </div>
-</div>
-<br>
-
-<label for="productImages">Product Images (Max 3):</label>
-    <input type="file" id="productImages" name="productImages[]" accept="image/*" multiple>
-
-    <!-- Image preview container -->
-    <p style="text-align: center;">Double Click an Image to remove</p>
-    <div id="imagePreviewContainer"></div>
-    
-    <input class="submit-button" type="submit" value="Submit">
-   
-</form>
-    </div>
+      
     </div>
 
 
@@ -278,28 +281,34 @@ mysqli_close($conn);
 <script>
 
 document.getElementById('productForm').addEventListener('submit', function (event) {
-        event.preventDefault();
+    event.preventDefault();
 
-        // Create a FormData object to store form data
-        const formData = new FormData(this);
+    // Create a FormData object to store form data
+    const formData = new FormData(this);
 
-        // Use AJAX to send the form data to the PHP script
-        const xhr = new XMLHttpRequest();
-        xhr.open('POST', 'save_product.php', true);
-        xhr.onload = function () {
-            if (xhr.status === 200) {
-                // Handle the response from the server
-                console.log(xhr.responseText);
-                // You can perform additional actions based on the response
+    // Use AJAX to send the form data to the PHP script
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', 'add_product.php', true);
+    xhr.onload = function () {
+        if (xhr.status === 200) {
+            // Handle the response from the server
+            const response = JSON.parse(xhr.responseText);
+            if (response.success) {
+                // Product saved successfully, refresh the page
+                window.location.reload();
             } else {
-                // Handle errors
-                console.error('Error:', xhr.statusText);
+                // Display error message
+                document.getElementById('response-message').innerText = response.message;
             }
-        };
+        } else {
+            // Handle errors
+            console.error('Error:', xhr.statusText);
+        }
+    };
 
-        // Send the FormData object
-        xhr.send(formData);
-    });
+    // Send the FormData object
+    xhr.send(formData);
+});
 
 
 

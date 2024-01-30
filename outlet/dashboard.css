@@ -405,11 +405,12 @@ body {
     padding: 20px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
     z-index: 1000;
-    width: 90%;
+    width: 100%;
     border-radius: 8px; /* Add border radius for rounded corners */
-    height: 80%; /* Set maximum height for the popup */
+    height: 100%; /* Set maximum height for the popup */
     overflow-y: auto; /* Add a scrollbar for overflow content */
-    scrollbar-color: hsl(351, 61%, 24%)  #fff; 
+    scrollbar-color: hsl(351, 61%, 24%) ; 
+
 }
 @media screen and (max-width: 600px) {
     .popup-container{
