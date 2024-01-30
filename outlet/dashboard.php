@@ -121,6 +121,7 @@ mysqli_close($conn);
         <a href="">Sales</a> -->
 
     </div>
+      <div class="popup-overlay"></div>
     <div class="main-body">
     <div id="menu1Content" class="content">
         <div class="bg">
@@ -129,41 +130,92 @@ mysqli_close($conn);
 
         <p class="report">You have <span class="product-number"><b>0</b></span> products listed on your Outlet</b>
 
-        
+      
         <!-- Pop-up container -->
         <div class="popup-container" id="popupContainer">
-        <!-- Your pop-up content goes here -->
-        <p>Fill Product details.  <button onclick="closePopup()">X</button></p> 
-        <form action="#" method="post" enctype="multipart/form-data">
-    <label for="productName">Product Name:</label>
+     
+        <p><b>FILL PRODUCT DETAILS</b></p> 
+        <button class="close-button" onclick="closePopup()">Close</button>
+        
+        <form id="productForm">
+    <label for="productName"><b>Product Name:</b></label>
     <input type="text" id="productName" name="productName" required>
 
-    <label>Product Category:</label>
-    <input type="checkbox" id="categoryClothing" name="categories[]" value="Clothing">
-    <label for="categoryClothing">Clothing</label>
-    <input type="checkbox" id="categoryElectronics" name="categories[]" value="Electronics">
-    <label for="categoryElectronics">Electronics</label>
-    <!-- Add more category checkboxes as needed -->
+  
 
-    <label for="itemsInStock">Items in Stock:</label>
+    <div class="checkbox-container">
+    <label><b>Product Category:</b></label>
+        <div class="checkbox-item">
+            <input type="checkbox" id="checkbox1" name="checkbox1">
+            <label for="checkbox1">Fashion</label>
+        </div>
+
+        <div class="checkbox-item">
+            <input type="checkbox" id="checkbox1" name="checkbox1">
+            <label for="checkbox1">Electronics</label>
+        </div>
+
+        <div class="checkbox-item">
+            <input type="checkbox" id="checkbox1" name="checkbox1">
+            <label for="checkbox1">Home </label>
+        </div>
+
+        <div class="checkbox-item">
+            <input type="checkbox" id="checkbox1" name="checkbox1">
+            <label for="checkbox1">Beauty </label>
+        </div>
+
+        <div class="checkbox-item">
+            <input type="checkbox" id="checkbox1" name="checkbox1">
+            <label for="checkbox1">Outdoors </label>
+        </div>
+
+        <div class="checkbox-item">
+            <input type="checkbox" id="checkbox1" name="checkbox1">
+            <label for="checkbox1">Handmade </label>
+        </div>
+
+        <div class="checkbox-item">
+            <input type="checkbox" id="checkbox1" name="checkbox1">
+            <label for="checkbox1">Edibles </label>
+        </div>
+
+        <div class="checkbox-item">
+            <input type="checkbox" id="checkbox1" name="checkbox1">
+            <label for="checkbox1">Others</label>
+        </div>
+
+    </div>
+           
+
+    <label for="itemsInStock"><b>Items in Stock:</b></label>
     <input type="number" id="itemsInStock" name="itemsInStock" required>
 
-    <label for="price">Price:</label>
+    <label for="price"><b>Price per one (In Naira):</b></label>
     <input type="number" id="price" name="price" required>
+    <div class="checkbox-container">
+    <label><b>Retail or Wholesale:</b></label>
+        <div class="checkbox-item">
+            <input type="radio" id="checkbox1" name="checkbox1">
+            <label for="checkbox1">Retail </label>
+        </div>
 
-    <label>Wholesale or Retail:</label>
-    <input type="radio" id="wholesale" name="saleType" value="Wholesale" required>
-    <label for="wholesale">Wholesale</label>
-    <input type="radio" id="retail" name="saleType" value="Retail" required>
-    <label for="retail">Retail</label>
+        <div class="checkbox-item">
+            <input type="radio" id="checkbox1" name="checkbox1">
+            <label for="checkbox1">Wholesale </label>
+        </div>
+</div>
+<br>
 
-    <label for="productImages">Product Images (Max 3):</label>
+<label for="productImages">Product Images (Max 3):</label>
     <input type="file" id="productImages" name="productImages[]" accept="image/*" multiple>
 
     <!-- Image preview container -->
+    <p style="text-align: center;">Double Click an Image to remove</p>
     <div id="imagePreviewContainer"></div>
-
-    <input type="submit" value="Submit">
+    
+    <input class="submit-button" type="submit" value="Submit">
+   
 </form>
     </div>
     </div>
@@ -225,6 +277,41 @@ mysqli_close($conn);
 
 <script>
 
+document.getElementById('productForm').addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        // Create a FormData object to store form data
+        const formData = new FormData(this);
+
+        // Use AJAX to send the form data to the PHP script
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', 'save_product.php', true);
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                // Handle the response from the server
+                console.log(xhr.responseText);
+                // You can perform additional actions based on the response
+            } else {
+                // Handle errors
+                console.error('Error:', xhr.statusText);
+            }
+        };
+
+        // Send the FormData object
+        xhr.send(formData);
+    });
+
+
+
+
+
+
+
+
+
+
+
+
 document.getElementById('productImages').addEventListener('change', function (event) {
     const previewContainer = document.getElementById('imagePreviewContainer');
     const files = event.target.files;
@@ -250,8 +337,18 @@ document.getElementById('productImages').addEventListener('change', function (ev
             const closeButton = document.createElement('button');
             closeButton.innerText = 'X';
             closeButton.className = 'close-button';
-            closeButton.addEventListener('click', function () {
-                previewContainer.removeChild(imgElement);
+
+            // Set up a timer for double-tap behavior on mobile
+            let lastClickTime = 0;
+            imgElement.addEventListener('click', function () {
+                const currentTime = new Date().getTime();
+                const timeSinceLastClick = currentTime - lastClickTime;
+
+                if (timeSinceLastClick < 300) {
+                    previewContainer.removeChild(imgElement);
+                }
+
+                lastClickTime = currentTime;
             });
 
             // Append the image and close button to the preview container
@@ -262,6 +359,9 @@ document.getElementById('productImages').addEventListener('change', function (ev
         reader.readAsDataURL(file);
     }
 });
+
+
+        
 
 
 

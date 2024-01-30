@@ -368,9 +368,7 @@ body {
 }
 
 @media screen and (max-width: 600px) {
-    /* Your existing media query styles */
 
-    /* Adjust the styles for small screens */
     .contents {
     position: fixed;
     
@@ -395,33 +393,28 @@ body {
 }
 
 
- .popup-container {
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: #fff;
-    padding: 20px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-    z-index: 1000;
-}
-
 
 
 .popup-container {
     display: none;
     position: fixed;
     top: 50%;
-    left: 50%;
+    left: 40%;
     transform: translate(-50%, -50%);
-    background-color: #fff;
+    background-color: #fffdfd;
     padding: 20px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
     z-index: 1000;
+    width: 90%;
     border-radius: 8px; /* Add border radius for rounded corners */
-    max-height: 80vh; /* Set maximum height for the popup */
+    height: 80%; /* Set maximum height for the popup */
     overflow-y: auto; /* Add a scrollbar for overflow content */
+    scrollbar-color: hsl(351, 61%, 24%)  #fff; 
+}
+@media screen and (max-width: 600px) {
+    .popup-container{
+        height: 100%;
+    }
 }
 
 .popup-container p {
@@ -435,10 +428,24 @@ body {
 }
 
 .popup-container label {
-    margin-bottom: 5px;
-    color: #333;
+    display: inline-block !important;
+    margin-right: 10px !important;
 }
 
+.checkbox-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px; /* Adjust the gap between checkboxes as needed */
+}
+
+.checkbox-item {
+    display: flex;
+    align-items: center;
+}
+
+input[type="checkbox"] {
+    margin-right: 5px; /* Adjust the margin between checkbox and title */
+}
 .popup-container input[type="text"],
 .popup-container input[type="number"],
 .popup-container input[type="file"],
@@ -447,6 +454,7 @@ body {
     margin-bottom: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
+    width: 95%;
 }
 
 .popup-container input[type="checkbox"],
@@ -456,10 +464,32 @@ body {
 
 #imagePreviewContainer {
     margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.preview-image {
+    width: auto;
+    height: 200px;
+    margin: 5px; /* Adjust margin as needed */
+}
+
+.submit-button{
+    cursor: pointer;
+    background-color: hsl(351, 61%, 24%) ;
+    color: #fff;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+}
+
+.close-button {
+    margin-left: 5px; /* Adjust margin as needed */
+    cursor: pointer;
 }
 
 .popup-container button {
-    background-color: #3498db;
+    background-color: hsl(351, 61%, 24%) ;
     color: #fff;
     padding: 10px 15px;
     border: none;
@@ -468,5 +498,37 @@ body {
 }
 
 .popup-container button:hover {
-    background-color: #2980b9;
+    background-color:  hsl(351, 61%, 24%) ;
+}
+
+
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #ddd;
+    color: #333;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;  
+}
+
+.close-button:hover {
+    background-color: #bbb;
+}
+
+
+.popup-container::-webkit-scrollbar {
+    width: 12px; /* Width of the entire scrollbar */
+}
+
+.popup-container::-webkit-scrollbar-track {
+    background: #fff; /* Color of the tracking area */
+}
+
+.popup-container::-webkit-scrollbar-thumb {
+    background-color: hsl(351, 61%, 24%) ; /* Color of the scrollbar thumb */
+    border-radius: 6px; /* Roundness of the scrollbar thumb */
+    border: 3px solid #fff; /* Border color around the thumb */
 }
