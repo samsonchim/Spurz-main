@@ -12,7 +12,8 @@ CREATE TABLE products (
     product_category VARCHAR(255) NOT NULL,
     price INT NOT NULL,
     items_in_stock INT NOT NULL,
-    product_type VARCHAR(50) NOT NULL
+    product_type VARCHAR(50) NOT NULL,
+    user_id INT NOT NULL
 );
 
 -- Set the starting value for the AUTO_INCREMENT column
