@@ -25,7 +25,7 @@ if (!isset($_SESSION['id'])) {
 $user_id = $_SESSION['id'];
 
 // Fetch the first two recent products for the logged-in user
-$sql = "SELECT product_name, product_category, price FROM products WHERE user_id = ? ORDER BY product_id DESC LIMIT 2";
+$sql = "SELECT product_id, product_name, product_category, price FROM products WHERE user_id = ? ORDER BY product_id DESC LIMIT 2";
 $stmt = $conn->prepare($sql);
 
 if ($stmt) {
@@ -39,6 +39,7 @@ if ($stmt) {
     // Add product information to the array
     while ($row = $result->fetch_assoc()) {
         $products[] = [
+            'product_id' => $row['product_id'],
             'product_name' => $row['product_name'],
             'product_category' => $row['product_category'],
             'price' => $row['price'],

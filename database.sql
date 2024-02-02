@@ -18,3 +18,12 @@ CREATE TABLE products (
 
 -- Set the starting value for the AUTO_INCREMENT column
 ALTER TABLE products AUTO_INCREMENT = 2000;
+
+
+ALTER TABLE outlets
+ADD COLUMN account_no INT (20),
+ADD COLUMN account_name VARCHAR (255),
+ADD COLUMN bank_name VARCHAR (255),
+ADD COLUMN phone_no VARCHAR(15),
+ADD COLUMN business_logo VARCHAR(255),
+ADD COLUMN location VARCHAR(255);
