@@ -142,12 +142,12 @@
   </div>
   <!---->
 <script>
-function submitForm() {
+ function submitForm() {
     var xhr = new XMLHttpRequest();
     var form = document.querySelector('form');
     var formData = new FormData(form);
 
-    xhr.open('POST', 'signup.php', true);
+    xhr.open('POST', 'php/signup.php', true);
 
     xhr.onreadystatechange = function() {
         if (xhr.readyState == 4) {
