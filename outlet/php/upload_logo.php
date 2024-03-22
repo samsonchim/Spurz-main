@@ -28,7 +28,7 @@ if (isset($_FILES["logo"]) && in_array($_FILES["logo"]["type"], $allowedTypes)) 
         $servername = "localhost";
         $username = "root";
         $password = "";
-        $dbname = "Sellbizzhub";
+        $dbname = "spurz";
 
         $conn = new mysqli($servername, $username, $password, $dbname);
 

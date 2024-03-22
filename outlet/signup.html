@@ -42,7 +42,7 @@
              
               <div class="card card-md">
                 <div class="card-body">
-                  <div class="error-message" id="response-message" style="text-align: center;"></div>
+                 
                   <h2 class="h2 text-center mb-4">Create an Outlet</h2>
                   <form action="php/signup.php" method="post" onsubmit="return validateForm()">
                 
@@ -139,6 +139,8 @@
                           
                         </div>
                       </div>
+                      <div class="error-message" id="response-message" style="text-align: center; color: rgb(231, 0, 0);"></div>
+                    
                     
                     <div class="form-footer">
                       <button  type="button" onclick="submitForm()" class="btn btn-primary w-100">Sign in</button>
@@ -181,7 +183,7 @@
                 // Check for success message in the response
                 if (xhr.responseText.trim() === 'Registration Successful') {
                     // Redirect to login.html
-                    window.location.href = 'dashboard.php';
+                    window.location.href = 'profile.php';
                 }
             } else {
                 // Handle other HTTP status codes or errors

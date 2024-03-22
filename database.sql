@@ -9,10 +9,14 @@ CREATE TABLE IF NOT EXISTS outlets (
 CREATE TABLE products (
     product_id INT AUTO_INCREMENT PRIMARY KEY,
     product_name VARCHAR(255) NOT NULL,
+    product_description VARCHAR (255) NOT NULL,
     product_category VARCHAR(255) NOT NULL,
     price INT NOT NULL,
     items_in_stock INT NOT NULL,
     product_type VARCHAR(50) NOT NULL,
+    meta_tags VARCHAR (255) NOT NULL.
+    live BIT NOT NULL,
+    promote VARCHAR(255) NOT NULL,
     user_id INT NOT NULL
 );
 

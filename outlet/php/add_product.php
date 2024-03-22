@@ -2,7 +2,7 @@
 $servername = "localhost";
 $username = "root";
 $password = "";
-$dbname = "sellbizzhub";
+$dbname = "spurz";
 
 
 session_start();
@@ -19,6 +19,7 @@ if (isset($_SESSION['id'])) {
 
     // Initialize other variables with default values
     $product_name = isset($_POST['product_name']) ? $_POST['product_name'] : '';
+    $product_description = isset($_POST['product_description']) ? $_POST['product_description'] : '';
     $product_category = isset($_POST['product_category']) ? implode(',', $_POST['product_category']) : '';
     $items_in_stock = isset($_POST['items_in_stock']) ? $_POST['items_in_stock'] : '';
     $price = isset($_POST['price']) ? $_POST['price'] : '';
@@ -55,9 +56,10 @@ if (isset($_SESSION['id'])) {
         // Get the last inserted product ID
         $lastProductId = $stmt->insert_id;
 
-        // Rename and move the images to the specified format
+                // Rename and move the images to the specified format
+            // Rename and move the images to the specified format
         foreach ($uploadedFiles as $key => $image) {
-            $newFileName = $lastProductId . "(" . ($key + 1) . ").png";
+            $newFileName = $lastProductId . "_(" . ($key + 1) . ").png";
             $newFilePath = $targetDir . $newFileName;
             rename($image, $newFilePath);
         }

@@ -3,7 +3,7 @@
 $servername = "localhost";
 $username = "root";
 $password = "";
-$dbname = "Sellbizzhub";
+$dbname = "spurz";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
@@ -357,86 +357,97 @@ mysqli_close($conn);
             </div>
           </div>
         </div>
+<style>
+  .product_image{
+    height: 50%;
+    width: 50%;
+  }
 
+  .see_products{
+    text-align: center !important;
+  }
+</style>
        <script>
  // Fetch products from the server and update local storage
- function fetchAndAppendProducts() {
-            // Make an AJAX request to fetch products from the server
-            fetch('php/fetch_products.php')
-                .then(response => response.json())
-                .then(data => {
-                    // Update local storage with the fetched products
-                    localStorage.setItem('userProducts', JSON.stringify(data));
+function fetchAndAppendProducts() {
+    // Make an AJAX request to fetch products from the server
+    fetch('php/fetch_products.php')
+        .then(response => response.json())
+        .then(data => {
+            // Update local storage with the fetched products
+            localStorage.setItem('userProducts', JSON.stringify(data));
 
-                    // Get the containers to append new cards
-                    const container1 = document.getElementById('product-column');
-                    const container2 = document.getElementById('product-column-2');
+            // Get the containers to append new cards
+            const container1 = document.getElementById('product-column');
+            const container2 = document.getElementById('product-column-2');
 
-                    // Loop through the fetched records and create new card elements
-                    for (let i = 0; i < data.length; i++) {
-                        const product = data[i];
+            // Loop through the fetched records and create new card elements
+            for (let i = 0; i < data.length; i++) {
+                const product = data[i];
 
-                        // Create a new card element
-                        const card = document.createElement('div');
-                        card.id = `product-card-${i}`;
-                        card.className = 'card';
+                // Generate the URL for the first product image based on the product ID
+                const imageUrl = `php/uploads/${product.product_id}_(1).png`; // Assuming the image extension is always PNG
 
-                        // Populate the card with product data
-                        card.innerHTML = `
-                            <div class="card-body">
-                                <div class="row align-items-center">
-                                    <div class="col-3" id="product-image-${i}">
-                                        <img src="${product.image}" alt="${product.product_name}" class="rounded">
-                                    </div>
-                                    <div class="col">
-                                        <h3 class="card-title mb-1">
-                                            <a href="#" class="text-reset">${product.product_name}</a>
-                                        </h3>
-                                        <div class="text-muted">
-                                            ${product.product_category}
-                                        </div>
-                                        <div class="mt-3">
-                                            <div class="row g-2 align-items-center">
-                                                <div class="col-auto">
-                                                    &#x20A6; ${product.price}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-auto">
-                                        <div class="dropdown">
-                                            <a href="#" class="btn-action" data-bs-toggle="dropdown" aria-expanded="false">
-                                                <!-- Download SVG icon from http://tabler-icons.io/i/dots-vertical -->
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /><path d="M12 19m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /><path d="M12 5m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /></svg>
-                                            </a>
-                                            <div class="dropdown-menu dropdown-menu-end">
-                                                <a href="#" class="dropdown-item">Import</a>
-                                                <a href="#" class="dropdown-item">Export</a>
-                                                <a href="#" class="dropdown-item">Download</a>
-                                                <a href="#" class="dropdown-item text-danger">Delete</a>
-                                            </div>
+                // Create a new card element
+                const card = document.createElement('div');
+                card.id = `product-card-${i}`;
+                card.className = 'card';
+
+                // Populate the card with product data
+                card.innerHTML = `
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-3" id="product-image-${i}">
+                                <img class="product_image" src="${imageUrl}" alt="${product.product_name}" class="rounded">
+                            </div>
+                            <div class="col">
+                                <h3 class="card-title mb-1">
+                                    <a href="#" class="text-reset">${product.product_name}</a>
+                                </h3>
+                                <div class="text-muted">
+                                    ${product.product_category}
+                                </div>
+                                <div class="mt-3">
+                                    <div class="row g-2 align-items-center">
+                                        <div class="col-auto">
+                                            &#x20A6; ${product.price}
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        `;
+                            <div class="col-auto">
+                                <div class="dropdown">
+                                    <a href="#" class="btn-action" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <!-- Download SVG icon from http://tabler-icons.io/i/dots-vertical -->
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /><path d="M12 19m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /><path d="M12 5m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /></svg>
+                                    </a>
+                                    <div class="dropdown-menu dropdown-menu-end">
+                                        <a href="#" class="dropdown-item">Go Live</a>
+                                        <a href="#" class="dropdown-item">Promote</a>
+                                        <a href="#" class="dropdown-item text-danger">Delete</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
 
-                        // Append the new card to the respective container
-                        if (i % 2 === 0) {
-                            container1.appendChild(card);
-                        } else {
-                            container2.appendChild(card);
-                        }
-                    }
-                })
-                .catch(error => console.error('Error fetching and appending products:', error));
-        }
+                // Append the new card to the respective container
+                if (i % 2 === 0) {
+                    container1.appendChild(card);
+                } else {
+                    container2.appendChild(card);
+                }
+            }
+        })
+        .catch(error => console.error('Error fetching and appending products:', error));
+}
 
-        // Call the function when the page loads
-        fetchAndAppendProducts();
+// Call the function when the page loads
+fetchAndAppendProducts();
+
     </script>
 
-    </script>
 
        </script>
        <div class="page-body">
@@ -449,7 +460,7 @@ mysqli_close($conn);
                     <!-- The fetched products will be appended here -->
                 </div>
             </div>
-            <a href="">See all Products</a>
+            <a class="see_products" href="">See all Products</a>
         </div>
        
     </div>
@@ -925,6 +936,9 @@ mysqli_close($conn);
             <form id="productForm" action="php/add_product.php" method="post" enctype="multipart/form-data">
               <label class="form-label">Product Name</label>
               <input type="text" class="form-control"  id="product_name" name="product_name"  placeholder="Men's Eyeglass" required>
+
+              <label class="form-label">Product Description</label>
+              <input type="text" class="form-control"  id="product_description" name="product_description"  placeholder="Red Men's elegant Eyeglass with variant of colors" required>
             </div>
 
             <label class="form-label">Product Category (Select all the applies)</label>
@@ -961,8 +975,18 @@ mysqli_close($conn);
                               </label>
 
                               <label class="form-selectgroup-item">
+                                <input type="checkbox" type="checkbox" id="digitalProducts" name="product_category[]" value="Digital Products" class="form-selectgroup-input">
+                                <span class="form-selectgroup-label">Digital Products</span>
+                              </label>
+
+                              <label class="form-selectgroup-item">
+                                <input type="checkbox" type="checkbox" id="services" name="product_category[]" value="Services" class="form-selectgroup-input">
+                                <span class="form-selectgroup-label">Services</span>
+                              </label>
+
+                              <label class="form-selectgroup-item">
                                 <input type="checkbox" type="checkbox" id="categoryOthers" name="product_category[]" value="Others" class="form-selectgroup-input">
-                                <span class="form-selectgroup-label">Edibles</span>
+                                <span class="form-selectgroup-label">others</span>
                               </label>
     </div>
             <label class="form-label">Product type</label>

@@ -4,7 +4,7 @@ session_start(); // Start the session
 $servername = "localhost";
 $username = "root";
 $password = "";
-$dbname = "Sellbizzhub";
+$dbname = "spurz";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
@@ -33,6 +33,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Check if password and confirm password match
     if ($password != $cpassword) {
         echo "Password and Confirm Password do not match.";
+        exit();
+    }
+
+    // Check if the password is at least 8 characters long
+    if (strlen($password) < 8) {
+        echo "Password should be at least 8 characters long.";
+        exit();
+    }
+
+    // Check if the email already exists in the database
+    $checkEmailQuery = "SELECT * FROM outlets WHERE email = ?";
+    $stmt = $conn->prepare($checkEmailQuery);
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        echo "Email already exists. Please choose a different email.";
         exit();
     }
 
