@@ -4,7 +4,6 @@ $username = "root";
 $password = "";
 $dbname = "spurz";
 
-
 session_start();
 
 $conn = new mysqli($servername, $username, $password, $dbname);
@@ -12,7 +11,6 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
-
 
 if (isset($_SESSION['id'])) {
     $user_id = $_SESSION['id'];
@@ -23,6 +21,7 @@ if (isset($_SESSION['id'])) {
     $product_category = isset($_POST['product_category']) ? implode(',', $_POST['product_category']) : '';
     $items_in_stock = isset($_POST['items_in_stock']) ? $_POST['items_in_stock'] : '';
     $price = isset($_POST['price']) ? $_POST['price'] : '';
+    $meta_tags = isset($_POST['meta_tags']) ? $_POST['meta_tags'] : '';
     $product_type = isset($_POST['product_type']) ? $_POST['product_type'] : '';
 
     // Handle file uploads
@@ -42,22 +41,21 @@ if (isset($_SESSION['id'])) {
     }
 
     // Insert data into the database
-    $sql = "INSERT INTO products (user_id, product_name, product_category, items_in_stock, price, product_type)
-            VALUES (?, ?, ?, ?, ?, ?)";
+    $sql = "INSERT INTO products (user_id, product_name, product_description, product_category, items_in_stock, meta_tags, price, product_type)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
     // Prepare the SQL statement with placeholders
     $stmt = $conn->prepare($sql);
 
     // Bind parameters and execute the statement
-    $stmt->bind_param("issdis", $user_id, $product_name, $product_category, $items_in_stock, $price, $product_type);
+    $stmt->bind_param("isssdsss", $user_id, $product_name, $product_description, $product_category, $items_in_stock, $meta_tags, $price, $product_type);
     $stmt->execute();
 
     if ($stmt->affected_rows > 0) {
         // Get the last inserted product ID
         $lastProductId = $stmt->insert_id;
 
-                // Rename and move the images to the specified format
-            // Rename and move the images to the specified format
+        // Rename and move the images to the specified format
         foreach ($uploadedFiles as $key => $image) {
             $newFileName = $lastProductId . "_(" . ($key + 1) . ").png";
             $newFilePath = $targetDir . $newFileName;
@@ -74,7 +72,7 @@ if (isset($_SESSION['id'])) {
     // Close the prepared statement and the database connection
     $stmt->close();
 } else {
-    //
+    // User not logged in
     echo json_encode(array('success' => false, 'message' => 'User not logged in'));
 }
 

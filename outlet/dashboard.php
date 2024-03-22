@@ -939,6 +939,10 @@ fetchAndAppendProducts();
 
               <label class="form-label">Product Description</label>
               <input type="text" class="form-control"  id="product_description" name="product_description"  placeholder="Red Men's elegant Eyeglass with variant of colors" required>
+
+              <label class="form-label">Search Tags</label>
+              <input type="text" class="form-control"  id="meta_tags" name="meta_tags"  placeholder="Something like: Fashion, Cloths, Men's Wear" required>
+          
             </div>
 
             <label class="form-label">Product Category (Select all the applies)</label>
@@ -1033,7 +1037,8 @@ fetchAndAppendProducts();
               
             </div>
           </div>
-          <div class="modal-body">
+         
+              <div class="modal-body">
             <div class="row">
             <label for="productImages"><b>Product Images (Max 3):</b></label>
                     <input class="form-control" type="file" id="productImages" name="productImages[]" accept="image/*" multiple>

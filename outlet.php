@@ -63,8 +63,7 @@ if (isset($_GET['id'])) {
     echo "ID parameter not found in the URL.";
 }
 
-// Close the database connection
-$conn->close();
+
 ?>
 
 <!DOCTYPE html>
@@ -431,7 +430,7 @@ $conn->close();
                                             <style>
                                             .carousel {
                                                     position: relative;
-                                                    width: 300px; /* Adjust as needed */
+                                                    width: 350px; /* Adjust as needed */
                                                     height: 400px; /* Adjust as needed */
                                                     overflow: hidden;
                                                     }
@@ -453,39 +452,70 @@ $conn->close();
                     <div class="row shop_wrapper grid_3">
 
                         <!-- Single Product Start -->
-                        <div class="col-lg-4 col-md-4 col-sm-6 product" data-aos="fade-up" data-aos-delay="200">
-                            <div class="product-inner">
-                                <div class="thumb">
-                                    <div id="carousel" class="carousel">
-                                    <img class="first-image" src="outlet/assets/images/products/medium-size/2.jpg" alt="Product" />
-                                    <img class="second-image" src="outlet/assets/images/products/medium-size/3.jpg" alt="Product" />
-                                    <img class="third-image" src="https://th.bing.com/th/id/OIP.edoBfWGEEdPvms3ztVBpqwHaE7?w=231&h=180&c=7&r=0&o=5&pid=1.7" alt="Product" />
-                                </div>
-                                    <div class="actions">
-                                        <a href="" title="Like Product" class="action wishlist"><i class="pe-7s-like"></i></a>
-                                        </div>
-                                </div>
-                                <div class="content">
-                                    <h5 class="title">Studio Design</a></h5>
-                                    <h6 class="sub-title">This will be the product sd</a></h6>
-                                    <span class="ratings">
-                                            <span class="rating-wrap">
-                                                <span class="star" style="width: 100%"></span>
-                                    </span>
-                                    <span class="rating-num">(4)</span>
-                                    </span>
-                                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce posuere metus vitae arcu imperdiet, id aliquet ante scelerisque. Sed sit amet sem vitae urna fringilla tempus.</p>
-                                    <span class="price">
-                                            <span class="new">$40.50</span>
-                                    <span class="old">$42.85</span>
-                                    </span>
-                                    <div class="shop-list-btn">
-                                        <a title="Like Product" href="#" class="btn btn-sm btn-outline-dark btn-hover-primary wishlist"><i class="fa fa-heart"></i></a>
-                                        <button class="btn btn-sm btn-outline-dark btn-hover-primary" title="Add To Cart">Add To Cart</button>
-                                     </div>
-                                </div>
-                            </div>
-                        </div>
+                        <?php
+                            // Assuming $id contains the user_id you want to filter products for
+                           
+                            // Fetch products from the database based on user_id
+                            $sql = "SELECT * FROM products WHERE user_id = ?";
+                            $stmt = $conn->prepare($sql);
+                            $stmt->bind_param("i", $id);
+                            $stmt->execute();
+                            $result = $stmt->get_result();
+
+                            // Check if there are products
+                            if ($result->num_rows > 0) {
+                                // Loop through each product
+                                while ($row = $result->fetch_assoc()) {
+                                    $product_name = $row['product_name'];
+                                    $product_description = $row['product_description'];
+                                    $price = $row['price'];
+                                    $product_id = $row['product_id']; // Assuming you have product_id in your database
+
+                                    // Calculate the old price (20% less than the new price)
+                                    $old_price = $price * 3.0;
+
+                                    // Output HTML structure with fetched product details
+                                    echo '<div class="col-lg-4 col-md-4 col-sm-6 product" data-aos="fade-up" data-aos-delay="200">';
+                                    echo '<div class="product-inner">';
+                                    echo '<div class="thumb">';
+                                    echo '<div id="carousel" class="carousel">';
+                                    // Output images here
+                                    for ($i = 1; $i <= 3; $i++) {
+                                        $image_path = "outlet/php/uploads/{$product_id}_({$i}).png";
+                                        // Check if the image file exists
+                                        if (file_exists($image_path)) {
+                                            echo '<img class="carousel-item" src="' . $image_path . '" alt="Product Image">';
+                                        }
+                                    }
+                                    echo '</div>';
+                                    echo '<div class="actions">';
+                                    echo '<a href="" title="Like Product" class="action wishlist"><i class="pe-7s-like"></i></a>';
+                                    echo '</div>';
+                                    echo '</div>';
+                                    echo '<div class="content">';
+                                    echo '<h5 class="title"><a href="single-product.html">' . $product_name . '</a></h5>';
+                                    echo '<h4 class="sub-title"><a href="single-product.html">' . $product_description . '</a></h4>';
+                                    echo '<span class="price">';
+                                    echo '<span class="new">$' . number_format($price, 2) . '</span>'; // Display new price
+                                    echo '<span class="old">$' . number_format($old_price, 2) . '</span>'; // Display old price
+                                    echo '</span>';
+                                    echo '<div class="shop-list-btn">';
+                                    echo '<a title="Like Product" href="#" class="btn btn-sm btn-outline-dark btn-hover-primary wishlist"><i class="fa fa-heart"></i></a>';
+                                    echo '<button class="btn btn-sm btn-outline-dark btn-hover-primary" title="Add To Cart">Add To Cart</button>';
+                                    echo '</div>';
+                                    echo '</div>';
+                                    echo '</div>';
+                                    echo '</div>';
+                                }
+                            } else {
+                                echo 'No products found.';
+                            }
+
+                            // Close the prepared statement and the database connection
+                            $stmt->close();
+                            $conn->close();
+                            ?>
+
                         <!-- Single Product End -->
 
                      

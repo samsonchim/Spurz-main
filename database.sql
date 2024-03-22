@@ -14,7 +14,7 @@ CREATE TABLE products (
     price INT NOT NULL,
     items_in_stock INT NOT NULL,
     product_type VARCHAR(50) NOT NULL,
-    meta_tags VARCHAR (255) NOT NULL.
+    meta_tags VARCHAR (255) NOT NULL,
     live BIT NOT NULL,
     promote VARCHAR(255) NOT NULL,
     user_id INT NOT NULL
