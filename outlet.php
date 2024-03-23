@@ -184,9 +184,9 @@ if (isset($_GET['id'])) {
                                 <!-- Wishlist Header Action Button End -->
 
                                 <!-- Shopping Cart Header Action Button Start -->
-                                <a href="javascript:void(0)" class="header-action-btn header-action-btn-cart">
+                                <a href="cart.html" class="header-action-btn header-action-btn-cart">
                                     <i class="pe-7s-shopbag"></i>
-                                    <span class="header-action-num">3</span>
+                                    <span class="header-action-num"></span>
                                 </a>
                                 <!-- Shopping Cart Header Action Button End -->
 
@@ -267,129 +267,7 @@ if (isset($_GET['id'])) {
         <!-- Mobile Menu End -->
 
       
-        <!-- Offcanvas Search End -->
-
-        <!-- Cart Offcanvas Start -->
-        <div class="cart-offcanvas-wrapper">
-            <div class="offcanvas-overlay"></div>
-
-            <!-- Cart Offcanvas Inner Start -->
-            <div class="cart-offcanvas-inner">
-
-                <!-- Button Close Start -->
-                <div class="offcanvas-btn-close">
-                    <i class="pe-7s-close"></i>
-                </div>
-                <!-- Button Close End -->
-
-                <!-- Offcanvas Cart Content Start -->
-                <div class="offcanvas-cart-content">
-                    <!-- Offcanvas Cart Title Start -->
-                    <h2 class="offcanvas-cart-title mb-10">Shopping Cart</h2>
-                    <!-- Offcanvas Cart Title End -->
-
-                    <!-- Cart Product/Price Start -->
-                    <div class="cart-product-wrapper mb-6">
-
-                        <!-- Single Cart Product Start -->
-                        <div class="single-cart-product">
-                            <div class="cart-product-thumb">
-                                <a href="single-product.html"><img src="outlet/assets/images/products/small-product/1.jpg" alt="Cart Product"></a>
-                            </div>
-                            <div class="cart-product-content">
-                                <h3 class="title"><a href="single-product.html">Brother Hoddies in Grey</a></h3>
-                                <span class="price">
-								<span class="new">$38.50</span>
-                                <span class="old">$40.00</span>
-                                </span>
-                            </div>
-                        </div>
-                        <!-- Single Cart Product End -->
-
-                        <!-- Product Remove Start -->
-                        <div class="cart-product-remove">
-                            <a href="#"><i class="fa fa-trash"></i></a>
-                        </div>
-                        <!-- Product Remove End -->
-
-                    </div>
-                    <!-- Cart Product/Price End -->
-
-                    <!-- Cart Product/Price Start -->
-                    <div class="cart-product-wrapper mb-6">
-
-                        <!-- Single Cart Product Start -->
-                        <div class="single-cart-product">
-                            <div class="cart-product-thumb">
-                                <a href="single-product.html"><img src="outlet/assets/images/products/small-product/2.jpg" alt="Cart Product"></a>
-                            </div>
-                            <div class="cart-product-content">
-                                <h3 class="title"><a href="single-product.html">Basic Jogging Shorts</a></h3>
-                                <span class="price">
-								<span class="new">$14.50</span>
-                                <span class="old">$18.00</span>
-                                </span>
-                            </div>
-                        </div>
-                        <!-- Single Cart Product End -->
-
-                        <!-- Product Remove Start -->
-                        <div class="cart-product-remove">
-                            <a href="#"><i class="fa fa-trash"></i></a>
-                        </div>
-                        <!-- Product Remove End -->
-
-                    </div>
-                    <!-- Cart Product/Price End -->
-
-                    <!-- Cart Product/Price Start -->
-                    <div class="cart-product-wrapper mb-6">
-
-                        <!-- Single Cart Product Start -->
-                        <div class="single-cart-product">
-                            <div class="cart-product-thumb">
-                                <a href="single-product.html"><img src="outlet/assets/images/products/small-product/3.jpg" alt="Cart Product"></a>
-                            </div>
-                            <div class="cart-product-content">
-                                <h3 class="title"><a href="single-product.html">Enjoy The Rest T-Shirt</a></h3>
-                                <span class="price">
-								<span class="new">$20.00</span>
-                                <span class="old">$21.00</span>
-                                </span>
-                            </div>
-                        </div>
-                        <!-- Single Cart Product End -->
-
-                        <!-- Product Remove Start -->
-                        <div class="cart-product-remove">
-                            <a href="#"><i class="fa fa-trash"></i></a>
-                        </div>
-                        <!-- Product Remove End -->
-
-                    </div>
-                    <!-- Cart Product/Price End -->
-
-                    <!-- Cart Product Total Start -->
-                    <div class="cart-product-total">
-                        <span class="value">Subtotal</span>
-                        <span class="price">220$</span>
-                    </div>
-                    <!-- Cart Product Total End -->
-
-                    <!-- Cart Product Button Start -->
-                    <div class="cart-product-btn mt-4">
-                        <a href="cart.html" class="btn btn-dark btn-hover-primary rounded-0 w-100">View cart</a>
-                        <a href="checkout.html" class="btn btn-dark btn-hover-primary rounded-0 w-100 mt-4">Checkout</a>
-                    </div>
-                    <!-- Cart Product Button End -->
-
-                </div>
-                <!-- Offcanvas Cart Content End -->
-
-            </div>
-            <!-- Cart Offcanvas Inner End -->
-        </div>
-        <!-- Cart Offcanvas End -->
+    
 
     </div>
 
@@ -428,17 +306,18 @@ if (isset($_GET['id'])) {
                     </div>
                     <!--shop toolbar end-->
                                             <style>
+                                                
                                             .carousel {
                                                     position: relative;
-                                                    width: 350px; /* Adjust as needed */
-                                                    height: 400px; /* Adjust as needed */
+                                                    width: 320px;
+                                                    height: 400px;
                                                     overflow: hidden;
                                                     }
 
                                                     .carousel img {
                                                     display: none;
-                                                    width: 100%; /* Ensures images fill the container */
-                                                    height: 100%; /* Ensures images fill the container */
+                                                    width: 100%; 
+                                                    height: 100%;
                                                     object-fit: cover; /* Ensures images maintain aspect ratio and cover the container */
                                                     }
 
@@ -453,68 +332,73 @@ if (isset($_GET['id'])) {
 
                         <!-- Single Product Start -->
                         <?php
-                            // Assuming $id contains the user_id you want to filter products for
-                           
-                            // Fetch products from the database based on user_id
-                            $sql = "SELECT * FROM products WHERE user_id = ?";
-                            $stmt = $conn->prepare($sql);
-                            $stmt->bind_param("i", $id);
-                            $stmt->execute();
-                            $result = $stmt->get_result();
+// Assuming $id contains the user_id you want to filter products for
 
-                            // Check if there are products
-                            if ($result->num_rows > 0) {
-                                // Loop through each product
-                                while ($row = $result->fetch_assoc()) {
-                                    $product_name = $row['product_name'];
-                                    $product_description = $row['product_description'];
-                                    $price = $row['price'];
-                                    $product_id = $row['product_id']; // Assuming you have product_id in your database
+// Fetch products from the database based on user_id
+$sql = "SELECT * FROM products WHERE user_id = ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $id);
+$stmt->execute();
+$result = $stmt->get_result();
 
-                                    // Calculate the old price (20% less than the new price)
-                                    $old_price = $price * 3.0;
+// Check if there are products
+if ($result->num_rows > 0) {
+    // Loop through each product
+    while ($row = $result->fetch_assoc()) {
+        $product_name = htmlspecialchars($row['product_name']);
+        $product_description = htmlspecialchars($row['product_description']);
+        $price = $row['price'];
+        $product_id = $row['product_id']; // Assuming you have product_id in your database
 
-                                    // Output HTML structure with fetched product details
-                                    echo '<div class="col-lg-4 col-md-4 col-sm-6 product" data-aos="fade-up" data-aos-delay="200">';
-                                    echo '<div class="product-inner">';
-                                    echo '<div class="thumb">';
-                                    echo '<div id="carousel" class="carousel">';
-                                    // Output images here
-                                    for ($i = 1; $i <= 3; $i++) {
-                                        $image_path = "outlet/php/uploads/{$product_id}_({$i}).png";
-                                        // Check if the image file exists
-                                        if (file_exists($image_path)) {
-                                            echo '<img class="carousel-item" src="' . $image_path . '" alt="Product Image">';
-                                        }
-                                    }
-                                    echo '</div>';
-                                    echo '<div class="actions">';
-                                    echo '<a href="" title="Like Product" class="action wishlist"><i class="pe-7s-like"></i></a>';
-                                    echo '</div>';
-                                    echo '</div>';
-                                    echo '<div class="content">';
-                                    echo '<h5 class="title"><a href="single-product.html">' . $product_name . '</a></h5>';
-                                    echo '<h4 class="sub-title"><a href="single-product.html">' . $product_description . '</a></h4>';
-                                    echo '<span class="price">';
-                                    echo '<span class="new">$' . number_format($price, 2) . '</span>'; // Display new price
-                                    echo '<span class="old">$' . number_format($old_price, 2) . '</span>'; // Display old price
-                                    echo '</span>';
-                                    echo '<div class="shop-list-btn">';
-                                    echo '<a title="Like Product" href="#" class="btn btn-sm btn-outline-dark btn-hover-primary wishlist"><i class="fa fa-heart"></i></a>';
-                                    echo '<button class="btn btn-sm btn-outline-dark btn-hover-primary" title="Add To Cart">Add To Cart</button>';
-                                    echo '</div>';
-                                    echo '</div>';
-                                    echo '</div>';
-                                    echo '</div>';
-                                }
-                            } else {
-                                echo 'No products found.';
+        // Calculate the old price (20% less than the new price)
+        $old_price = $price * 1.3;
+
+        // Output HTML structure with fetched product details
+        ?>
+        <div class="col-lg-4 col-md-4 col-sm-6 product" data-aos="fade-up" data-aos-delay="200">
+            <div class="product-inner">
+                <div class="thumb">
+                    <div id="carousel-<?php echo $product_id; ?>" class="carousel">
+                        <?php
+                        // Output images here for this product
+                        for ($i = 1; $i <= 3; $i++) {
+                            $image_path = "outlet/php/uploads/{$product_id}_({$i}).png";
+                            // Check if the image file exists
+                            if (file_exists($image_path)) {
+                                echo '<img class="carousel-item" src="' . $image_path . '" alt="Product Image">';
                             }
+                        }
+                        ?>
+                    </div>
+                    <div class="actions">
+                        <a href="" title="Like Product" class="action wishlist"><i class="pe-7s-like"></i></a>
+                    </div>
+                </div>
+                <div class="content">
+                    <h5 class="title"><a href="single-product.html"><?php echo $product_name; ?></a></h5>
+                    <h4 class="sub-title"><a href="single-product.html"><?php echo $product_description; ?></a></h4>
+                    <span class="price">
+                        <span class="new">₦<?php echo number_format($price, 2); ?></span> <!-- Display new price -->
+                        <span class="old">₦<?php echo number_format($old_price, 2); ?></span> <!-- Display old price -->
+                    </span>
+                    <div class="shop-list-btn">
+                        <a title="Like Product" href="#" class="btn btn-sm btn-outline-dark btn-hover-primary wishlist"><i class="fa fa-heart"></i></a>
+                        <button class="btn btn-sm btn-outline-dark btn-hover-primary btn-add-to-cart" title="Add To Cart" data-product-name="<?php echo $product_name; ?>" data-product-description="<?php echo $product_description; ?>" data-price="<?php echo $price; ?>" data-product-id="<?php echo $product_id; ?>" data-user-id="<?php echo $id; ?>">Add To Cart</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <?php
+    }
+} else {
+    echo 'No products found.';
+}
 
-                            // Close the prepared statement and the database connection
-                            $stmt->close();
-                            $conn->close();
-                            ?>
+// Close the prepared statement and the database connection
+$stmt->close();
+$conn->close();
+?>
+
 
                         <!-- Single Product End -->
 
@@ -713,24 +597,93 @@ if (isset($_GET['id'])) {
 
         <script>
                         // Get all carousel images
-                const carouselImages = document.querySelectorAll('.carousel img');
+                        document.addEventListener('DOMContentLoaded', function () {
+    // Select all carousel containers
+    const carousels = document.querySelectorAll('.carousel');
 
-            // Set initial index and show the first image
-            let currentIndex = 0;
+    // Iterate over each carousel container
+    carousels.forEach(function (carousel) {
+        // Select images within the current carousel container
+        const carouselImages = carousel.querySelectorAll('img');
+
+        // Set initial index and show the first image for the current carousel
+        let currentIndex = 0;
+        carouselImages[currentIndex].style.display = 'block';
+
+        // Function to switch to the next image for the current carousel
+        function showNextImage() {
+            // Hide the current image
+            carouselImages[currentIndex].style.display = 'none';
+            // Increment the index
+            currentIndex = (currentIndex + 1) % carouselImages.length;
+            // Show the next image
             carouselImages[currentIndex].style.display = 'block';
+        }
 
-            // Function to switch to the next image
-            function showNextImage() {
-                // Hide the current image
-                carouselImages[currentIndex].style.display = 'none';
-                // Increment the index
-                currentIndex = (currentIndex + 1) % carouselImages.length;
-                // Show the next image
-                carouselImages[currentIndex].style.display = 'block';
+        // Automatically switch to the next image every 5 seconds for the current carousel
+        setInterval(showNextImage, 5000);
+    });
+});
+
+
+    // Function to handle adding a product to the cart
+    function addToCart(productName, productDescription, price, productId, userId) {
+        // Retrieve existing cart items from local storage or initialize an empty array
+        let cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+
+        // Create a new object representing the product
+        let product = {
+            productName: productName,
+            productDescription: productDescription,
+            price: price,
+            productId: productId,
+            userId: userId
+        };
+
+        // Add the product to the cart array
+        cartItems.push(product);
+
+        // Store the updated cart items back in local storage
+        localStorage.setItem('cartItems', JSON.stringify(cartItems));
+
+        // Optional: Provide feedback to the user
+        alert('Product added to cart!');
+    }
+
+    // Add event listeners to all "Add To Cart" buttons
+    document.querySelectorAll('.btn-add-to-cart').forEach(button => {
+        button.addEventListener('click', function() {
+            // Retrieve product details from the button's data attributes
+            let productName = this.getAttribute('data-product-name');
+            let productDescription = this.getAttribute('data-product-description');
+            let price = parseFloat(this.getAttribute('data-price'));
+            let productId = parseInt(this.getAttribute('data-product-id'));
+            let userId = parseInt(this.getAttribute('data-user-id'));
+
+            // Call the addToCart function with the product details
+            addToCart(productName, productDescription, price, productId, userId);
+        });
+    });
+
+
+
+                // Retrieve the products array from localStorage
+            const products = JSON.parse(localStorage.getItem('cartItems'));
+
+            // Check if products exist in localStorage
+            if (products) {
+                // Get the length of the products array
+                const productCount = products.length;
+
+                // Update the HTML element with the product count
+                const headerActionNum = document.querySelector('.header-action-num');
+                headerActionNum.textContent = productCount.toString();
+            } else {
+                // If no products exist, set count to 0
+                const headerActionNum = document.querySelector('.header-action-num');
+                headerActionNum.textContent = '0';
             }
 
-            // Automatically switch to the next image every 5 seconds
-            setInterval(showNextImage, 5000);
         </script>
 
     <!--Main JS-->
