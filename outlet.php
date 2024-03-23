@@ -331,13 +331,34 @@ if (isset($_GET['id'])) {
                     <div class="row shop_wrapper grid_3">
 
                         <!-- Single Product Start -->
-                        <?php
+                       <?php
 // Assuming $id contains the user_id you want to filter products for
 
+// Define pagination parameters
+$itemsPerPage = 9; // Number of products per page
+
 // Fetch products from the database based on user_id
-$sql = "SELECT * FROM products WHERE user_id = ?";
+$sql = "SELECT COUNT(*) AS total FROM products WHERE user_id = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $id);
+$stmt->execute();
+$result = $stmt->get_result();
+$row = $result->fetch_assoc();
+$totalProducts = $row['total'];
+
+// Calculate total number of pages
+$totalPages = ceil($totalProducts / $itemsPerPage);
+
+// Get current page number (default to 1 if not provided)
+$page = isset($_GET['page']) ? $_GET['page'] : 1;
+
+// Calculate the offset for pagination
+$offset = ($page - 1) * $itemsPerPage;
+
+// Fetch products for the current page
+$sql = "SELECT * FROM products WHERE user_id = ? LIMIT ?, ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("iii", $id, $offset, $itemsPerPage);
 $stmt->execute();
 $result = $stmt->get_result();
 
@@ -418,25 +439,34 @@ $conn->close();
                         <!-- Shop Top Bar Left end -->
 
                         <!-- Shopt Top Bar Right Start -->
+                   
+                          <!-- Pagination -->
                         <div class="shop-top-bar-right">
                             <nav>
                                 <ul class="pagination">
-                                    <li class="page-item disabled">
-                                        <a class="page-link" href="#" aria-label="Previous">
-                                            <span aria-hidden="true">&laquo;</span>
-                                        </a>
-                                    </li>
-                                    <li class="page-item"><a class="page-link active" href="#">1</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                    <li class="page-item">
-                                        <a class="page-link" href="#" aria-label="Next">
-                                            <span aria-hidden="true">&raquo;</span>
-                                        </a>
-                                    </li>
+                                    <?php if ($page > 1) : ?>
+                                        <li class="page-item">
+                                            <a class="page-link" href="?id=<?php echo $id; ?>&page=<?php echo $page - 1; ?>" aria-label="Previous">
+                                                <span aria-hidden="true">&laquo;</span>
+                                            </a>
+                                        </li>
+                                    <?php endif; ?>
+                                    <?php for ($i = 1; $i <= $totalPages; $i++) : ?>
+                                        <li class="page-item <?php echo $i == $page ? 'active' : ''; ?>">
+                                            <a class="page-link" href="?id=<?php echo $id; ?>&page=<?php echo $i; ?>"><?php echo $i; ?></a>
+                                        </li>
+                                    <?php endfor; ?>
+                                    <?php if ($page < $totalPages) : ?>
+                                        <li class="page-item">
+                                            <a class="page-link" href="?id=<?php echo $id; ?>&page=<?php echo $page + 1; ?>" aria-label="Next">
+                                                <span aria-hidden="true">&raquo;</span>
+                                            </a>
+                                        </li>
+                                    <?php endif; ?>
                                 </ul>
                             </nav>
                         </div>
+
                         <!-- Shopt Top Bar Right End -->
 
                     </div>
@@ -626,63 +656,71 @@ $conn->close();
 });
 
 
-    // Function to handle adding a product to the cart
-    function addToCart(productName, productDescription, price, productId, userId) {
-        // Retrieve existing cart items from local storage or initialize an empty array
-        let cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+ // Function to handle adding a product to the cart
+function addToCart(productName, productDescription, price, productId, userId) {
+    // Retrieve existing cart items from local storage or initialize an empty array
+    let cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
 
-        // Create a new object representing the product
-        let product = {
-            productName: productName,
-            productDescription: productDescription,
-            price: price,
-            productId: productId,
-            userId: userId
-        };
+    // Create a new object representing the product
+    let product = {
+        productName: productName,
+        productDescription: productDescription,
+        price: price,
+        productId: productId,
+        userId: userId
+    };
 
-        // Add the product to the cart array
-        cartItems.push(product);
+    // Add the product to the cart array
+    cartItems.push(product);
 
-        // Store the updated cart items back in local storage
-        localStorage.setItem('cartItems', JSON.stringify(cartItems));
+    // Store the updated cart items back in local storage
+    localStorage.setItem('cartItems', JSON.stringify(cartItems));
 
-        // Optional: Provide feedback to the user
-        alert('Product added to cart!');
+    // Update the product count dynamically
+    updateProductCount();
+
+    // Optional: Provide feedback to the user
+    alert('Product added to cart!');
+}
+
+// Function to update the product count dynamically
+function updateProductCount() {
+    // Retrieve the products array from localStorage
+    const products = JSON.parse(localStorage.getItem('cartItems'));
+
+    // Check if products exist in localStorage
+    if (products) {
+        // Get the length of the products array
+        const productCount = products.length;
+
+        // Update the HTML element with the product count
+        const headerActionNum = document.querySelector('.header-action-num');
+        headerActionNum.textContent = productCount.toString();
+    } else {
+        // If no products exist, set count to 0
+        const headerActionNum = document.querySelector('.header-action-num');
+        headerActionNum.textContent = '0';
     }
+}
 
-    // Add event listeners to all "Add To Cart" buttons
-    document.querySelectorAll('.btn-add-to-cart').forEach(button => {
-        button.addEventListener('click', function() {
-            // Retrieve product details from the button's data attributes
-            let productName = this.getAttribute('data-product-name');
-            let productDescription = this.getAttribute('data-product-description');
-            let price = parseFloat(this.getAttribute('data-price'));
-            let productId = parseInt(this.getAttribute('data-product-id'));
-            let userId = parseInt(this.getAttribute('data-user-id'));
+// Update product count dynamically when the page loads
+updateProductCount();
 
-            // Call the addToCart function with the product details
-            addToCart(productName, productDescription, price, productId, userId);
-        });
+// Add event listeners to all "Add To Cart" buttons
+document.querySelectorAll('.btn-add-to-cart').forEach(button => {
+    button.addEventListener('click', function() {
+        // Retrieve product details from the button's data attributes
+        let productName = this.getAttribute('data-product-name');
+        let productDescription = this.getAttribute('data-product-description');
+        let price = parseFloat(this.getAttribute('data-price'));
+        let productId = parseInt(this.getAttribute('data-product-id'));
+        let userId = parseInt(this.getAttribute('data-user-id'));
+
+        // Call the addToCart function with the product details
+        addToCart(productName, productDescription, price, productId, userId);
     });
+});
 
-
-
-                // Retrieve the products array from localStorage
-            const products = JSON.parse(localStorage.getItem('cartItems'));
-
-            // Check if products exist in localStorage
-            if (products) {
-                // Get the length of the products array
-                const productCount = products.length;
-
-                // Update the HTML element with the product count
-                const headerActionNum = document.querySelector('.header-action-num');
-                headerActionNum.textContent = productCount.toString();
-            } else {
-                // If no products exist, set count to 0
-                const headerActionNum = document.querySelector('.header-action-num');
-                headerActionNum.textContent = '0';
-            }
 
         </script>
 
