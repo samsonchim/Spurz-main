@@ -62,11 +62,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt = mysqli_prepare($conn, $sql);
 
     if ($stmt) {
-        mysqli_stmt_bind_param($stmt, "ssss", $usernamee, $email, $hashedPassword);
+        mysqli_stmt_bind_param($stmt, "sss", $username, $email, $hashedPassword);
 
         if (mysqli_stmt_execute($stmt)) {
             // Set session variables
-            $_SESSION['id'] = mysqli_insert_id($conn); 
+            $_SESSION['user_id'] = mysqli_insert_id($conn); 
         
             // Echo a success message instead of redirecting
             echo "Registration Successful";

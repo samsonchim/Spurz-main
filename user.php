@@ -1,11 +1,63 @@
+<?php
+// Include your database connection code here
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "spurz";
+
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Start session
+session_start();
+
+// Check if the user is logged in
+if (!isset($_SESSION['user_id'])) {
+    // Redirect to the login page if not logged in
+    header("Location: login.html");
+    exit();
+}
+
+// Retrieve user data from the database
+$user_id = $_SESSION['user_id'];
+
+$sql = "SELECT * FROM users WHERE user_id = ?";
+$stmt = mysqli_prepare($conn, $sql);
+
+if ($stmt) {
+    mysqli_stmt_bind_param($stmt, "i", $user_id);
+
+    if (mysqli_stmt_execute($stmt)) {
+        $result = mysqli_stmt_get_result($stmt);
+
+        // Fetch and display user records
+        while ($row = mysqli_fetch_assoc($result)) {
+            $username = $row['username'];
+        }
+    } else {
+        echo "Error executing the statement: " . mysqli_error($conn);
+    }
+
+    // Close the statement
+    mysqli_stmt_close($stmt);
+} else {
+    echo "Error preparing the statement: " . mysqli_error($conn);
+}
+
+// Close the database connection
+mysqli_close($conn);
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
-<!-- Mirrored from wedo.dexignzone.com/xhtml/profile.html by HTTrack Website Copier/3.x [XR&CO'2014], Mon, 19 Feb 2024 21:19:56 GMT -->
 <head>
 	
 	<!-- Title -->
-	<title>Wedo - Ecommerce Mobile App Template ( Bootstrap + PWA )</title>
+	<title>Spurz - User Section</title>
 
 	<!-- Meta -->
 	<meta charset="utf-8">
@@ -59,7 +111,7 @@
 						</a>
 					</div>
 					<div class="mid-content">
-						<h6 class="title">Profile</h6>
+						<h6 class="title">User Section</h6>
 					</div>
 					<div class="right-content">
 						<a href="javascript:void(0);">
@@ -76,12 +128,10 @@
 		<div class="container">
 			<div class="profile-area">
 				<div class="main-profile">
-					<div class="media media-60 me-3 rounded-circle">
-						<img src="assets/images/user-profile.jpg" alt="profile-image">
-					</div>
+					
 					<div class="profile-detail">
-						<h6 class="name">Adeagbo Josiah</h6>
-						<span class="font-12">ID 02123141</span>
+						<h6 class="name"><?php echo $username?></h6>
+					<!--	<span class="font-12">ID 02123141</span> -->
 					</div>
 					<a href="edit-profile.html" class="edit-profile">
 						<i class="icon feather icon-edit-2"></i>
@@ -94,23 +144,23 @@
 								<div class="dz-icon-box">
 									<i class="icon feather icon-package"></i>
 								</div>
-								<span>Order</span>
+								<span>Orders</span>
 							</a>
 						</li>
 						<li class="col-6">							
-							<a href="wishlist.html">
+							<a href="cart.html">
 								<div class="dz-icon-box">
-									<i class="icon feather icon-heart"></i>
+									<i class="icon feather icon-shopping-cart"></i>
 								</div>
-								<span>Wishlist</span>
+								<span>My Cart</span>
 							</a>
 						</li>
 						<li class="col-6">							
 							<a href="coupon.html">
 								<div class="dz-icon-box">
-									<i class="icon feather icon-gift"></i>
+									<i class="icon feather icon-dollar-sign"></i>
 								</div>
-								<span>Coupons</span>
+								<span> Payments</span>
 							</a>
 						</li>
 						<li class="col-6">							
@@ -198,12 +248,12 @@
 				<span>Categories</span>
 			</a>
 			<a href="wishlist.html" class="nav-link">
-				<i class="icon feather icon-heart"></i>
-				<span>Wishlist</span>
+				<i class="icon feather icon-dollar-sign"></i>
+				<span>Payments</span>
 			</a>
 			<a href="profile.html" class="nav-link active">
 				<i class="icon feather icon-user"></i>
-				<span>Profile</span>
+				<span>User Section</span>
 			</a>
 		</div>
 	</div>

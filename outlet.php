@@ -131,7 +131,7 @@ if (isset($_GET['id'])) {
 
                     <!-- Header Top Message Start -->
                     <div class="col">
-                        <p class="header-top-message">We deliver to <?php echo $location?>. <a href="index.php">Explore Marketplace</a></p>
+                        <p class="header-top-message">We deliver to <?php echo $location?>. </p>
                     </div>
                     <!-- Header Top Message End -->
 
@@ -183,11 +183,11 @@ if (isset($_GET['id'])) {
                                 </a>
                                 <!-- Wishlist Header Action Button End -->
 
-                                <!-- Shopping Cart Header Action Button Start -->
-                                <a href="cart.html" class="header-action-btn header-action-btn-cart">
+                                <!-- Shopping Cart Header Action Button Start 
+                                <a href="cart.php?id=<?php echo $id; ?>" class="header-action-btn header-action-btn-cart">
                                     <i class="pe-7s-shopbag"></i>
                                     <span class="header-action-num"></span>
-                                </a>
+                                </a>-->
                                 <!-- Shopping Cart Header Action Button End -->
 
                                 <!-- Mobile Menu Hambarger Action Button Start -->
@@ -227,7 +227,7 @@ if (isset($_GET['id'])) {
                                 <a href="#">Home</a>
                             </li>
                             <li class="has-children">
-                                <a href="#">Product</a>
+                                <a href="#">Explore Similiar Outlets</a>
                             </li>
                             <li class="has-children">
                                 <a href="#">Review this Outlet</a>
@@ -404,7 +404,8 @@ if ($result->num_rows > 0) {
                     </span>
                     <div class="shop-list-btn">
                         <a title="Like Product" href="#" class="btn btn-sm btn-outline-dark btn-hover-primary wishlist"><i class="fa fa-heart"></i></a>
-                        <button class="btn btn-sm btn-outline-dark btn-hover-primary btn-add-to-cart" title="Add To Cart" data-product-name="<?php echo $product_name; ?>" data-product-description="<?php echo $product_description; ?>" data-price="<?php echo $price; ?>" data-product-id="<?php echo $product_id; ?>" data-user-id="<?php echo $id; ?>">Add To Cart</button>
+                        <a href="https://api.whatsapp.com/send?phone=<?php echo urlencode($phone_no); ?>&text=I%20am%20interested%20in%20the%20<?php echo urlencode($product_name); ?>%20listed%20on%20your%20Spurz%20outlet" class="btn btn-sm btn-outline-dark btn-hover-primary btn-add-to-cart">Buy on WhatsApp</a>
+
                     </div>
                 </div>
             </div>
@@ -655,71 +656,6 @@ $conn->close();
     });
 });
 
-
- // Function to handle adding a product to the cart
-function addToCart(productName, productDescription, price, productId, userId) {
-    // Retrieve existing cart items from local storage or initialize an empty array
-    let cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
-
-    // Create a new object representing the product
-    let product = {
-        productName: productName,
-        productDescription: productDescription,
-        price: price,
-        productId: productId,
-        userId: userId
-    };
-
-    // Add the product to the cart array
-    cartItems.push(product);
-
-    // Store the updated cart items back in local storage
-    localStorage.setItem('cartItems', JSON.stringify(cartItems));
-
-    // Update the product count dynamically
-    updateProductCount();
-
-    // Optional: Provide feedback to the user
-    alert('Product added to cart!');
-}
-
-// Function to update the product count dynamically
-function updateProductCount() {
-    // Retrieve the products array from localStorage
-    const products = JSON.parse(localStorage.getItem('cartItems'));
-
-    // Check if products exist in localStorage
-    if (products) {
-        // Get the length of the products array
-        const productCount = products.length;
-
-        // Update the HTML element with the product count
-        const headerActionNum = document.querySelector('.header-action-num');
-        headerActionNum.textContent = productCount.toString();
-    } else {
-        // If no products exist, set count to 0
-        const headerActionNum = document.querySelector('.header-action-num');
-        headerActionNum.textContent = '0';
-    }
-}
-
-// Update product count dynamically when the page loads
-updateProductCount();
-
-// Add event listeners to all "Add To Cart" buttons
-document.querySelectorAll('.btn-add-to-cart').forEach(button => {
-    button.addEventListener('click', function() {
-        // Retrieve product details from the button's data attributes
-        let productName = this.getAttribute('data-product-name');
-        let productDescription = this.getAttribute('data-product-description');
-        let price = parseFloat(this.getAttribute('data-price'));
-        let productId = parseInt(this.getAttribute('data-product-id'));
-        let userId = parseInt(this.getAttribute('data-user-id'));
-
-        // Call the addToCart function with the product details
-        addToCart(productName, productDescription, price, productId, userId);
-    });
-});
 
 
         </script>

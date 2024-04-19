@@ -5,7 +5,7 @@
 <head>
 	
     <!-- Title -->
-	<title>Wedo - Ecommerce Mobile App Template ( Bootstrap + PWA )</title>
+	<title>Spurz - Login</title>
 
 	<!-- Meta -->
 	<meta charset="utf-8">
@@ -62,22 +62,23 @@
 					<p>Welcome back you've been missed!</p>
 				</div>
 				<div class="account-area">
-					<form>
+					<div class="error-message" id="response-message" style="text-align: center; color: rgb(231, 0, 0);"></div>
+					<form method="post" onsubmit="return validateForm()">
 						<div class="mb-3">
-							<label class="form-label" for="name">Username</label>
-							<input type="text" id="name" class="form-control" placeholder="Type Username Here">
+							<label class="form-label"  for="name">Email</label>
+							<input type="text" id="email" name="email" class="form-control" placeholder="Type registered Email here">
 						</div>
 						<div>
 							<label class="form-label" for="password">Password</label>
 							<div class="mb-3 input-group input-group-icon">
-								<input type="password" id="password" class="form-control dz-password" placeholder="Type Password Here">
+								<input type="password" id="password" name="password" class="form-control dz-password" placeholder="Type Password Here">
 								<span class="input-group-text show-pass"> 
 									<i class="icon feather icon-eye-off eye-close"></i>
 									<i class="icon feather icon-eye eye-open"></i>
 								</span>
 							</div>
 						</div>
-						<a href="index.html" class="btn mb-3 btn-primary w-100">Login</a>
+						<a  type="button" onclick="submitForm()" class="btn mb-3 btn-primary w-100">Login</a>
 						<div class="d-flex justify-content-between align-items-center mb-4">
 							<a href="forgot-password.html" class="btn-link text-link">Forgot password?</a>
 							<a href="forgot-password.html" class="btn-link">Reset here</a>
@@ -95,6 +96,39 @@
 <!--**********************************
     Scripts
 ***********************************-->
+<script>
+	  function submitForm() {
+      var xhr = new XMLHttpRequest();
+      var form = document.querySelector('form');
+      var formData = new FormData(form);
+  
+      xhr.open('POST', 'php/login.php', true);
+  
+      xhr.onreadystatechange = function() {
+          if (xhr.readyState == 4) {
+              if (xhr.status == 200) {
+                  document.getElementById('response-message').innerHTML = xhr.responseText;
+  
+                  // Check for success message in the response
+                  if (xhr.responseText.trim() === 'Login Successful') {
+                      // Redirect to login.html
+                      window.location.href = 'user.php';
+                  }
+              } else {
+                  // Handle other HTTP status codes or errors
+                  console.error('Error: ' + xhr.status);
+              }
+          }
+      };
+  
+      xhr.send(formData);
+  }
+  
+  function validateForm() {
+      // Implement any client-side validation if needed
+      return true;
+  }
+</script>
 <script src="assets/js/jquery.js"></script>
 <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="assets/vendor/swiper/swiper-bundle.min.js"></script><!-- Swiper -->
