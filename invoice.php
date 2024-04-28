@@ -1,3 +1,69 @@
+<?php
+// Include your database connection code here
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "spurz";
+
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Check if the ID parameter is present in the URL
+if(isset($_GET['id'])) {
+    // Sanitize the input to prevent SQL injection
+    $id = mysqli_real_escape_string($conn, $_GET['id']);
+
+    // Prepare SQL statement to fetch data from the invoices table based on the provided ID
+    $sql = "SELECT * FROM invoices WHERE id = '$id'";
+    
+    // Execute the query
+    $result = $conn->query($sql);
+
+    if ($result->num_rows > 0) {
+        // Fetch the data and store it in a variable
+        $row = $result->fetch_assoc();
+        
+        // Store the fetched data in variables
+        $user_id = $row['user_id'];
+        $customer_name = $row['customer_name'];
+        $product_name = $row['product_name'];
+        $customer_address = $row['customer_address'];
+        $total_price = $row['total_price'];
+        $waybill_price = $row['waybill_price'];
+        $expected_delivery_date = $row['expected_delivery_date'];
+        $created_at = $row['created_at'];
+        $status = $row['status'];
+
+       // Remove commas from $total_price and $waybill_price
+        $total_price_numeric = str_replace(',', '', $total_price);
+        $waybill_price_numeric = str_replace(',', '', $waybill_price);
+
+        // Check if $total_price and $waybill_price are numeric after removing commas
+        if (is_numeric($total_price_numeric) && is_numeric($waybill_price_numeric)) {
+            // Perform addition
+            $total_due = $total_price_numeric + $waybill_price_numeric;
+        } else {
+            // Handle the case where one or both of the values are not numeric
+            echo "Total price and waybill price must be numeric values.";
+        }
+
+        
+        // You can now use these variables as needed in your application
+    } else {
+        echo "No Invoice associated with the URL you entered.";
+    }
+} else {
+    echo "ID parameter not provided.";
+}
+
+// Close the database connection
+$conn->close();
+?>
+
+
 <!doctype html>
 
 <html lang="en">
@@ -5,13 +71,13 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
     <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
-    <title>Create Invoice</title>
+    <title>Invoice.</title>
     <!-- CSS files -->
-    <link href="./dist/css/tabler.min.css?1684106062" rel="stylesheet"/>
-    <link href="./dist/css/tabler-flags.min.css?1684106062" rel="stylesheet"/>
-    <link href="./dist/css/tabler-payments.min.css?1684106062" rel="stylesheet"/>
-    <link href="./dist/css/tabler-vendors.min.css?1684106062" rel="stylesheet"/>
-    <link href="./dist/css/demo.min.css?1684106062" rel="stylesheet"/>
+    <link href="./outlet/dist/css/tabler.min.css?1684106062" rel="stylesheet"/>
+    <link href="./outlet/dist/css/tabler-flags.min.css?1684106062" rel="stylesheet"/>
+    <link href="./outlet/dist/css/tabler-payments.min.css?1684106062" rel="stylesheet"/>
+    <link href="./outlet/dist/css/tabler-vendors.min.css?1684106062" rel="stylesheet"/>
+    <link href="./outlet/dist/css/demo.min.css?1684106062" rel="stylesheet"/>
     <style>
       @import url('https://rsms.me/inter/inter.css');
       :root {
@@ -366,17 +432,17 @@
                     </div>
                   </div>
                 </li>
-                <li class="nav-item active">
+                <li class="nav-item">
                   <a class="nav-link" href="./form-elements.html" >
                     <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/checkbox -->
                       <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 11l3 3l8 -8" /><path d="M20 12v6a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h9" /></svg>
                     </span>
                     <span class="nav-link-title">
-                      Creating Invoice
+                      Form elements
                     </span>
                   </a>
                 </li>
-                <li class="nav-item dropdown">
+                <li class="nav-item active dropdown">
                   <a class="nav-link dropdown-toggle" href="#navbar-extra" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button" aria-expanded="false" >
                     <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/star -->
                       <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873z" /></svg>
@@ -401,7 +467,7 @@
                         <a class="dropdown-item" href="./gallery.html">
                           Gallery
                         </a>
-                        <a class="dropdown-item" href="./invoice.html">
+                        <a class="dropdown-item active" href="./invoice.html">
                           Invoice
                         </a>
                         <a class="dropdown-item" href="./search-results.html">
@@ -586,522 +652,118 @@
             <div class="row g-2 align-items-center">
               <div class="col">
                 <h2 class="page-title">
-                 Creating Invoice
+                  Invoice
                 </h2>
+              </div>
+              <!-- Page title actions -->
+              <div class="col-auto ms-auto d-print-none">
+                <button type="button" class="btn btn-primary" onclick="javascript:window.print();">
+                  <!-- Download SVG icon from http://tabler-icons.io/i/printer -->
+                  <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M17 17h2a2 2 0 0 0 2 -2v-4a2 2 0 0 0 -2 -2h-14a2 2 0 0 0 -2 2v4a2 2 0 0 0 2 2h2" /><path d="M17 9v-4a2 2 0 0 0 -2 -2h-6a2 2 0 0 0 -2 2v4" /><path d="M7 13m0 2a2 2 0 0 1 2 -2h6a2 2 0 0 1 2 2v4a2 2 0 0 1 -2 2h-6a2 2 0 0 1 -2 -2z" /></svg>
+                  Print Invoice
+                </button>
               </div>
             </div>
           </div>
         </div>
         <!-- Page body -->
-
-        <style>
-            .col-lg-8{
-                width: 90% !important;
-            }
-            .card-title{
-                text-align: center !important;
-            }
-        </style>
         <div class="page-body">
           <div class="container-xl">
-            <div class="row row-cards">
-              <div class="col-12">
-                <form action="https://httpbin.org/post" method="post" class="card">
-                  <div class="card-header">
-                    <h6 class="card-title">Creating Invoice</h6>
+            <div class="card card-lg">
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-6">
+                    <p class="h3">Goods/Products are to be delivered to you by</p>
+                    <address>
+                        <?php echo $expected_delivery_date?>
+                    </address>
                   </div>
-
-
-                  <div class="col-lg-8">
-                    <div class="row row-cards">
-                      <div class="col-12">
-                        <form class="card">
-                          <div class="card-body">
-                            <div class="row row-cards">
-                              <div class="col-md-5">
-                                <div class="mb-3">
-                                  <label class="form-label">Customer's Name</label>
-                                  <input type="text" class="form-control"  placeholder="Jim Iyke?" value="">
-                                </div>
-                              </div>
-                              <div class="col-sm-6 col-md-3">
-                                <div class="mb-3">
-                                  <label class="form-label">Product name</label>
-                                  <input type="text" class="form-control" placeholder="Binatone and Dishwasher" value="">
-                                </div>
-                              </div>
-                              <div class="col-sm-6 col-md-4">
-                                <div class="mb-3">
-                                  <label class="form-label">Customer's address</label>
-                                  <input type="text" class="form-control" placeholder="Amen Estate?" value="">
-                                </div>
-                              </div>
-                              <div class="col-sm-6 col-md-6">
-                                <div class="mb-3">
-                                  <label class="form-label">Total Price</label>
-                                  <input type="text" id="totalPrice" class="form-control" placeholder="Enter amount" value="">
-                                </div>
-                              </div>
-                              
-                              <div class="col-sm-6 col-md-6">
-                                <div class="mb-3">
-                                  <label class="form-label">Waybill Price</label>
-                                  <input type="text" id="waybillPrice" class="form-control" placeholder="Agreed Waybill price" value="">
-                                </div>
-                              </div>                              
-                              <div class="col-md-12">
-                                <div class="mb-3">
-                                  <label class="form-label">When should the customer be expecting the goods?</label>
-                                  <input type="text" class="form-control" placeholder="12/04/2026" value="">
-                                </div>
-                              </div>
-                              
-                            </div>
-                          </div>
-                          <div class="card-footer text-end">
-                            <button type="submit" class="btn btn-primary">Create Invoice</button>
-                          </div>
-                        </form>
-                      </div>
+                  <div class="col-6 text-end">
+                    <p class="h3">Delivery's Address</p>
+                    <address>
+                     <?php echo $customer_address ?>
+                    </address>
+                  </div>
+                  <div class="col-12 my-5">
+                    <h1>Invoice INV/001/15</h1>
                   </div>
                 </div>
+                <table class="table table-transparent table-responsive">
+                  <thead>
+                    <tr>
+                      <th class="text-center" style="width: 1%"></th>
+                      <th>Product</th>
+                      <th class="text-end" style="width: 1%"></th>
+                    </tr>
+                  </thead>
+                  <tr>
+                    <td class="text-center">1</td>
+                    <td>
+                      <p class="strong mb-1"><?php echo $product_name ?></p>
+                    </td>
+                    <td class="text-end"></td>
+                  </tr>
+                  <tr>
+                   
+                  <tr>
+                    <td colspan="2" class="strong text-end">Product Amount</td>
+                    <td class="text-end"><?php echo $total_price  ?></td>
+                  </tr>
+                
+                  <tr>
+                    <td colspan="2" class="strong text-end">Waybill Amount</td>
+                    <td class="text-end"><?php echo $waybill_price?></td>
+                  </tr>
+                  <tr>
+                    <td colspan="2" class="font-weight-bold text-uppercase text-end">Total Due</td>
+                    <td class="font-weight-bold text-end"><?php echo $total_due ?></td>
+                  </tr>
+                </table>
+                <p class="text-muted text-center mt-5">Thank you very much for doing business with us. We look forward to working with
+                  you again!</p>
               </div>
             </div>
           </div>
         </div>
-      </div>
-      <footer class="footer footer-transparent d-print-none">
-        <div class="container-xl">
-          <div class="row text-center align-items-center flex-row-reverse">
-            <div class="col-lg-auto ms-lg-auto">
-              <ul class="list-inline list-inline-dots mb-0">
-                <li class="list-inline-item"><a href="howto.html" target="_blank" class="link-secondary" rel="noopener">How To?</a></li>
-                <li class="list-inline-item"><a href="https://wa.me/09162035539" class="link-secondary">Whatsapp Us</a></li>
-                <li class="list-inline-item"><a href="mailto:" target="_blank" class="link-secondary" rel="noopener">Report an Issue</a></li>
-               
-              </ul>
-            </div>
-            <div class="col-12 col-lg-auto mt-3 mt-lg-0">
-              <ul class="list-inline list-inline-dots mb-0">
-                <li class="list-inline-item">
-                  Copyright &copy; 2024
-                  <a href="." class="link-secondary">Spurz</a>.
-                  All rights reserved.
-                </li>
-                <li class="list-inline-item">
-                  <a href="./changelog.html" class="link-secondary" rel="noopener">
-                   
-                  </a>
-                </li>
-              </ul>
+        <footer class="footer footer-transparent d-print-none">
+          <div class="container-xl">
+            <div class="row text-center align-items-center flex-row-reverse">
+              <div class="col-lg-auto ms-lg-auto">
+                <ul class="list-inline list-inline-dots mb-0">
+                  <li class="list-inline-item"><a href="https://tabler.io/docs" target="_blank" class="link-secondary" rel="noopener">Documentation</a></li>
+                  <li class="list-inline-item"><a href="./license.html" class="link-secondary">License</a></li>
+                  <li class="list-inline-item"><a href="https://github.com/tabler/tabler" target="_blank" class="link-secondary" rel="noopener">Source code</a></li>
+                  <li class="list-inline-item">
+                    <a href="https://github.com/sponsors/codecalm" target="_blank" class="link-secondary" rel="noopener">
+                      <!-- Download SVG icon from http://tabler-icons.io/i/heart -->
+                      <svg xmlns="http://www.w3.org/2000/svg" class="icon text-pink icon-filled icon-inline" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" /></svg>
+                      Sponsor
+                    </a>
+                  </li>
+                </ul>
+              </div>
+              <div class="col-12 col-lg-auto mt-3 mt-lg-0">
+                <ul class="list-inline list-inline-dots mb-0">
+                  <li class="list-inline-item">
+                    Copyright &copy; 2023
+                    <a href="." class="link-secondary">Tabler</a>.
+                    All rights reserved.
+                  </li>
+                  <li class="list-inline-item">
+                    <a href="./changelog.html" class="link-secondary" rel="noopener">
+                      v1.0.0-beta19
+                    </a>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
-        </div>
-      </footer>
+        </footer>
+      </div>
     </div>
-  </div>
-  <!-- Libs JS -->
-  <script src="./dist/libs/nouislider/dist/nouislider.min.js?1684106062" defer></script>
-  <script src="./dist/libs/litepicker/dist/litepicker.js?1684106062" defer></script>
-  <script src="./dist/libs/tom-select/dist/js/tom-select.base.min.js?1684106062" defer></script>
-  <!-- Tabler Core -->
-  <script src="./dist/js/tabler.min.js?1684106062" defer></script>
-  <script src="./dist/js/demo.min.js?1684106062" defer></script>
-  <script>
-    // Function to format the number with units, tens, hundreds, etc.
-function formatNumber(num) {
-  // Convert the number to a string
-  var numStr = String(num);
-  var formattedStr = '';
-
-  // Loop through each digit of the number from right to left
-  for (var i = numStr.length - 1, j = 0; i >= 0; i--, j++) {
-    // Insert a comma every three digits
-    if (j > 0 && j % 3 === 0) {
-      formattedStr = ',' + formattedStr;
-    }
-    // Append the current digit to the formatted string
-    formattedStr = numStr[i] + formattedStr;
-  }
-
-  return formattedStr;
-}
-// Function to update the input value with formatted number
-function updateFormattedNumber(inputId) {
-  // Get the input element
-  var input = document.getElementById(inputId);
-  // Get the numeric value entered by the user
-  var numericValue = parseFloat(input.value.replace(/,/g, '')); // Remove commas from the input
-  // Format the numeric value
-  var formattedValue = formatNumber(numericValue);
-  // Update the input value with the formatted number
-  input.value = formattedValue;
-}
-
-// Add event listener to the input fields to listen for input events
-document.getElementById('totalPrice').addEventListener('input', function() {
-  updateFormattedNumber('totalPrice');
-});
-
-document.getElementById('waybillPrice').addEventListener('input', function() {
-  updateFormattedNumber('waybillPrice');
-});
-
-  </script>
-  <script>
-    // @formatter:off
-    document.addEventListener("DOMContentLoaded", function () {
-    	var el;
-    	window.TomSelect && (new TomSelect(el = document.getElementById('select-states'), {
-    		copyClassesToDropdown: false,
-    		dropdownParent: 'body',
-    		controlInput: '<input>',
-    		render:{
-    			item: function(data,escape) {
-    				if( data.customProperties ){
-    					return '<div><span class="dropdown-item-indicator">' + data.customProperties + '</span>' + escape(data.text) + '</div>';
-    				}
-    				return '<div>' + escape(data.text) + '</div>';
-    			},
-    			option: function(data,escape){
-    				if( data.customProperties ){
-    					return '<div><span class="dropdown-item-indicator">' + data.customProperties + '</span>' + escape(data.text) + '</div>';
-    				}
-    				return '<div>' + escape(data.text) + '</div>';
-    			},
-    		},
-    	}));
-    });
-    // @formatter:on
-  </script>
-  <script>
-    // @formatter:off
-    document.addEventListener("DOMContentLoaded", function () {
-    	 window.noUiSlider && (noUiSlider.create(document.getElementById('range-simple'), {
-    			  start: 20,
-    			  connect: [true, false],
-    			  step: 10,
-    			  range: {
-    				  min: 0,
-    				  max: 100
-    			  }
-    	 }));
-    });
-    // @formatter:on
-  </script>
-  <script>
-    // @formatter:off
-    document.addEventListener("DOMContentLoaded", function () {
-    	 window.noUiSlider && (noUiSlider.create(document.getElementById('range-connect'), {
-    			  start: [60, 90],
-    			  connect: [false, true, false],
-    			  step: 10,
-    			  range: {
-    				  min: 0,
-    				  max: 100
-    			  }
-    	 }));
-    });
-    // @formatter:on
-  </script>
-  <script>
-    // @formatter:off
-    document.addEventListener("DOMContentLoaded", function () {
-    	 window.noUiSlider && (noUiSlider.create(document.getElementById('range-color'), {
-    			  start: 40,
-    			  connect: [true, false],
-    			  step: 10,
-    			  range: {
-    				  min: 0,
-    				  max: 100
-    			  }
-    	 }));
-    });
-    // @formatter:on
-  </script>
-  <script>
-    // @formatter:off
-    document.addEventListener("DOMContentLoaded", function () {
-    	window.Litepicker && (new Litepicker({
-    		element: document.getElementById('datepicker-default'),
-    		buttonText: {
-    			previousMonth: `<!-- Download SVG icon from http://tabler-icons.io/i/chevron-left -->
-    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M15 6l-6 6l6 6" /></svg>`,
-    			nextMonth: `<!-- Download SVG icon from http://tabler-icons.io/i/chevron-right -->
-    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6l-6 6" /></svg>`,
-    		},
-    	}));
-    });
-    // @formatter:on
-  </script>
-  <script>
-    // @formatter:off
-    document.addEventListener("DOMContentLoaded", function () {
-    	window.Litepicker && (new Litepicker({
-    		element: document.getElementById('datepicker-icon'),
-    		buttonText: {
-    			previousMonth: `<!-- Download SVG icon from http://tabler-icons.io/i/chevron-left -->
-    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M15 6l-6 6l6 6" /></svg>`,
-    			nextMonth: `<!-- Download SVG icon from http://tabler-icons.io/i/chevron-right -->
-    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6l-6 6" /></svg>`,
-    		},
-    	}));
-    });
-    // @formatter:on
-  </script>
-  <script>
-    // @formatter:off
-    document.addEventListener("DOMContentLoaded", function () {
-    	window.Litepicker && (new Litepicker({
-    		element: document.getElementById('datepicker-icon-prepend'),
-    		buttonText: {
-    			previousMonth: `<!-- Download SVG icon from http://tabler-icons.io/i/chevron-left -->
-    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M15 6l-6 6l6 6" /></svg>`,
-    			nextMonth: `<!-- Download SVG icon from http://tabler-icons.io/i/chevron-right -->
-    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6l-6 6" /></svg>`,
-    		},
-    	}));
-    });
-    // @formatter:on
-  </script>
-  <script>
-    // @formatter:off
-    document.addEventListener("DOMContentLoaded", function () {
-    	window.Litepicker && (new Litepicker({
-    		element: document.getElementById('datepicker-inline'),
-    		buttonText: {
-    			previousMonth: `<!-- Download SVG icon from http://tabler-icons.io/i/chevron-left -->
-    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M15 6l-6 6l6 6" /></svg>`,
-    			nextMonth: `<!-- Download SVG icon from http://tabler-icons.io/i/chevron-right -->
-    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6l-6 6" /></svg>`,
-    		},
-    		inlineMode: true,
-    	}));
-    });
-    // @formatter:on
-  </script>
-  <script>
-    // @formatter:off
-    document.addEventListener("DOMContentLoaded", function () {
-    	var el;
-    	window.TomSelect && (new TomSelect(el = document.getElementById('select-tags'), {
-    		copyClassesToDropdown: false,
-    		dropdownParent: 'body',
-    		controlInput: '<input>',
-    		render:{
-    			item: function(data,escape) {
-    				if( data.customProperties ){
-    					return '<div><span class="dropdown-item-indicator">' + data.customProperties + '</span>' + escape(data.text) + '</div>';
-    				}
-    				return '<div>' + escape(data.text) + '</div>';
-    			},
-    			option: function(data,escape){
-    				if( data.customProperties ){
-    					return '<div><span class="dropdown-item-indicator">' + data.customProperties + '</span>' + escape(data.text) + '</div>';
-    				}
-    				return '<div>' + escape(data.text) + '</div>';
-    			},
-    		},
-    	}));
-    });
-    // @formatter:on
-  </script>
-  <script>
-    // @formatter:off
-    document.addEventListener("DOMContentLoaded", function () {
-    	var el;
-    	window.TomSelect && (new TomSelect(el = document.getElementById('select-users'), {
-    		copyClassesToDropdown: false,
-    		dropdownParent: 'body',
-    		controlInput: '<input>',
-    		render:{
-    			item: function(data,escape) {
-    				if( data.customProperties ){
-    					return '<div><span class="dropdown-item-indicator">' + data.customProperties + '</span>' + escape(data.text) + '</div>';
-    				}
-    				return '<div>' + escape(data.text) + '</div>';
-    			},
-    			option: function(data,escape){
-    				if( data.customProperties ){
-    					return '<div><span class="dropdown-item-indicator">' + data.customProperties + '</span>' + escape(data.text) + '</div>';
-    				}
-    				return '<div>' + escape(data.text) + '</div>';
-    			},
-    		},
-    	}));
-    });
-    // @formatter:on
-  </script>
-  <script>
-    // @formatter:off
-    document.addEventListener("DOMContentLoaded", function () {
-    	var el;
-    	window.TomSelect && (new TomSelect(el = document.getElementById('select-optgroups'), {
-    		copyClassesToDropdown: false,
-    		dropdownParent: 'body',
-    		controlInput: '<input>',
-    		render:{
-    			item: function(data,escape) {
-    				if( data.customProperties ){
-    					return '<div><span class="dropdown-item-indicator">' + data.customProperties + '</span>' + escape(data.text) + '</div>';
-    				}
-    				return '<div>' + escape(data.text) + '</div>';
-    			},
-    			option: function(data,escape){
-    				if( data.customProperties ){
-    					return '<div><span class="dropdown-item-indicator">' + data.customProperties + '</span>' + escape(data.text) + '</div>';
-    				}
-    				return '<div>' + escape(data.text) + '</div>';
-    			},
-    		},
-    	}));
-    });
-    // @formatter:on
-  </script>
-  <script>
-    // @formatter:off
-    document.addEventListener("DOMContentLoaded", function () {
-    	var el;
-    	window.TomSelect && (new TomSelect(el = document.getElementById('select-people'), {
-    		copyClassesToDropdown: false,
-    		dropdownParent: 'body',
-    		controlInput: '<input>',
-    		render:{
-    			item: function(data,escape) {
-    				if( data.customProperties ){
-    					return '<div><span class="dropdown-item-indicator">' + data.customProperties + '</span>' + escape(data.text) + '</div>';
-    				}
-    				return '<div>' + escape(data.text) + '</div>';
-    			},
-    			option: function(data,escape){
-    				if( data.customProperties ){
-    					return '<div><span class="dropdown-item-indicator">' + data.customProperties + '</span>' + escape(data.text) + '</div>';
-    				}
-    				return '<div>' + escape(data.text) + '</div>';
-    			},
-    		},
-    	}));
-    });
-    // @formatter:on
-  </script>
-  <script>
-    // @formatter:off
-    document.addEventListener("DOMContentLoaded", function () {
-    	var el;
-    	window.TomSelect && (new TomSelect(el = document.getElementById('select-countries'), {
-    		copyClassesToDropdown: false,
-    		dropdownParent: 'body',
-    		controlInput: '<input>',
-    		render:{
-    			item: function(data,escape) {
-    				if( data.customProperties ){
-    					return '<div><span class="dropdown-item-indicator">' + data.customProperties + '</span>' + escape(data.text) + '</div>';
-    				}
-    				return '<div>' + escape(data.text) + '</div>';
-    			},
-    			option: function(data,escape){
-    				if( data.customProperties ){
-    					return '<div><span class="dropdown-item-indicator">' + data.customProperties + '</span>' + escape(data.text) + '</div>';
-    				}
-    				return '<div>' + escape(data.text) + '</div>';
-    			},
-    		},
-    	}));
-    });
-    // @formatter:on
-  </script>
-  <script>
-    // @formatter:off
-    document.addEventListener("DOMContentLoaded", function () {
-    	var el;
-    	window.TomSelect && (new TomSelect(el = document.getElementById('select-labels'), {
-    		copyClassesToDropdown: false,
-    		dropdownParent: 'body',
-    		controlInput: '<input>',
-    		render:{
-    			item: function(data,escape) {
-    				if( data.customProperties ){
-    					return '<div><span class="dropdown-item-indicator">' + data.customProperties + '</span>' + escape(data.text) + '</div>';
-    				}
-    				return '<div>' + escape(data.text) + '</div>';
-    			},
-    			option: function(data,escape){
-    				if( data.customProperties ){
-    					return '<div><span class="dropdown-item-indicator">' + data.customProperties + '</span>' + escape(data.text) + '</div>';
-    				}
-    				return '<div>' + escape(data.text) + '</div>';
-    			},
-    		},
-    	}));
-    });
-    // @formatter:on
-  </script>
-  <script>
-    // @formatter:off
-    document.addEventListener("DOMContentLoaded", function () {
-    	var el;
-    	window.TomSelect && (new TomSelect(el = document.getElementById('select-countries-valid'), {
-    		copyClassesToDropdown: false,
-    		dropdownParent: 'body',
-    		controlInput: '<input>',
-    		render:{
-    			item: function(data,escape) {
-    				if( data.customProperties ){
-    					return '<div><span class="dropdown-item-indicator">' + data.customProperties + '</span>' + escape(data.text) + '</div>';
-    				}
-    				return '<div>' + escape(data.text) + '</div>';
-    			},
-    			option: function(data,escape){
-    				if( data.customProperties ){
-    					return '<div><span class="dropdown-item-indicator">' + data.customProperties + '</span>' + escape(data.text) + '</div>';
-    				}
-    				return '<div>' + escape(data.text) + '</div>';
-    			},
-    		},
-    	}));
-    });
-    // @formatter:on
-  </script>
-  <script>
-    // @formatter:off
-    document.addEventListener("DOMContentLoaded", function () {
-    	var el;
-    	window.TomSelect && (new TomSelect(el = document.getElementById('select-countries-invalid'), {
-    		copyClassesToDropdown: false,
-    		dropdownParent: 'body',
-    		controlInput: '<input>',
-    		render:{
-    			item: function(data,escape) {
-    				if( data.customProperties ){
-    					return '<div><span class="dropdown-item-indicator">' + data.customProperties + '</span>' + escape(data.text) + '</div>';
-    				}
-    				return '<div>' + escape(data.text) + '</div>';
-    			},
-    			option: function(data,escape){
-    				if( data.customProperties ){
-    					return '<div><span class="dropdown-item-indicator">' + data.customProperties + '</span>' + escape(data.text) + '</div>';
-    				}
-    				return '<div>' + escape(data.text) + '</div>';
-    			},
-    		},
-    	}));
-    });
-    // @formatter:on
-  </script>
-  <script>
-    document.addEventListener("DOMContentLoaded", function() {
-    	let sliderTriggerList = [].slice.call(document.querySelectorAll("[data-slider]"));
-    	sliderTriggerList.map(function (sliderTriggerEl) {
-    		let options = {};
-    		if (sliderTriggerEl.getAttribute("data-slider")) {
-    			options = JSON.parse(sliderTriggerEl.getAttribute("data-slider"));
-    		}
-    		let slider = noUiSlider.create(sliderTriggerEl, options);
-    		if (options['js-name']) {
-    			window[options['js-name']] = slider;
-    		}
-    	});
-    });
-  </script>
-</body>
+    <!-- Libs JS -->
+    <!-- Tabler Core -->
+    <script src="./dist/js/tabler.min.js?1684106062" defer></script>
+    <script src="./dist/js/demo.min.js?1684106062" defer></script>
+  </body>
 </html>

@@ -38,3 +38,19 @@ ADD COLUMN bank_name VARCHAR (255),
 ADD COLUMN phone_no VARCHAR(15),
 ADD COLUMN business_logo VARCHAR(255),
 ADD COLUMN location VARCHAR(255);
+
+
+
+CREATE TABLE invoices (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    customer_name VARCHAR(255),
+    product_name VARCHAR(255),
+    customer_address VARCHAR(255),
+    total_price VARCHAR (255), 
+    waybill_price VARCHAR (255), 
+    expected_delivery_date VARCHAR (255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+ALTER TABLE invoices ADD status VARCHAR(255);

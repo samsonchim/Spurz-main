@@ -50,6 +50,22 @@ if ($stmt) {
     echo "Error preparing the statement: " . mysqli_error($conn);
 }
 
+
+
+// Initialize an empty array to store fetched invoice data
+$invoices = array();
+
+// Fetch invoice data for the logged-in user
+$user_id = $_SESSION['id'];
+$sql = "SELECT * FROM invoices WHERE user_id = '$user_id'";
+$result = mysqli_query($conn, $sql);
+
+if (mysqli_num_rows($result) > 0) {
+    // Loop through the fetched rows and store them in the $invoices array
+    while ($row = mysqli_fetch_assoc($result)) {
+        $invoices[] = $row;
+    }
+}
 // Close the database connection
 mysqli_close($conn);
 ?>
@@ -197,16 +213,17 @@ mysqli_close($conn);
                   <div class="dropdown-menu">
                     <div class="dropdown-menu-columns">
                       <div class="dropdown-menu-column">
-                        <a class="dropdown-item" href="./empty.html">
+                        <a class="dropdown-item" href="./profile.php">
                           Business Profile
                         </a>
                         <a class="dropdown-item" href="./cookie-banner.html">
                           How to?
                           <span class="badge badge-sm bg-green-lt text-uppercase ms-auto">New</span>
                         </a>
+                        <!--
                         <a class="dropdown-item" href="./activity.html">
                           Settings
-                        </a>
+                        </a> -->
                         <a class="dropdown-item" href="logout.php">
                           Logout
                         </a>
@@ -565,14 +582,7 @@ fetchAndAppendProducts();
                     <h3 class="card-title">Invoices</h3>
                   </div>
                   <div class="card-body border-bottom py-3">
-                    <div class="d-flex">
-                      <div class="text-muted">
-                        Show
-                        <div class="mx-2 d-inline-block">
-                          <input type="text" class="form-control form-control-sm" value="8" size="3" aria-label="Invoices count">
-                        </div>
-                        entries
-                      </div>
+                     
                       <div class="ms-auto text-muted">
                         Search:
                         <div class="ms-2 d-inline-block">
@@ -585,101 +595,118 @@ fetchAndAppendProducts();
                     <table class="table card-table table-vcenter text-nowrap datatable">
                       <thead>
                         <tr>
-                          <th class="w-1"><input class="form-check-input m-0 align-middle" type="checkbox" aria-label="Select all invoices"></th>
-                          <th class="w-1">No. <!-- Download SVG icon from http://tabler-icons.io/i/chevron-up -->
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm icon-thick" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 15l6 -6l6 6" /></svg>
-                          </th>
-                          <th>Invoice Subject</th>
-                          <th>Client</th>
-                          <th>Created</th>
-                          <th>Status</th>
-                          <th>Price</th>
-                          <th></th>
+                          
                         </tr>
                       </thead>
                       <tbody>
-                        
-                        <tr>
-                          <td><input class="form-check-input m-0 align-middle" type="checkbox" aria-label="Select invoice"></td>
-                          <td><span class="text-muted">001401</span></td>
-                          <td><a href="create_invoice.php">Design Works</a></td>
-                          <td>
-                            Carlson Limited
-                          </td>
-                          <td>
-                            15 Dec 2017
-                          </td>
-                          <td>
-                            <span class="badge bg-success me-1"></span> Recieved
-                          </td>
-                          <td>₦887</td>
-                        </tr>
-                        
-                        <tr>
-                          <td><input class="form-check-input m-0 align-middle" type="checkbox" aria-label="Select invoice"></td>
-                          <td><span class="text-muted">001402</span></td>
-                          <td><a href="invoice.html" class="text-reset" tabindex="-1">UX Wireframes</a></td>
-                          <td>
-                            Adobe
-                          </td>
-                          <td>
-                            12 Apr 2017
-                          </td>
-                          <td>
-                            <span class="badge bg-warning me-1"></span> Pending
-                          </td>
-                          <td>₦1200</td>
-                          
-                        </tr>
-                        
-                        <tr>
-                          <td><input class="form-check-input m-0 align-middle" type="checkbox" aria-label="Select invoice"></td>
-                          <td><span class="text-muted">001404</span></td>
-                          <td><a href="invoice.html" class="text-reset" tabindex="-1">Landing Page</a></td>
-                          <td>
-                            Salesforce
-                          </td>
-                          <td>
-                            2 Sep 2017
-                          </td>
-                          <td>
-                            <span class="badge bg-secondary me-1"></span> Paid
-                          </td>
-                          <td>₦1500</td>
-                         
-                        </tr>
-                        
-                      </tbody>
-                    </table>
-                  </div>
-                  <div class="card-footer d-flex align-items-center">
-                    <ul class="pagination m-0 ms-auto">
-                      <li class="page-item disabled">
-                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">
-                          <!-- Download SVG icon from http://tabler-icons.io/i/chevron-left -->
-                          <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M15 6l-6 6l6 6" /></svg>
-                          prev
-                        </a>
-                      </li>
-                      <li class="page-item"><a class="page-link" href="#">1</a></li>
-                      <li class="page-item active"><a class="page-link" href="#">2</a></li>
-                      <li class="page-item"><a class="page-link" href="#">3</a></li>
-                      <li class="page-item"><a class="page-link" href="#">4</a></li>
-                      <li class="page-item"><a class="page-link" href="#">5</a></li>
-                      <li class="page-item">
-                        <a class="page-link" href="#">
-                          next <!-- Download SVG icon from http://tabler-icons.io/i/chevron-right -->
-                          <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6l-6 6" /></svg>
-                        </a>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
+                      <div class="container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Select</th>
+                <th>ID</th>
+                <th>Product Name</th>
+                <th>Customer Name</th>
+                <th>Payment Link</th>
+                <th>Status</th>
+                <th>Total Price</th>
+                <th>Created At</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php
+            $recordsPerPage = 12;
+
+            if (isset($_GET['page']) && is_numeric($_GET['page'])) {
+                $currentPage = $_GET['page'];
+            } else {
+                $currentPage = 1;
+            }
+            $startIndex = ($currentPage - 1) * $recordsPerPage;
+            $endIndex = min($startIndex + $recordsPerPage, count($invoices));
+            
+            $invoices = array_reverse($invoices); 
+
+            foreach (array_slice($invoices, $startIndex, $recordsPerPage) as $invoice):
+            ?>
+            <tr>
+                <td><input class="form-check-input m-0 align-middle" type="checkbox" aria-label="Select invoice"></td>
+                <td><span class="text-muted"><?php echo $invoice['id']; ?></span></td>
+                <td><a href="<?php echo "create_invoice?id=" . $invoice['id'];?>"><?php echo $invoice['product_name']; ?></a></td>
+                <td><?php echo $invoice['customer_name']; ?></td>
+                <td class="link" onclick="copyToClipboard('<?php echo "localhost/spurz/invoice.php?id=" . $invoice['id']; ?>')">Copy Link</td>
+                <td>
+                    <?php
+                    $status = $invoice['status'];
+                    switch ($status) {
+                        case 'Received':
+                            echo '<span class="badge bg-success me-1">Received</span>';
+                            break;
+                        case 'Paid':
+                            echo '<span class="badge bg-secondary me-1">Paid</span>';
+                            break;
+                        case 'Refunded':
+                            echo '<span class="badge bg-failed me-1">Refunded</span>';
+                            break;
+                        default:
+                            echo '<span class="badge bg-warning me-1">Pending</span>';
+                            break;
+                    }
+                    ?>
+                </td>
+                <td>₦<?php echo $invoice['total_price']; ?></td>
+                <td><?php echo $invoice['created_at']; ?></td>
+            </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+    <br>
+    <div class="card-footer d-flex align-items-center">
+        <ul class="pagination m-0 ms-auto">
+            <?php if ($currentPage > 1): ?>
+                <li class="page-item">
+                    <a class="page-link" href="?page=<?php echo ($currentPage - 1); ?>" tabindex="-1" aria-disabled="true">prev</a>
+                </li>
+            <?php endif; ?>
+            <?php for ($page = 1; $page <= ceil(count($invoices) / $recordsPerPage); $page++): ?>
+                <li class="page-item<?php echo ($currentPage == $page ? ' active' : ''); ?>">
+                    <a class="page-link" href="?page=<?php echo $page; ?>"><?php echo $page; ?></a>
+                </li>
+            <?php endfor; ?>
+            <?php if ($currentPage < ceil(count($invoices) / $recordsPerPage)): ?>
+                <li class="page-item">
+                    <a class="page-link" href="?page=<?php echo ($currentPage + 1); ?>">next</a>
+                </li>
+            <?php endif; ?>
+        </ul>
+    </div>
+</div>
+
               </div>
             </div>
           </div>
         </div>
-             
+        <style>
+          .bg-failed{
+            background-color: red !important;
+          }
+
+          .link{
+            color: darkblue !important;
+            cursor: pointer;
+          }
+        </style>
+        <script>
+    function copyToClipboard(text) {
+      var tempInput = document.createElement("input");
+      tempInput.value = text;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      document.execCommand("copy");
+      document.body.removeChild(tempInput);
+      alert("Payment link copied, share it with the buyer for seamless payment: " + text);
+    }
+  </script>
              
         <footer class="footer footer-transparent d-print-none">
           <div class="container-xl">
@@ -771,8 +798,8 @@ fetchAndAppendProducts();
                               </label>
 
                               <label class="form-selectgroup-item">
-                                <input type="checkbox" type="checkbox" id="services" name="product_category[]" value="Services" class="form-selectgroup-input">
-                                <span class="form-selectgroup-label">Services</span>
+                                <input type="checkbox" type="checkbox" id="services" name="product_category[]" value="Education Related" class="form-selectgroup-input">
+                                <span class="form-selectgroup-label">Education Relate</span>
                               </label>
 
                               <label class="form-selectgroup-item">

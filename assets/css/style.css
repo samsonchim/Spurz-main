@@ -1,113 +1,25 @@
-/* 	=========================
-	Template Name 	 : Wedo
-	Author			 : DexignZone
-	Version			 : 1.0
-	Author Portfolio : https://themeforest.net/user/dexignzone
-	=========================
-	
-	=========================
-	[Table of Contents]
-	=========================
-	==============
-	  SCSS Start
-	==============
-	1. Abstracts
-        1.1 _mixin
-        1.2 _variable
-        1.3 _abstracts
-
-    2. Bootstrap 
-        2.1 Here goes all official bootstrap scss files
-
-    3. Global/Base
-        3.1 _fonts
-        3.2 _reset
-        3.3 _shortcode 
-
-    4. Layout
-        4.1 footer
-        4.2 header
-			4.2.1 _header-sidebar
-		
-		4.3 rtl
-		4.4 theme
-
-    5. Components
-        5.1 ui
-			5.1.1	_ui-accordion 
-			5.1.2	_ui-action-sheet 
-			5.1.3	_ui-add-banner 
-			5.1.4	_ui-alert 
-			5.1.5	_ui-avatar 
-			5.1.6	_ui-badge 
-			5.1.7	_ui-breadcrumb 
-			5.1.8	_ui-button 
-			5.1.9	_ui-card 
-			5.1.10 	_ui-chip 
-			5.1.11 	_ui-divider 
-			5.1.12 	_ui-dropdown 
-			5.1.13 	_ui-form 
-			5.1.14 	_ui-lightgallery 
-			5.1.15 	_ui-list-group 
-			5.1.16 	_ui-media 
-			5.1.17 	_ui-modal 
-			5.1.18 	_ui-nouislider 
-			5.1.19 	_ui-pagination 
-			5.1.20 	_ui-popover 
-			5.1.21 	_ui-progressbar 
-			5.1.22 	_ui-radio 
-			5.1.23 	_ui-scrollspy 
-			5.1.24 	_ui-spinner 
-			5.1.25 	_ui-stepper 
-			5.1.26 	_ui-swiper 
-			5.1.27 	_ui-switch 
-			5.1.28 	_ui-tab 
-			5.1.29 	_ui-table 
-			5.1.30 	_ui-timeline 
-			5.1.31	_ui-toast 
-			5.1.32	_ui-treeview 
-	
-    6. Pages
-        6.1  _home
-        6.2  _login
-        6.3  _message
-        6.4  _order
-        6.5  _pages
-        6.6  _product-details
-        6.7  _profile
-        6.8  _shop
-        6.9  _splashcreen
-        6.10 _tracking-order
-        6.11 _welcome
-		
-	7. PreLoader 
-	
-	==============
-	  SCSS End
-	==============
-========================= */
 /*==== 1. Abstracts ====*/
 @import url("../icons/fontawesome/css/all.min.css");
 @import url("../icons/feather/css/iconfont.css");
 @import url("../icons/flaticon/flaticon.css");
 @import url("../icons/themify-icons/css/themify-icons.css");
 :root {
-  --primary: #FE4487;
-  --primary-light: #fe9fc2;
-  --bg-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0) 37.5%, rgba(255, 255, 255, 0.67) 44.84%, #FFF 56.23%, #FFF 100%);
-  --primary-hover: #fe1166;
-  --primary-dark: #a8013d;
-  --secondary: #612657;
-  --secondary-light: rgba(47, 47, 47, 0.50);
-  --rgba-primary-1: rgba(254, 68, 135, 0.1);
-  --rgba-primary-2: rgba(254, 68, 135, 0.2);
-  --rgba-primary-3: rgba(254, 68, 135, 0.3);
-  --rgba-primary-4: rgba(254, 68, 135, 0.4);
-  --rgba-primary-5: rgba(254, 68, 135, 0.5);
-  --rgba-primary-6: rgba(254, 68, 135, 0.6);
-  --rgba-primary-7: rgba(254, 68, 135, 0.7);
-  --rgba-primary-8: rgba(254, 68, 135, 0.8);
-  --rgba-primary-9: rgba(254, 68, 135, 0.9);
+  --primary: #81D5CC;
+  --primary-light: #a9e9e2;
+  --bg-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0) 37.5%, rgba(255, 255, 255, 0.67) 44.84%, #cce2ee 56.23%, #99c5ee 100%);
+  --primary-hover: #61cec3;
+  --primary-dark: #1d524c;
+  --secondary: #6ss12657;
+  --secondary-light:#24635c;
+  --rgba-primary-1: #36948a;
+  --rgba-primary-2:#3ca096;
+  --rgba-primary-3: #71e4d8;
+  --rgba-primary-4: #23ccbb;
+  --rgba-primary-5: #90dad2;
+  --rgba-primary-6: rgb(57, 145, 136);
+  --rgba-primary-7: rgb(131, 218, 209);
+  --rgba-primary-8: rgb(129 213 204);
+  --rgba-primary-9:rgb(129 213 204);
   --font-family-title: Poppins, sans-serif;
   --font-family-base: Open Sans, sans-serif;
   --box-shadow: 0px 2px 8px 0px rgba(99, 99, 99, 0.2);
@@ -123,7 +35,7 @@
   --card-bg: #fff;
   --theme-text-color: #fff;
   --light: #FFF1F6;
-  --text-accent: #612657; }
+  --text-accent: #225666; }
 
 /*
 	0 - 600: Phone
@@ -154,7 +66,7 @@
   --bs-gray-700: #495057;
   --bs-gray-800: #343a40;
   --bs-gray-900: #212529;
-  --bs-primary: #FE4487;
+  --bs-primary: #81D5CC;
   --bs-secondary: #612657;
   --bs-success: #18BF29;
   --bs-info: #2B39B9;
@@ -218,12 +130,12 @@
   --bs-tertiary-bg: #f8f9fa;
   --bs-tertiary-bg-rgb: 248, 249, 250;
   --bs-heading-color: #2F2F2F;
-  --bs-link-color: #FE4487;
+  --bs-link-color: #3fa79c;
   --bs-link-color-rgb: 254, 68, 135;
   --bs-link-decoration: underline;
-  --bs-link-hover-color: #cb366c;
+  --bs-link-hover-color: rgb(14, 165, 102)79c;
   --bs-link-hover-color-rgb: 203, 54, 108;
-  --bs-code-color: #ff0081;
+  --bs-code-color: #00b7ff;
   --bs-highlight-bg: #ffeecc;
   --bs-border-width: 1px;
   --bs-border-style: solid;
@@ -289,12 +201,16 @@
   --bs-light-border-subtle: #495057;
   --bs-dark-border-subtle: #343a40;
   --bs-heading-color: inherit;
-  --bs-link-color: #fe8fb7;
-  --bs-link-hover-color: #fea5c5;
-  --bs-link-color-rgb: 254, 143, 183;
-  --bs-link-hover-color-rgb: 254, 165, 197;
-  --bs-code-color: #ff66b3;
-  --bs-border-color: #495057;
+  --bs-link-color: #3fa79c;
+  --bs-link-color-rgb: 254, 68, 135;
+  --bs-link-decoration: underline;
+  --bs-link-hover-color: rgb(14, 165, 102)79c;
+  --bs-link-hover-color-rgb: 203, 54, 108;
+  --bs-code-color: #00b7ff;
+  --bs-highlight-bg: #ffeecc;
+  --bs-border-width: 1px;
+  --bs-border-style: solid;
+  --bs-border-color: #dee2e6;
   --bs-border-color-translucent: rgba(255, 255, 255, 0.15);
   --bs-form-valid-color: #b5dfbe;
   --bs-form-valid-border-color: #b5dfbe;
@@ -18569,46 +18485,32 @@ label input {
     display: flex;
     justify-content: center; }
 
-.load-circle {
-  display: inline-block;
-  position: relative;
-  width: 80px;
-  height: 80px; }
-  .load-circle div {
-    position: absolute;
-    border: 4px solid var(--primary-light);
-    opacity: 1;
-    border-radius: 50%;
-    animation: load-circle 1s cubic-bezier(0, 0.2, 0.8, 1) infinite; }
-    .load-circle div:nth-child(2) {
-      animation-delay: -0.5s; }
-
-@keyframes load-circle {
-  0% {
-    top: 36px;
-    left: 36px;
-    width: 0;
-    height: 0;
-    opacity: 0; }
-  4.9% {
-    top: 36px;
-    left: 36px;
-    width: 0;
-    height: 0;
-    opacity: 0; }
-  5% {
-    top: 36px;
-    left: 36px;
-    width: 0;
-    height: 0;
-    opacity: 1; }
-  100% {
-    top: 0px;
-    left: 0px;
-    width: 72px;
-    height: 72px;
-    opacity: 0; } }
-
+/* HTML: <div class="loader"></div> */
+.loader {
+  width: 50px;
+  aspect-ratio: 1;
+  display: grid;
+  border: 4px solid #0000;
+  border-radius: 50%;
+  border-right-color: #25b09b;
+  animation: l15 1s infinite linear;
+}
+.loader::before,
+.loader::after {    
+  content: "";
+  grid-area: 1/1;
+  margin: 2px;
+  border: inherit;
+  border-radius: 50%;
+  animation: l15 2s infinite;
+}
+.loader::after {
+  margin: 8px;
+  animation-duration: 3s;
+}
+@keyframes l15{ 
+  100%{transform: rotate(1turn)}
+}
 /*==== 9. RTL ====*/
 
 /*# sourceMappingURL=style.css.map */
