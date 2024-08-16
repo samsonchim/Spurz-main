@@ -59,6 +59,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $totalPrice = $_POST['total_price'];
     $waybillPrice = $_POST['waybill_price'];
     $expectedDeliveryDate = $_POST['expected_delivery_date'];
+    $currency = $_POST['currency'];
+    $phone_no = $_POST['phone_no'];
     
     // Sanitize form data
     $customerName = mysqli_real_escape_string($conn, $customerName);
@@ -67,17 +69,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $totalPrice = mysqli_real_escape_string($conn, $totalPrice); 
     $waybillPrice = mysqli_real_escape_string($conn, $waybillPrice);
     $expectedDeliveryDate = mysqli_real_escape_string($conn, $expectedDeliveryDate);
+    $phone_no = mysqli_real_escape_string($conn, $phone_no);
 
     // Check if the product ID is empty (indicating a new record)
     if (empty($productId)) {
         // Create new record
         // Retrieve user ID from session
         $userId = $_SESSION['id'];
-        $sql = "INSERT INTO invoices (user_id, customer_name, product_name, customer_address, total_price, waybill_price, expected_delivery_date) VALUES ('$userId', '$customerName', '$productName', '$customerAddress', '$totalPrice', '$waybillPrice', '$expectedDeliveryDate')";
+        $sql = "INSERT INTO invoices (user_id, currency, customer_name, product_name, customer_address, total_price, waybill_price, expected_delivery_date, phone_no) VALUES ('$userId', '$currency', '$customerName', '$productName', '$customerAddress', '$totalPrice', '$waybillPrice', '$expectedDeliveryDate', '$phone_no')";
     } else {
         // Update existing record
         $productId = mysqli_real_escape_string($conn, $productId); // Sanitize the ID
-        $sql = "UPDATE invoices SET customer_name='$customerName', product_name='$productName', customer_address='$customerAddress', total_price='$totalPrice', waybill_price='$waybillPrice', expected_delivery_date='$expectedDeliveryDate' WHERE id='$productId'";
+        $sql = "UPDATE invoices SET customer_name='$customerName',  currency='$currency', phone_no='$phone_no', product_name='$productName', customer_address='$customerAddress', total_price='$totalPrice', waybill_price='$waybillPrice', expected_delivery_date='$expectedDeliveryDate' WHERE id='$productId'";
     }
 
     if (mysqli_query($conn, $sql)) {

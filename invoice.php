@@ -11,7 +11,48 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Check if the ID parameter is present in the URL
+// Start session
+ob_start(); // Start output buffering
+session_start();
+
+// Check if the user is logged in
+if (!isset($_SESSION['id'])) {
+    // Redirect to the login page if not logged in
+    header("Location: login.html");
+    exit();
+}
+
+// Retrieve user data from the database
+$user_id = $_SESSION['id'];
+
+$sql = "SELECT * FROM outlets WHERE id = ?";
+$stmt = mysqli_prepare($conn, $sql);
+
+if ($stmt) {
+    mysqli_stmt_bind_param($stmt, "i", $user_id);
+
+    if (mysqli_stmt_execute($stmt)) {
+        $result = mysqli_stmt_get_result($stmt);
+
+        // Fetch and display user records
+        while ($row = mysqli_fetch_assoc($result)) {
+            $businessName = $row['businessName'];
+            $email = $row['email'];
+            $businessType = $row['businessType'];
+            // Add more fields as needed
+        }
+    } else {
+        echo "Error executing the statement: " . mysqli_error($conn);
+    }
+
+    // Close the statement
+    mysqli_stmt_close($stmt);
+} else {
+    echo "Error preparing the statement: " . mysqli_error($conn);
+}
+
+
+
 if(isset($_GET['id'])) {
     // Sanitize the input to prevent SQL injection
     $id = mysqli_real_escape_string($conn, $_GET['id']);
@@ -27,6 +68,7 @@ if(isset($_GET['id'])) {
         $row = $result->fetch_assoc();
         
         // Store the fetched data in variables
+        $id = $row['id'];
         $user_id = $row['user_id'];
         $customer_name = $row['customer_name'];
         $product_name = $row['product_name'];
@@ -36,6 +78,8 @@ if(isset($_GET['id'])) {
         $expected_delivery_date = $row['expected_delivery_date'];
         $created_at = $row['created_at'];
         $status = $row['status'];
+        $currency = $row['currency'];
+        $phone_no = $row['phone_no'];
 
        // Remove commas from $total_price and $waybill_price
         $total_price_numeric = str_replace(',', '', $total_price);
@@ -656,12 +700,7 @@ $conn->close();
                 </h2>
               </div>
               <!-- Page title actions -->
-              <div class="col-auto ms-auto d-print-none">
-                <button type="button" class="btn btn-primary" onclick="javascript:window.print();">
-                  <!-- Download SVG icon from http://tabler-icons.io/i/printer -->
-                  <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M17 17h2a2 2 0 0 0 2 -2v-4a2 2 0 0 0 -2 -2h-14a2 2 0 0 0 -2 2v4a2 2 0 0 0 2 2h2" /><path d="M17 9v-4a2 2 0 0 0 -2 -2h-6a2 2 0 0 0 -2 2v4" /><path d="M7 13m0 2a2 2 0 0 1 2 -2h6a2 2 0 0 1 2 2v4a2 2 0 0 1 -2 2h-6a2 2 0 0 1 -2 -2z" /></svg>
-                  Print Invoice
-                </button>
+             
               </div>
             </div>
           </div>
@@ -673,7 +712,7 @@ $conn->close();
               <div class="card-body">
                 <div class="row">
                   <div class="col-6">
-                    <p class="h3">Goods/Products are to be delivered to you by</p>
+                    <p class="h3">Delivery Date</p>
                     <address>
                         <?php echo $expected_delivery_date?>
                     </address>
@@ -685,7 +724,7 @@ $conn->close();
                     </address>
                   </div>
                   <div class="col-12 my-5">
-                    <h1>Invoice INV/001/15</h1>
+                    <h1>Invoice to <?php echo $customer_name ?></h1>
                   </div>
                 </div>
                 <table class="table table-transparent table-responsive">
@@ -715,9 +754,34 @@ $conn->close();
                     <td class="text-end"><?php echo $waybill_price?></td>
                   </tr>
                   <tr>
-                    <td colspan="2" class="font-weight-bold text-uppercase text-end">Total Due</td>
-                    <td class="font-weight-bold text-end"><?php echo $total_due ?></td>
+                  <form method="POST" action="https://checkout.flutterwave.com/v3/hosted/pay">
+                  <?php
+                  // Generate CSRF token and store it in the session
+             
+                  $csrf_token = bin2hex(random_bytes(32));
+                  $_SESSION['csrf_token'] = $csrf_token;
+                  
+
+                  $tx_ref = "spurz-" . $csrf_token;
+                  ?>
+                  <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
+                  <input type="hidden" name="id" value="<?php echo $id; ?>">
+                  <input type="hidden" name="total_due" value="<?php echo $total_due; ?>">
+                  <input type="hidden" name="currency" value="<?php echo $currency; ?>">
+                  <input type="hidden" name="customer_name" value="<?php echo $customer_name; ?>">
+                  <input type="hidden" name="product_name" value="<?php echo $product_name; ?>">
+                  <td colspan="2" class="font-weight-bold text-uppercase text-end">Total Due</td>
+                  <td class="font-weight-bold text-end"><?php echo $currency . ' ' . $total_due ?></td>
+                  <tr>
+                      <td colspan="2">
+                      <button type="button" class="btn btn-primary" onclick="makePayment()">Pay Now</button>
+                      </td>
                   </tr>
+              </form>
+
+
+
+
                 </table>
                 <p class="text-muted text-center mt-5">Thank you very much for doing business with us. We look forward to working with
                   you again!</p>
@@ -765,5 +829,50 @@ $conn->close();
     <!-- Tabler Core -->
     <script src="./dist/js/tabler.min.js?1684106062" defer></script>
     <script src="./dist/js/demo.min.js?1684106062" defer></script>
+    <script src="https://checkout.flutterwave.com/v3.js"></script>
+    <script>
+   function makePayment() {
+  FlutterwaveCheckout({
+    public_key: "FLWPUBK_TEST-6595882c69b3985611b08d8eef317b23-X",
+    tx_ref: "<?php echo $tx_ref ?>",
+    amount: <?php echo $total_due; ?>,
+    currency: "<?php echo $currency; ?>",
+    payment_options: "card, account, banktransfer, mpesa, mobilemoneyghana, mobilemoneyfranco, enaira, opay, mobilemoneyuganda, applepay, googlepay, mobilemoneyrwanda, mobilemoneyzambia, barter, nqr, credit, paypal, ussd",
+    redirect_url: "thank-you.html",
+    meta: {
+      consumer_id: 23,
+      consumer_mac: "92a3-912ba-1192a",
+    },
+    customer: {
+      email: "<?php echo $email ?>",
+      name: "Spurz",
+    },
+    customizations: {
+      title: "Spurz.com",
+      description: "<?php echo $phone_no ?>",
+      logo: "logo.png",
+    },
+    callback: function (response) {
+      // After payment completion, create the JSON object
+      var productPayment = {
+        "product_id": "<?php echo $id ?>",
+        "tx_ref": "<?php echo $tx_ref ?>",
+        "transaction_id": response.transaction_id || "" // Use response.transaction_id if available, otherwise leave it empty
+      };
+
+      // Convert the JSON object to a string
+      var productPaymentString = JSON.stringify(productPayment);
+
+      // Store the JSON string in the local storage
+      localStorage.setItem("productPayment", productPaymentString);
+    }
+  });
+}
+
+</script>
   </body>
 </html>
+
+<?php
+ob_end_flush(); // Flush output buffer and send output
+?>

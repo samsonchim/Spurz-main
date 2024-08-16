@@ -54,3 +54,5 @@ CREATE TABLE invoices (
 );
 
 ALTER TABLE invoices ADD status VARCHAR(255);
+ALTER TABLE invoices ADD currency VARCHAR(255);
+ALTER TABLE invoices ADD phone_no VARCHAR(255);

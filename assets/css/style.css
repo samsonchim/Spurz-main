@@ -16654,7 +16654,9 @@ label input {
   font-size: 18px; }
 
 .pwa-offcanvas {
-  text-align: center; }
+  text-align: center;
+  display: none;
+ }
   .pwa-offcanvas .title {
     margin-bottom: 10px; }
   .pwa-offcanvas .logo {

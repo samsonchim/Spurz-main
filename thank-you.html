@@ -19,7 +19,6 @@
             background-color: #f8f6f6;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-			margin-top: 50%;
         }
         h1 {
             color: #333;
@@ -45,20 +44,39 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <img src="success.png" alt="">
         <h1>Thank You!</h1>
-        <p>We would like to extend our sincerest gratitude for your support. Your contribution means a lot to us.</p>
-        <p>If you have any questions or feedback, please feel free to contact us. We are always here to help.</p>
-        <p>Thank you again for shopping with us!</p>
+        <p>Your payment was Successful</p>
+        <p>Screenshot this and keep it safe</p>
+        <p>Track ID: <span id="trackId"></span></p>
 
 		<a href="tracking-order.html">
-			<button type="submit">Track Order</button>
+			<button type="button">Track Order</button>
 		</a>
 		<a href="index.html">
-			<button type="su">Go Back Home</button>
+			<button type="button">Go Back Home</button>
 		</a>
     </div>
+
+    <script>
+        // Function to get URL parameters
+        function getUrlParameter(name) {
+            name = name.replace(/[[]/, '\\[').replace(/[\]]/, '\\]');
+            var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+            var results = regex.exec(location.search);
+            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+        };
+
+        var transaction_id = getUrlParameter('transaction_id');
+
+        // Update the track ID element with the transaction reference
+        document.getElementById('trackId').innerText = transaction_id;
+
+        // You can use transaction_id if needed in your page
+        // console.log('Transaction ID:', transaction_id);
+    </script>
 </body>
 </html>

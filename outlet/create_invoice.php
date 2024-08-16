@@ -44,7 +44,7 @@ if ($stmt) {
         echo "Error executing the statement: " . mysqli_error($conn);
     }
 
-    $customerName = $productName = $customerAddress = $totalPrice = $waybillPrice = $expectedDeliveryDate = "";
+    $customerName = $productName = $customerAddress = $phone_no = $totalPrice = $waybillPrice = $expectedDeliveryDate = "";
 
     // Check if product ID is provided in the URL parameter
     if (isset($_GET['id'])) {
@@ -64,6 +64,7 @@ if ($stmt) {
             $totalPrice = $row['total_price'];
             $waybillPrice = $row['waybill_price'];
             $expectedDeliveryDate = $row['expected_delivery_date'];
+            $phone_no = $row['phone_no'];
         } else {
             echo "No product found with ID: $productId";
         }
@@ -717,14 +718,24 @@ $conn->close();
                                   <input type="text" name="customer_address" class="form-control" placeholder="Customer's Address" value="<?php echo $customerAddress; ?>">
                                 </div>
                               </div>
-                              <div class="col-sm-6 col-md-6">
+
+                             
+                                  <input type="text" name="currency" id="currency" class="form-control" hidden>
+                              
+                              <div class="col-sm-6 col-md-3">
+                                <div class="mb-3">
+                                  <label class="form-label">Customer's number</label>
+                                  <input type="text" name="phone_no" class="form-control" placeholder="Customer's Phone Number" value="<?php echo $phone_no; ?>" >
+                                </div>
+                              </div>
+                              <div class="col-sm-6 col-md-4">
                                 <div class="mb-3">
                                   <label class="form-label">Total Price</label>
                                   <input type="text" name="total_price" id="totalPrice" class="form-control" placeholder="Enter amount" value="<?php echo $totalPrice; ?>">
                                 </div>
                               </div>
                               
-                              <div class="col-sm-6 col-md-6">
+                              <div class="col-sm-6 col-md-4">
                                 <div class="mb-3">
                                   <label class="form-label">Waybill Price</label>
                                   <input type="text" name="waybill_price" id="waybillPrice" class="form-control" placeholder="Agreed Waybill price" value="<?php echo $waybillPrice; ?>">
@@ -788,6 +799,29 @@ $conn->close();
   <!-- Tabler Core -->
   <script src="./dist/js/tabler.min.js?1684106062" defer></script>
   <script src="./dist/js/demo.min.js?1684106062" defer></script>
+  <script>
+        // Function to retrieve user's currency from localStorage and update the input field
+        function updateCurrencyField() {
+            try {
+                // Retrieve user information from localStorage
+                const userInfo = localStorage.getItem('userInfo');
+                if (userInfo) {
+                    const userData = JSON.parse(userInfo);
+                    // Extract currency information
+                    const currency = userData.currency;
+                    // Update the input field value with the currency
+                    document.getElementById('currency').value = currency;
+                } else {
+                    console.log('User information not found in localStorage.');
+                }
+            } catch (error) {
+                console.error('Error updating currency field:', error);
+            }
+        }
+
+        // Call the function when the page is loaded
+        window.onload = updateCurrencyField;
+    </script>
   <script>
 
     // Function to parse query string and extract parameter value by name
@@ -982,6 +1016,10 @@ document.getElementById('waybillPrice').addEventListener('input', function() {
     });
     // @formatter:on
   </script>
+
+
+
+
   <script>
     // @formatter:off
     document.addEventListener("DOMContentLoaded", function () {
