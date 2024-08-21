@@ -4,22 +4,13 @@
 @import url("../icons/flaticon/flaticon.css");
 @import url("../icons/themify-icons/css/themify-icons.css");
 :root {
-  --primary: #FE4487;
-  --primary-light: #fe9fc2;
+  --primary: #0716bd;
+  --primary-light: #0110bd;
   --bg-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0) 37.5%, rgba(255, 255, 255, 0.67) 44.84%, #FFF 56.23%, #FFF 100%);
-  --primary-hover: #fe1166;
-  --primary-dark: #a8013d;
+  --primary-hover: #0110bd;
+  --primary-dark: #101DB0;
   --secondary: #612657;
-  --secondary-light: rgba(47, 47, 47, 0.50);
-  --rgba-primary-1: rgba(254, 68, 135, 0.1);
-  --rgba-primary-2: rgba(254, 68, 135, 0.2);
-  --rgba-primary-3: rgba(254, 68, 135, 0.3);
-  --rgba-primary-4: rgba(254, 68, 135, 0.4);
-  --rgba-primary-5: rgba(254, 68, 135, 0.5);
-  --rgba-primary-6: rgba(254, 68, 135, 0.6);
-  --rgba-primary-7: rgba(254, 68, 135, 0.7);
-  --rgba-primary-8: rgba(254, 68, 135, 0.8);
-  --rgba-primary-9: rgba(254, 68, 135, 0.9);
+ 
   --font-family-title: Poppins, sans-serif;
   --font-family-base: Open Sans, sans-serif;
   --box-shadow: 0px 2px 8px 0px rgba(99, 99, 99, 0.2);
