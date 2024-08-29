@@ -4,7 +4,7 @@
 @import url("../icons/flaticon/flaticon.css");
 @import url("../icons/themify-icons/css/themify-icons.css");
 :root {
-  --primary: #0716bd;
+  --primary: #206bc4;
   --primary-light: #0110bd;
   --bg-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0) 37.5%, rgba(255, 255, 255, 0.67) 44.84%, #FFF 56.23%, #FFF 100%);
   --primary-hover: #0110bd;
@@ -60,7 +60,7 @@
   --bs-primary: #FE4487;
   --bs-secondary: #612657;
   --bs-success: #18BF29;
-  --bs-info: #2B39B9;
+  --bs-info: #206bc4;
   --bs-warning: #ffb02c;
   --bs-danger: #E12344;
   --bs-light: #FFF1F6;
