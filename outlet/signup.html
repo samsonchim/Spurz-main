@@ -1,12 +1,5 @@
 <!doctype html>
-<!--
-* Tabler - Premium and Open Source dashboard template with responsive and high quality UI.
-* @version 1.0.0-beta19
-* @link https://tabler.io
-* Copyright 2018-2023 The Tabler Authors
-* Copyright 2018-2023 codecalm.net Paweł Kuna
-* Licensed under MIT (https://github.com/tabler/tabler/blob/master/LICENSE)
--->
+
 <html lang="en">
   <head>
     <meta charset="utf-8"/>
@@ -14,6 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
     <title>Create an Outlet</title>
     <!-- CSS files -->
+     <link rel="shortcut icon" href="logo.png" type="image/x-icon">
     <link href="./dist/css/tabler.min.css?1684106062" rel="stylesheet"/>
     <link href="./dist/css/tabler-flags.min.css?1684106062" rel="stylesheet"/>
     <link href="./dist/css/tabler-payments.min.css?1684106062" rel="stylesheet"/>
@@ -143,7 +137,7 @@
                     
                     
                     <div class="form-footer">
-                      <button  type="button" onclick="submitForm()" class="btn btn-primary w-100">Sign in</button>
+                      <button  type="button" onclick="submitForm()" class="btn btn-primary w-100">Create Outlet</button>
                     </div>
                    
                   </form>
@@ -183,7 +177,7 @@
                 // Check for success message in the response
                 if (xhr.responseText.trim() === 'Registration Successful') {
                     // Redirect to login.html
-                    window.location.href = 'profile.php';
+                    window.location.href = 'onboarded';
                 }
             } else {
                 // Handle other HTTP status codes or errors
@@ -196,9 +190,27 @@
 }
 
 function validateForm() {
-    // Implement any client-side validation if needed
     return true;
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+    const togglePassword = document.querySelectorAll('.link-secondary');
+
+    togglePassword.forEach(function (toggle) {
+        toggle.addEventListener('click', function (e) {
+            e.preventDefault();
+            const passwordInput = this.closest('.input-group').querySelector('input');
+            const passwordType = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', passwordType);
+            
+            // Toggle the icon
+            const icon = this.querySelector('svg');
+            icon.innerHTML = passwordType === 'password'
+                ? '<path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" /><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" />'
+                : '<path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12l0 0m0 -2a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"/><path d="M4.94 4.94l14.12 14.12"/><path d="M10.73 9.73a6 6 0 0 0 8.49 8.49"/><path d="M9.27 9.27a6 6 0 0 0 0 8.49"/><path d="M3 3l18 18"/>';
+        });
+    });
+});
 
     </script>
     <!-- Libs JS -->

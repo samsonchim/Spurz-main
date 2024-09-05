@@ -82,6 +82,7 @@ $conn->close();
     <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
     <title><?php echo $businessName ?></title>
     <!-- CSS files -->
+     <link rel="shortcut icon" href="logo.png" type="image/x-icon">
     <link href="./dist/css/tabler.min.css?1684106062" rel="stylesheet"/>
     <link href="./dist/css/tabler-flags.min.css?1684106062" rel="stylesheet"/>
     <link href="./dist/css/tabler-payments.min.css?1684106062" rel="stylesheet"/>
@@ -187,7 +188,7 @@ $conn->close();
             <div class="row g-2 align-items-center">
               <div class="col">
                 <h2 class="page-title">
-                 Business Account Settings
+                 Outlet Account Settings
                 </h2>
               </div>
             </div>
@@ -210,7 +211,7 @@ $conn->close();
                     </div>
                     <h4 class="subheader mt-4">Experience</h4>
                     <div class="list-group list-group-transparent">
-                      <a href="#" class="list-group-item list-group-item-action">Give Feedback</a>
+                      <a href="https://wa.me/+2349162035539" class="list-group-item list-group-item-action">Give Feedback</a>
                     </div>
                   </div>
                 </div>
@@ -255,7 +256,7 @@ $conn->close();
                     
                   
                       <div class="col-md">
-                        <div class="form-label">City and States you can sell to</div>
+                        <div class="form-label">City and States you can waybill to</div>
                         <input type="text" name="location"  class="form-control" value="<?php echo $location ?>">
                       </div>
                     </div>
@@ -355,7 +356,7 @@ $conn->close();
                   <div class="input-group input-group-flat">
                     <input type="password" class="form-control" name="old_password" placeholder="initial password"  autocomplete="off">
                     <span class="input-group-text">
-                      <a href="#" class="input-group-link">Show password</a>
+                    <!--  <a href="#" class="input-group-link">Show password</a> -->
                     </span>
                   </div>
                 </div>
@@ -364,7 +365,7 @@ $conn->close();
                             <div class="input-group input-group-flat">
                               <input type="password" name="new_password"class="form-control" placeholder="new password"   autocomplete="off">
                               <span class="input-group-text">
-                                <a href="#" class="input-group-link">Show password</a>
+                            <!--    <a href="#" class="input-group-link">Show password</a> -->
                               </span>
                   </div>
                 </div>
@@ -397,8 +398,8 @@ $conn->close();
           <div class="modal-footer">
             <div class="w-100">
               <div class="row">
-                <div class="col"><a href="dashboard.php" class="btn w-100" data-bs-dismiss="modal">
-                    Go to dashboard
+                <div class="col" class="btn w-100" data-bs-dismiss="modal">
+                <a href="dashboard.php"> Go to dashboard
                   </a></div>
                 <div class="col"><a href="#" class="btn btn-success w-100" data-bs-dismiss="modal">
                     View 

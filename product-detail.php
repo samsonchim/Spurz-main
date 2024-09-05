@@ -178,34 +178,26 @@ $conn->close();
     </div>
 
 </div>
+<!---
 <div class="divider border"></div>
   <div class="container mt-5 mb-5">
     <div class="d-flex justify-content-center row">
         <div class="d-flex flex-column col-md-8">
 			 <h6 class="review"><i class="fa-solid fa-star me-1"></i>46 Likes <span>(5 review(s))</span></h6>
-            <div class="d-flex flex-row align-items-center text-left comment-top p-2 bg-white border-bottom px-1">
-                <!-- Comment input section -->
-                <input type="text" class="form-control mr-4" placeholder="Add comment">
+             <div class="d-flex flex-row align-items-center text-left comment-top p-2 bg-white border-bottom px-1">
+                 Comment input section 
+                <input type="text" id="comment-input" class="form-control mr-4" placeholder="Add comment">
             </div>
-			
-                <button class="btn btn-primary" type="button">Comment</button>
-            </div>
+            <button class="btn btn-primary" id="submit-comment" type="button">Comment</button>
+
             <div class="coment-bottom bg-white p-2 px-4">
-                <!-- Comment section -->
-                <div class="commented-section mt-2">
-				<h4>Comments</h4> <br>
-                    <div class="d-flex flex-row align-items-center commented-user">
-                        <h6 class="mr-2">Corey Oates</h6>
-                        
-                    </div>
-                    <div class="comment-text-sm">
-                        <span>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</span>
-                    </div>
-                    <div class="reply-section">
-                        <div class="d-flex flex-row align-items-center voting-icons">
-                        </div>
+                <h4>Comments</h4><br>
+                    <div id="comment-section">
+                        <?php include 'php/load_comments.php'; ?>
+                        Comments will be dynamically added here -->
                     </div>
                 </div>
+
                 <!-- Additional comments go here -->
             </div>
         </div>
@@ -236,6 +228,8 @@ $conn->close();
 ***********************************-->
 
 <script>
+
+    //Product Like
     document.getElementById('likeButton').addEventListener('click', function () {
         const productId = <?php echo $product['product_id']; ?>;
         const userId = <?php echo $product['user_id']; ?>;
@@ -273,6 +267,27 @@ $conn->close();
             document.getElementById('heartIcon').style.fill = 'red';
         }
     };
+
+//Product Review
+    document.getElementById('submit-comment').addEventListener('click', function () {
+    var comment = document.getElementById('comment-input').value;
+    if (comment.trim() !== "") {
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "php/submit_comment.php", true);
+        xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                document.getElementById('comment-input').value = ''; // Clear input field
+                document.getElementById('comment-section').innerHTML += xhr.responseText; // Append the new comment
+            }
+        };
+        xhr.send("comment=" + encodeURIComponent(comment));
+    } else {
+        alert("Please enter a comment.");
+    }
+});
+
 </script>
 <script src="assets/js/jquery.js"></script>
 <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>

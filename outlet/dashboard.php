@@ -221,7 +221,7 @@ mysqli_close($conn);
                   Overview
                 </div>
                 <h2 class="page-title">
-                  Dashboard
+                  Recent Products
                 </h2>
               </div>
               <!-- Page title actions -->

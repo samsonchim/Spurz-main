@@ -1,11 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<!-- Mirrored from wedo.dexignzone.com/xhtml/product-list.html by HTTrack Website Copier/3.x [XR&CO'2014], Mon, 19 Feb 2024 21:20:03 GMT -->
 <head>
 	
 	<!-- Title -->
-	<title>Wedo - Ecommerce Mobile App Template ( Bootstrap + PWA )</title>
+	<title>Spurz: Buy and Sale, Cheap</title>
 
 	<!-- Meta -->
 	<meta charset="utf-8">
@@ -15,14 +13,16 @@
 	<meta name="robots" content="index, follow"> 
 	<meta name="keywords" content="android, ios, mobile, application template, progressive web app, ui kit, multiple color, dark layout">
 	<meta name="description" content="Revolutionize your online store with our Ecommerce App Template. Seamless shopping, secure payments, and personalized recommendations for an exceptional user experience">
-	<meta property="og:title" content="Wedo - Ecommerce Mobile App Template ( Bootstrap + PWA )">
+	<meta property="og:title" content="Spurz: Buy Cheap">
 	<meta property="og:description" content="Revolutionize your online store with our Ecommerce App Template. Seamless shopping, secure payments, and personalized recommendations for an exceptional user experience.">
-	<meta property="og:image" content="social-image.png">
+	<meta property="og:image" content="assets/this.jpg">
 	<meta name="format-detection" content="telephone=no">
 
 	<!-- Favicons Icon -->
 	<link rel="shortcut icon" type="image/x-icon" href="assets/images/favicon.png">
 	
+	<!-- PWA Version -->
+	<link rel="manifest" href="manifest.json">
     
     <!-- Global CSS -->
 	<link href="assets/vendor/bootstrap-select/dist/css/bootstrap-select.min.css" rel="stylesheet">
@@ -33,10 +33,12 @@
     <link rel="stylesheet" class="main-css" type="text/css" href="assets/css/style.css">
 	
     <!-- Google Fonts -->
-	<link rel="preconnect" href="https://fonts.googleapis.com/">
-	<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
-	<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700;800&amp;family=Poppins:wght@100;200;300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700;800&family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
+
+	
 </head>   
 <body>
 <div class="page-wrapper">
@@ -44,9 +46,9 @@
 	<!-- Preloader -->
 	<div id="preloader">
 		<div class="loader">
-			<div class="load-circle"><div></div><div></div></div>
+			<div class="cart"></div><div></div></div>
 		</div>
-	</div>
+	</div> 
     <!-- Preloader end-->
 	
 	<!-- Header -->
@@ -70,525 +72,114 @@
 	
 	
 	<!-- Page Content Start -->	
-	<div class="page-content space-top">
-        <div class="container p-0">
-			<div class="dz-tab style-1 tab-fixed">
-				<div class="tab-slide-effect">
-					<ul class="nav nav-tabs" id="myTab2" role="tablist">
-						<li class="tab-active-indicator" style="width: 90.7188px; transform: translateX(0px);"></li>
-						<li class="nav-item active" role="presentation">
-							<button class="nav-link active" id="home-tab2" data-bs-toggle="tab" data-bs-target="#home-tab-pane2" type="button" role="tab" aria-controls="home-tab-pane2" aria-selected="true">Popular</button>
-						</li>
-						<li class="nav-item" role="presentation">
-							<button class="nav-link" id="profile-tab2" data-bs-toggle="tab" data-bs-target="#profile-tab-pane2" type="button" role="tab" aria-controls="profile-tab-pane2" aria-selected="false">Best Products</button>
-						</li>
-						<li class="nav-item" role="presentation">
-							<button class="nav-link" id="contact-tab2" data-bs-toggle="tab" data-bs-target="#contact-tab-pane2" type="button" role="tab" aria-controls="contact-tab-pane2" aria-selected="false">Flash Sale</button>
-						</li>
-					</ul>
-				</div>
-				<div class="tab-content" id="myTabContent2">
-					<div class="tab-pane fade active show" id="home-tab-pane2" role="tabpanel" aria-labelledby="home-tab2" tabindex="0">
-						<div class="row">
-							<div class="col-12">
-								<div class="product-list">
-									<div class="dz-media">
-										<img src="assets/images/product/pic1.jpg" alt="">
-										<a href="javascript:void(0);" class="item-bookmark active">
-											<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-heart"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-										</a>
-									</div>
-									<div class="product-content">
-										<div class="dz-review-meta mb-1">
-											<h6 class="review">4.5<i class="fa-solid fa-star ms-1"></i><span>(265 Review)</span></h6>
-										</div>
-										<h6 class="title font-14"><a href="product-detail.html">Blue Long Dress With Round Neck Denim</a></h6>
-										<div class="product-footer">
-											<h5 class="price mb-0">$158.15<del>$200.10</del></h5>
-											<small>40%OFF</small>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div class="col-12">
-								<div class="product-list">
-									<div class="dz-media">
-										<img src="assets/images/product/pic2.jpg" alt="">
-										<a href="javascript:void(0);" class="item-bookmark">
-											<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-heart"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-										</a>
-									</div>
-									<div class="product-content">
-										<div class="dz-review-meta mb-1">
-											<h6 class="review">4.0<i class="fa-solid fa-star ms-1"></i><span>(265 Review)</span></h6>
-										</div>
-										<h6 class="title font-14"><a href="product-detail.html">Black Hat with White suits</a></h6>
-										<div class="product-footer">
-											<h5 class="price mb-0">$158.15<del>$200.10</del></h5>
-											<small>45%OFF</small>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div class="col-12">
-								<div class="product-list">
-									<div class="dz-media">
-										<img src="assets/images/product/pic3.jpg" alt="">
-										<a href="javascript:void(0);" class="item-bookmark active">
-											<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-heart"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-										</a>
-									</div>
-									<div class="product-content">
-										<div class="dz-review-meta mb-1">
-											<h6 class="review">4.0<i class="fa-solid fa-star ms-1"></i><span>(265 Review)</span></h6>
-										</div>
-										<h6 class="title font-14"><a href="product-detail.html">Brown Women Shirts by Coklat Cloth</a></h6>
-										<div class="product-footer">
-											<h5 class="price mb-0">$24.15<del>$50.00</del></h5>
-											<small>13%OFF</small>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div class="col-12">
-								<div class="product-list">
-									<div class="dz-media">
-										<img src="assets/images/product/pic4.jpg" alt="">
-										<a href="javascript:void(0);" class="item-bookmark active">
-											<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-heart"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-										</a>
-									</div>
-									<div class="product-content">
-										<div class="dz-review-meta mb-1">
-											<h6 class="review">4.5<i class="fa-solid fa-star ms-1"></i><span>(265 Review)</span></h6>
-										</div>
-										<h6 class="title font-14"><a href="product-detail.html">Blue Long Dress With Round Neck Denim</a></h6>
-										<div class="product-footer">
-											<h5 class="price mb-0">$158.15<del>$200.10</del></h5>
-											<small>40%OFF</small>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div class="col-12">
-								<div class="product-list">
-									<div class="dz-media">
-										<img src="assets/images/product/pic5.jpg" alt="">
-										<a href="javascript:void(0);" class="item-bookmark">
-											<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-heart"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-										</a>
-									</div>
-									<div class="product-content">
-										<div class="dz-review-meta mb-1">
-											<h6 class="review">4.0<i class="fa-solid fa-star ms-1"></i><span>(265 Review)</span></h6>
-										</div>
-										<h6 class="title font-14"><a href="product-detail.html">Black Hat with White suits</a></h6>
-										<div class="product-footer">
-											<h5 class="price mb-0">$158.15<del>$200.10</del></h5>
-											<small>45%OFF</small>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div class="col-12">
-								<div class="product-list">
-									<div class="dz-media">
-										<img src="assets/images/product/pic6.jpg" alt="">
-										<a href="javascript:void(0);" class="item-bookmark active">
-											<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-heart"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-										</a>
-									</div>
-									<div class="product-content">
-										<div class="dz-review-meta mb-1">
-											<h6 class="review">4.0<i class="fa-solid fa-star ms-1"></i><span>(265 Review)</span></h6>
-										</div>
-										<h6 class="title font-14"><a href="product-detail.html">Brown Women Shirts by Coklat Cloth</a></h6>
-										<div class="product-footer">
-											<h5 class="price mb-0">$24.15<del>$50.00</del></h5>
-											<small>13%OFF</small>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div class="col-12">
-								<div class="product-list">
-									<div class="dz-media">
-										<img src="assets/images/product/pic7.jpg" alt="">
-										<a href="javascript:void(0);" class="item-bookmark active">
-											<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-heart"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-										</a>
-									</div>
-									<div class="product-content">
-										<div class="dz-review-meta mb-1">
-											<h6 class="review">4.5<i class="fa-solid fa-star ms-1"></i><span>(265 Review)</span></h6>
-										</div>
-										<h6 class="title font-14"><a href="product-detail.html">Blue Long Dress With Round Neck Denim</a></h6>
-										<div class="product-footer">
-											<h5 class="price mb-0">$158.15<del>$200.10</del></h5>
-											<small>40%OFF</small>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div class="col-12">
-								<div class="product-list">
-									<div class="dz-media">
-										<img src="assets/images/product/pic8.jpg" alt="">
-										<a href="javascript:void(0);" class="item-bookmark">
-											<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-heart"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-										</a>
-									</div>
-									<div class="product-content">
-										<div class="dz-review-meta mb-1">
-											<h6 class="review">4.0<i class="fa-solid fa-star ms-1"></i><span>(265 Review)</span></h6>
-										</div>
-										<h6 class="title font-14"><a href="product-detail.html">Black Hat with White suits</a></h6>
-										<div class="product-footer">
-											<h5 class="price mb-0">$158.15<del>$200.10</del></h5>
-											<small>45%OFF</small>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="tab-pane fade" id="profile-tab-pane2" role="tabpanel" aria-labelledby="profile-tab2" tabindex="0">
-						<div class="row">
-							<div class="col-12">
-								<div class="product-list">
-									<div class="dz-media">
-										<img src="assets/images/product/pic7.jpg" alt="">
-										<a href="javascript:void(0);" class="item-bookmark active">
-											<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-heart"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-										</a>
-									</div>
-									<div class="product-content">
-										<div class="dz-review-meta mb-1">
-											<h6 class="review">4.5<i class="fa-solid fa-star ms-1"></i><span>(265 Review)</span></h6>
-										</div>
-										<h6 class="title font-14"><a href="product-detail.html">Blue Long Dress With Round Neck Denim</a></h6>
-										<div class="product-footer">
-											<h5 class="price mb-0">$158.15<del>$200.10</del></h5>
-											<small>40%OFF</small>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div class="col-12">
-								<div class="product-list">
-									<div class="dz-media">
-										<img src="assets/images/product/pic1.jpg" alt="">
-										<a href="javascript:void(0);" class="item-bookmark">
-											<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-heart"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-										</a>
-									</div>
-									<div class="product-content">
-										<div class="dz-review-meta mb-1">
-											<h6 class="review">4.5<i class="fa-solid fa-star ms-1"></i><span>(265 Review)</span></h6>
-										</div>
-										<h6 class="title font-14"><a href="product-detail.html">Blue Long Dress With Round Neck Denim</a></h6>
-										<div class="product-footer">
-											<h5 class="price mb-0">$158.15<del>$200.10</del></h5>
-											<small>40%OFF</small>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div class="col-12">
-								<div class="product-list">
-									<div class="dz-media">
-										<img src="assets/images/product/pic2.jpg" alt="">
-										<a href="javascript:void(0);" class="item-bookmark active">
-											<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-heart"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-										</a>
-									</div>
-									<div class="product-content">
-										<div class="dz-review-meta mb-1">
-											<h6 class="review">4.0<i class="fa-solid fa-star ms-1"></i><span>(265 Review)</span></h6>
-										</div>
-										<h6 class="title font-14"><a href="product-detail.html">Black Hat with White suits</a></h6>
-										<div class="product-footer">
-											<h5 class="price mb-0">$158.15<del>$200.10</del></h5>
-											<small>45%OFF</small>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div class="col-12">
-								<div class="product-list">
-									<div class="dz-media">
-										<img src="assets/images/product/pic3.jpg" alt="">
-										<a href="javascript:void(0);" class="item-bookmark active">
-											<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-heart"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-										</a>
-									</div>
-									<div class="product-content">
-										<div class="dz-review-meta mb-1">
-											<h6 class="review">4.0<i class="fa-solid fa-star ms-1"></i><span>(265 Review)</span></h6>
-										</div>
-										<h6 class="title font-14"><a href="product-detail.html">Brown Women Shirts by Coklat Cloth</a></h6>
-										<div class="product-footer">
-											<h5 class="price mb-0">$24.15<del>$50.00</del></h5>
-											<small>13%OFF</small>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div class="col-12">
-								<div class="product-list">
-									<div class="dz-media">
-										<img src="assets/images/product/pic4.jpg" alt="">
-										<a href="javascript:void(0);" class="item-bookmark">
-											<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-heart"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-										</a>
-									</div>
-									<div class="product-content">
-										<div class="dz-review-meta mb-1">
-											<h6 class="review">4.5<i class="fa-solid fa-star ms-1"></i><span>(265 Review)</span></h6>
-										</div>
-										<h6 class="title font-14"><a href="product-detail.html">Blue Long Dress With Round Neck Denim</a></h6>
-										<div class="product-footer">
-											<h5 class="price mb-0">$158.15<del>$200.10</del></h5>
-											<small>40%OFF</small>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div class="col-12">
-								<div class="product-list">
-									<div class="dz-media">
-										<img src="assets/images/product/pic5.jpg" alt="">
-										<a href="javascript:void(0);" class="item-bookmark">
-											<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-heart"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-										</a>
-									</div>
-									<div class="product-content">
-										<div class="dz-review-meta mb-1">
-											<h6 class="review">4.0<i class="fa-solid fa-star ms-1"></i><span>(265 Review)</span></h6>
-										</div>
-										<h6 class="title font-14"><a href="product-detail.html">Black Hat with White suits</a></h6>
-										<div class="product-footer">
-											<h5 class="price mb-0">$158.15<del>$200.10</del></h5>
-											<small>45%OFF</small>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div class="col-12">
-								<div class="product-list">
-									<div class="dz-media">
-										<img src="assets/images/product/pic6.jpg" alt="">
-										<a href="javascript:void(0);" class="item-bookmark active">
-											<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-heart"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-										</a>
-									</div>
-									<div class="product-content">
-										<div class="dz-review-meta mb-1">
-											<h6 class="review">4.0<i class="fa-solid fa-star ms-1"></i><span>(265 Review)</span></h6>
-										</div>
-										<h6 class="title font-14"><a href="product-detail.html">Brown Women Shirts by Coklat Cloth</a></h6>
-										<div class="product-footer">
-											<h5 class="price mb-0">$24.15<del>$50.00</del></h5>
-											<small>13%OFF</small>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div class="col-12">
-								<div class="product-list">
-									<div class="dz-media">
-										<img src="assets/images/product/pic8.jpg" alt="">
-										<a href="javascript:void(0);" class="item-bookmark active">
-											<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-heart"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-										</a>
-									</div>
-									<div class="product-content">
-										<div class="dz-review-meta mb-1">
-											<h6 class="review">4.0<i class="fa-solid fa-star ms-1"></i><span>(265 Review)</span></h6>
-										</div>
-										<h6 class="title font-14"><a href="product-detail.html">Black Hat with White suits</a></h6>
-										<div class="product-footer">
-											<h5 class="price mb-0">$158.15<del>$200.10</del></h5>
-											<small>45%OFF</small>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="tab-pane fade" id="contact-tab-pane2" role="tabpanel" aria-labelledby="contact-tab2" tabindex="0">
-						<div class="row">
-							<div class="col-12">
-								<div class="product-list">
-									<div class="dz-media">
-										<img src="assets/images/product/pic8.jpg" alt="">
-										<a href="javascript:void(0);" class="item-bookmark">
-											<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-heart"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-										</a>
-									</div>
-									<div class="product-content">
-										<div class="dz-review-meta mb-1">
-											<h6 class="review">4.0<i class="fa-solid fa-star ms-1"></i><span>(265 Review)</span></h6>
-										</div>
-										<h6 class="title font-14"><a href="product-detail.html">Black Hat with White suits</a></h6>
-										<div class="product-footer">
-											<h5 class="price mb-0">$158.15<del>$200.10</del></h5>
-											<small>45%OFF</small>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div class="col-12">
-								<div class="product-list">
-									<div class="dz-media">
-										<img src="assets/images/product/pic2.jpg" alt="">
-										<a href="javascript:void(0);" class="item-bookmark active">
-											<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-heart"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-										</a>
-									</div>
-									<div class="product-content">
-										<div class="dz-review-meta mb-1">
-											<h6 class="review">4.0<i class="fa-solid fa-star ms-1"></i><span>(265 Review)</span></h6>
-										</div>
-										<h6 class="title font-14"><a href="product-detail.html">Black Hat with White suits</a></h6>
-										<div class="product-footer">
-											<h5 class="price mb-0">$158.15<del>$200.10</del></h5>
-											<small>45%OFF</small>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div class="col-12">
-								<div class="product-list">
-									<div class="dz-media">
-										<img src="assets/images/product/pic3.jpg" alt="">
-										<a href="javascript:void(0);" class="item-bookmark active">
-											<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-heart"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-										</a>
-									</div>
-									<div class="product-content">
-										<div class="dz-review-meta mb-1">
-											<h6 class="review">4.0<i class="fa-solid fa-star ms-1"></i><span>(265 Review)</span></h6>
-										</div>
-										<h6 class="title font-14"><a href="product-detail.html">Brown Women Shirts by Coklat Cloth</a></h6>
-										<div class="product-footer">
-											<h5 class="price mb-0">$24.15<del>$50.00</del></h5>
-											<small>13%OFF</small>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div class="col-12">
-								<div class="product-list">
-									<div class="dz-media">
-										<img src="assets/images/product/pic4.jpg" alt="">
-										<a href="javascript:void(0);" class="item-bookmark">
-											<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-heart"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-										</a>
-									</div>
-									<div class="product-content">
-										<div class="dz-review-meta mb-1">
-											<h6 class="review">4.5<i class="fa-solid fa-star ms-1"></i><span>(265 Review)</span></h6>
-										</div>
-										<h6 class="title font-14"><a href="product-detail.html">Blue Long Dress With Round Neck Denim</a></h6>
-										<div class="product-footer">
-											<h5 class="price mb-0">$158.15<del>$200.10</del></h5>
-											<small>40%OFF</small>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div class="col-12">
-								<div class="product-list">
-									<div class="dz-media">
-										<img src="assets/images/product/pic5.jpg" alt="">
-										<a href="javascript:void(0);" class="item-bookmark active">
-											<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-heart"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-										</a>
-									</div>
-									<div class="product-content">
-										<div class="dz-review-meta mb-1">
-											<h6 class="review">4.0<i class="fa-solid fa-star ms-1"></i><span>(265 Review)</span></h6>
-										</div>
-										<h6 class="title font-14"><a href="product-detail.html">Black Hat with White suits</a></h6>
-										<div class="product-footer">
-											<h5 class="price mb-0">$158.15<del>$200.10</del></h5>
-											<small>45%OFF</small>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div class="col-12">
-								<div class="product-list">
-									<div class="dz-media">
-										<img src="assets/images/product/pic6.jpg" alt="">
-										<a href="javascript:void(0);" class="item-bookmark active">
-											<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-heart"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-										</a>
-									</div>
-									<div class="product-content">
-										<div class="dz-review-meta mb-1">
-											<h6 class="review">4.0<i class="fa-solid fa-star ms-1"></i><span>(265 Review)</span></h6>
-										</div>
-										<h6 class="title font-14"><a href="product-detail.html">Brown Women Shirts by Coklat Cloth</a></h6>
-										<div class="product-footer">
-											<h5 class="price mb-0">$24.15<del>$50.00</del></h5>
-											<small>13%OFF</small>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div class="col-12">
-								<div class="product-list">
-									<div class="dz-media">
-										<img src="assets/images/product/pic7.jpg" alt="">
-										<a href="javascript:void(0);" class="item-bookmark">
-											<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-heart"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-										</a>
-									</div>
-									<div class="product-content">
-										<div class="dz-review-meta mb-1">
-											<h6 class="review">4.5<i class="fa-solid fa-star ms-1"></i><span>(265 Review)</span></h6>
-										</div>
-										<h6 class="title font-14"><a href="product-detail.html">Blue Long Dress With Round Neck Denim</a></h6>
-										<div class="product-footer">
-											<h5 class="price mb-0">$158.15<del>$200.10</del></h5>
-											<small>40%OFF</small>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div class="col-12">
-								<div class="product-list">
-									<div class="dz-media">
-										<img src="assets/images/product/pic1.jpg" alt="">
-										<a href="javascript:void(0);" class="item-bookmark">
-											<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-heart"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-										</a>
-									</div>
-									<div class="product-content">
-										<div class="dz-review-meta mb-1">
-											<h6 class="review">4.5<i class="fa-solid fa-star ms-1"></i><span>(265 Review)</span></h6>
-										</div>
-										<h6 class="title font-14"><a href="product-detail.html">Blue Long Dress With Round Neck Denim</a></h6>
-										<div class="product-footer">
-											<h5 class="price mb-0">$158.15<del>$200.10</del></h5>
-											<small>40%OFF</small>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
+<div class="page-content space-top">
+    <div class="container p-0">
+        <div class="dz-tab style-1 tab-fixed">
+            <div class="tab-slide-effect">
+                <ul class="nav nav-tabs" id="myTab2" role="tablist">
+                    <li class="tab-active-indicator" style="width: 90.7188px; transform: translateX(0px);"></li>
+                    <li class="nav-item active" role="presentation">
+                        <button class="nav-link active" id="home-tab2" data-bs-toggle="tab" data-bs-target="#home-tab-pane2" type="button" role="tab" aria-controls="home-tab-pane2" aria-selected="true">Popular</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="profile-tab2" data-bs-toggle="tab" data-bs-target="#profile-tab-pane2" type="button" role="tab" aria-controls="profile-tab-pane2" aria-selected="false">Best Products</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="contact-tab2" data-bs-toggle="tab" data-bs-target="#contact-tab-pane2" type="button" role="tab" aria-controls="contact-tab-pane2" aria-selected="false">Flash Sale</button>
+                    </li>
+                </ul>
+            </div>
+            <div class="tab-content" id="myTabContent2">
+                <div class="tab-pane fade active show" id="home-tab-pane2" role="tabpanel" aria-labelledby="home-tab2" tabindex="0">
+                    <!-- Products will be inserted here -->
+                </div>
+                <div class="tab-pane fade" id="profile-tab-pane2" role="tabpanel" aria-labelledby="profile-tab2" tabindex="0">
+                    <!-- Products will be inserted here -->
+                </div>
+                <div class="tab-pane fade" id="contact-tab-pane2" role="tabpanel" aria-labelledby="contact-tab2" tabindex="0">
+                    <!-- Products will be inserted here -->
+                </div>
+            </div>
         </div>
-	</div>
-	<!-- Page Content End -->
-</div>  
+    </div>
+</div>
+<!-- Page Content End -->
+
 <!--**********************************
     Scripts
 ***********************************-->
+<script>
+	document.addEventListener('DOMContentLoaded', function() {
+    function fetchProducts() {
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', 'php/products.php', true);
+        xhr.onload = function() {
+            if (this.status === 200) {
+                try {
+                    const products = JSON.parse(this.responseText);
+                    displayProducts(products);
+                } catch (error) {
+                    console.error('Error parsing JSON:', error);
+                }
+            } else {
+                console.error('Failed to fetch products. Status:', this.status);
+            }
+        };
+        xhr.onerror = function() {
+            console.error('Request error.');
+        };
+        xhr.send();
+    }
+
+    function displayProducts(products) {
+        const homeTabPane = document.getElementById('home-tab-pane2');
+        const profileTabPane = document.getElementById('profile-tab-pane2');
+        const contactTabPane = document.getElementById('contact-tab-pane2');
+        
+        if (!homeTabPane || !profileTabPane || !contactTabPane) {
+            console.error('One or more tab panes are missing.');
+            return;
+        }
+        
+        homeTabPane.innerHTML = '';
+        profileTabPane.innerHTML = '';
+        contactTabPane.innerHTML = '';
+        
+        products.forEach(product => {
+            const productHtml = `
+                <div class="col-12">
+                    <div class="product-list">
+                        <div class="dz-media">
+                            <img src="${product.image}" alt="">
+                            <a href="javascript:void(0);" class="item-bookmark">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-heart"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                            </a>
+                        </div>
+                        <div class="product-content">
+                            <div class="dz-review-meta mb-1">
+                                <h6 class="review">4.0<i class="fa-solid fa-star ms-1"></i><span>(265 Review)</span></h6>
+                            </div>
+                            <h6 class="title font-14"><a href="product-detail.php?id=${product.product_id}">${product.product_name}</a></h6>
+                            <div class="product-footer">
+                                <h5 class="price mb-0">₦${product.price}<del>₦${(product.price * 1.2).toFixed(2)}</del></h5>
+                                <small>45%OFF</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Display products in different tabs as needed
+            homeTabPane.innerHTML += productHtml;
+            profileTabPane.innerHTML += productHtml;
+            contactTabPane.innerHTML += productHtml;
+        });
+    }
+
+    fetchProducts();
+});
+
+</script>
 <script src="assets/js/jquery.js"></script>
 <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="assets/vendor/swiper/swiper-bundle.min.js"></script><!-- Swiper -->
@@ -598,5 +189,4 @@
 <script src="assets/js/custom.js"></script>
 </body>
 
-<!-- Mirrored from wedo.dexignzone.com/xhtml/product-list.html by HTTrack Website Copier/3.x [XR&CO'2014], Mon, 19 Feb 2024 21:20:03 GMT -->
 </html>
