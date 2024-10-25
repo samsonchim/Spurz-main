@@ -24,8 +24,8 @@ if (!isset($_SESSION['id'])) {
 // Retrieve user ID from the session
 $user_id = $_SESSION['id'];
 
-// Fetch all products for the logged-in user (no LIMIT, so it fetches everything)
-$sql = "SELECT product_id, product_name, product_category, price FROM products WHERE user_id = ? ORDER BY product_id DESC";
+// Fetch the first two recent products for the logged-in user
+$sql = "SELECT product_id, product_name, product_category, price FROM products WHERE user_id = ? ORDER BY product_id DESC LIMIT 2";
 $stmt = $conn->prepare($sql);
 
 if ($stmt) {
@@ -46,9 +46,9 @@ if ($stmt) {
         ];
     }
 
-    // Output JSON response
+    // Output JSON response for debugging
     header('Content-Type: application/json');
-    echo json_encode($products);
+    echo json_encode($products, JSON_PRETTY_PRINT);
 
     // Close the statement
     $stmt->close();

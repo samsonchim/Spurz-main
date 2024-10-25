@@ -188,7 +188,7 @@ mysqli_close($conn);
               <div class="container-xl">
                 <ul class="navbar-nav">
                   <li class="nav-item">
-                    <a class="nav-link" href="./" >
+                    <a class="nav-link" href="dashboard.php" >
                       <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/home -->
                         <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l-2 0l9 -9l9 9l-2 0" /><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" /><path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" /></svg>
                       </span>
@@ -329,338 +329,150 @@ mysqli_close($conn);
             </div>
           </div>
         </div>
-<style>
-  .product_image{
+        <style>
+  .product_image {
     height: 50%;
     width: 50%;
   }
 
-  .see_products{
+  .see_products {
     text-align: center !important;
   }
+
+  .custom-row-spacing {
+    margin-bottom: 30px; /* Or any desired value */
+}
+
 </style>
-       <script>
- // Fetch products from the server and update local storage
+
+<script>
+// Fetch products from the server and update local storage
 function fetchAndAppendProducts() {
     // Make an AJAX request to fetch products from the server
-    fetch('php/fetch_product_index.php')
+    fetch('php/fetch_products.php')
         .then(response => response.json())
         .then(data => {
             // Update local storage with the fetched products
             localStorage.setItem('userProducts', JSON.stringify(data));
 
-            // Get the containers to append new cards
-            const container1 = document.getElementById('product-column');
-            const container2 = document.getElementById('product-column-2');
-            
+            // Get the container to append new rows
+            const container = document.querySelector('.row-cards');
+            container.innerHTML = ""; // Clear previous content if any
 
-            // Loop through the fetched records and create new card elements
-            for (let i = 0; i < data.length; i++) {
-                const product = data[i];
+            // Loop through the fetched records and create product card elements
+            for (let i = 0; i < data.length; i += 2) {
+                // Create a new row (div) to hold two product cards
+                const productRow = document.createElement('div');
+                productRow.className = 'row row-cards custom-row-spacing';
 
-                // Generate the URL for the first product image based on the product ID
-                const imageUrl = `php/uploads/${product.product_id}_(1).png`; // Assuming the image extension is always PNG
+                // For each iteration, create two cards (if available)
+                for (let j = 0; j < 2; j++) {
+                    if (data[i + j]) {
+                        const product = data[i + j];
+                        const imageUrl = `php/uploads/${product.product_id}_(1).png`;
 
-                // Create a new card element
-                const card = document.createElement('div');
-                card.id = `product-card-${i}`;
-                card.className = 'card';
-
-                // Populate the card with product data
-                card.innerHTML = `
-                    <div class="card-body">
-                        <div class="row align-items-center">
-                            <div class="col-3" id="product-image-${i}">
-                                <img class="product_image" src="${imageUrl}" alt="${product.product_name}" class="rounded">
-                            </div>
-                            <div class="col">
-                                <h3 class="card-title mb-1">
-                                    <a href="#" class="text-reset">${product.product_name}</a>
-                                </h3>
-                                <div class="text-muted">
-                                    ${product.product_category}
-                                </div>
-                                <div class="mt-3">
-                                    <div class="row g-2 align-items-center">
+                        // Create a new card element
+                        const card = document.createElement('div');
+                        card.className = 'col-lg-6';
+                        card.innerHTML = `
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="row align-items-center">
+                                        <div class="col-3">
+                                            <img class="product_image" src="${imageUrl}" alt="${product.product_name}" class="rounded">
+                                        </div>
+                                        <div class="col">
+                                            <h3 class="card-title mb-1">
+                                                <a href="#" class="text-reset">${product.product_name}</a>
+                                            </h3>
+                                            <div class="text-muted">
+                                                ${product.product_category}
+                                            </div>
+                                            <div class="mt-3">
+                                                <div class="row g-2 align-items-center">
+                                                    <div class="col-auto">
+                                                        &#x20A6; ${product.price}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                         <div class="col-auto">
-                                            &#x20A6; ${product.price}
+                                            <div class="dropdown">
+                                                <a href="#" class="btn-action" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /><path d="M12 19m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /><path d="M12 5m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /></svg>
+                                                </a>
+                                                <div class="dropdown-menu dropdown-menu-end">
+                                                    <a href="#" class="dropdown-item text-danger delete-product" data-id="${product.product_id}">Delete</a>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-auto">
-                                <div class="dropdown">
-                                    <a href="#" class="btn-action" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <!-- Download SVG icon from http://tabler-icons.io/i/dots-vertical -->
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /><path d="M12 19m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /><path d="M12 5m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /></svg>
-                                    </a>
-                                    <div class="dropdown-menu dropdown-menu-end">
-                                        <a href="#" class="dropdown-item">Go Live</a>
-                                        <a href="#" class="dropdown-item">Promote</a>
-                                        <a href="#" class="dropdown-item text-danger">Delete</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
+                        `;
 
-                // Append the new card to the respective container
-                if (i % 2 === 0) {
-                    container1.appendChild(card);
-                } else {
-                    container2.appendChild(card);
+                        // Append the card to the row
+                        productRow.appendChild(card);
+                    }
                 }
+
+                // Append the row to the container
+                container.appendChild(productRow);
             }
+
+            // Add event listener to delete buttons after cards are appended
+            const deleteButtons = document.querySelectorAll('.delete-product');
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    const productId = this.getAttribute('data-id');
+                    deleteProduct(productId, this);
+                });
+            });
         })
         .catch(error => console.error('Error fetching and appending products:', error));
+}
+
+// Function to send AJAX request to delete product from the database
+function deleteProduct(productId, buttonElement) {
+    fetch('php/delete_product.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ product_id: productId })
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            // Remove the card from the DOM
+            const card = buttonElement.closest('.col-lg-6');
+            card.remove();
+        } else {
+            console.error('Failed to delete the product:', result.message);
+        }
+    })
+    .catch(error => console.error('Error deleting product:', error));
 }
 
 // Call the function when the page loads
 fetchAndAppendProducts();
 
-    </script>
+</script>
 
-
-       </script>
-       <div class="page-body">
-        <div class="container-xl">
-            <div class="row row-cards">
-                <div class="col-lg-6" id="product-column">
-                    <!-- The fetched products will be appended here -->
-                </div>
-                <div class="col-lg-6" id="product-column-2">
-                    <!-- The fetched products will be appended here -->
-                </div>
-            </div>
-            <a class="see_products" href="product-list.php">See all Products</a>
+<div class="page-body">
+    <div class="container-xl">
+        <div class="row-cards">
+            <!-- Products will be appended here in rows of two products per row -->
         </div>
-       
-    </div>
-      
-        <div class="page-body">
-          <div class="container-xl">
-            <div class="row row-cards">
-              <div class="col-12">
-                <div class="row row-cards">
-                  <div class="col-sm-6 col-lg-3">
-                    <div class="card card-sm">
-                      <div class="card-body">
-                        <div class="row align-items-center">
-                          <div class="col-auto">
-                            <span class="bg-primary text-white avatar"><!-- Download SVG icon from http://tabler-icons.io/i/currency-dollar -->
-                              <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M16.7 8a3 3 0 0 0 -2.7 -2h-4a3 3 0 0 0 0 6h4a3 3 0 0 1 0 6h-4a3 3 0 0 1 -2.7 -2" /><path d="M12 3v3m0 12v3" /></svg>
-                            </span>
-                          </div>
-                          <div class="col">
-                            <div class="font-weight-medium">
-                              132 Sales
-                            </div>
-                            <div class="text-muted">
-                              12 waiting payments
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-sm-6 col-lg-3">
-                    <div class="card card-sm">
-                      <div class="card-body">
-                        <div class="row align-items-center">
-                          <div class="col-auto">
-                            <span class="bg-green text-white avatar"><!-- Download SVG icon from http://tabler-icons.io/i/shopping-cart -->
-                              <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M17 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M17 17h-11v-14h-2" /><path d="M6 5l14 1l-1 7h-13" /></svg>
-                            </span>
-                          </div>
-                          <div class="col">
-                            <div class="font-weight-medium">
-                              78 Orders
-                            </div>
-                            <div class="text-muted">
-                              32 shipped
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-sm-6 col-lg-3">
-                    <div class="card card-sm">
-                      <div class="card-body">
-                        <div class="row align-items-center">
-                          <div class="col-auto">
-                            <span class="bg-twitter text-white avatar"><!-- Download SVG icon from http://tabler-icons.io/i/brand-twitter -->
-                              <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c0 -.249 1.51 -2.772 1.818 -4.013z" /></svg>
-                            </span>
-                          </div>
-                          <div class="col">
-                            <div class="font-weight-medium">
-                              623 likes
-                            </div>
-                            <div class="text-muted">
-                              16 reviews
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-sm-6 col-lg-3">
-                    <div class="card card-sm">
-                      <div class="card-body">
-                        <div class="row align-items-center">
-                          <div class="col-auto">
-                            <span class="bg-facebook text-white avatar"><!-- Download SVG icon from http://tabler-icons.io/i/brand-facebook -->
-                              <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M7 10v4h3v7h4v-7h3l1 -4h-4v-2a1 1 0 0 1 1 -1h3v-4h-3a5 5 0 0 0 -5 5v2h-3" /></svg>
-                            </span>
-                          </div>
-                          <div class="col">
-                            <div class="font-weight-medium">
-                              132 Likes
-                            </div>
-                            <div class="text-muted">
-                              21 today
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-
-              <div class="col-12">
-                <div class="card">
-                  <div class="card-header">
-                    <h3 class="card-title">Invoices</h3>
-                  </div>
-                  <div class="card-body border-bottom py-3">
-                     
-                      <div class="ms-auto text-muted">
-                        Search:
-                        <div class="ms-2 d-inline-block">
-                          <input type="text" class="form-control form-control-sm" aria-label="Search invoice">
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="table-responsive">
-                    <table class="table card-table table-vcenter text-nowrap datatable">
-                      <thead>
-                        <tr>
-                          
-                        </tr>
-                      </thead>
-                      <tbody>
-                      <div class="container">
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Select</th>
-                <th>ID</th>
-                <th>Product Name</th>
-                <th>Customer Name</th>
-                <th>Payment Link</th>
-                <th>Status</th>
-                <th>Total Price</th>
-                <th>Created At</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php
-            $recordsPerPage = 12;
-
-            if (isset($_GET['page']) && is_numeric($_GET['page'])) {
-                $currentPage = $_GET['page'];
-            } else {
-                $currentPage = 1;
-            }
-            $startIndex = ($currentPage - 1) * $recordsPerPage;
-            $endIndex = min($startIndex + $recordsPerPage, count($invoices));
-            
-            $invoices = array_reverse($invoices); 
-
-            foreach (array_slice($invoices, $startIndex, $recordsPerPage) as $invoice):
-            ?>
-            <tr>
-                <td><input class="form-check-input m-0 align-middle" type="checkbox" aria-label="Select invoice"></td>
-                <td><span class="text-muted"><?php echo $invoice['id']; ?></span></td>
-                <td><a href="<?php echo "create_invoice?id=" . $invoice['id'];?>"><?php echo $invoice['product_name']; ?></a></td>
-                <td><?php echo $invoice['customer_name']; ?></td>
-                <td class="link" onclick="copyToClipboard('<?php echo "localhost/spurz/invoice.php?id=" . $invoice['id']; ?>')">Copy Link</td>
-                <td>
-                    <?php
-                    $status = $invoice['status'];
-                    switch ($status) {
-                        case 'Received':
-                            echo '<span class="badge bg-success me-1">Received</span>';
-                            break;
-                        case 'Paid':
-                            echo '<span class="badge bg-secondary me-1">Paid</span>';
-                            break;
-                        case 'Refunded':
-                            echo '<span class="badge bg-failed me-1">Refunded</span>';
-                            break;
-                        default:
-                            echo '<span class="badge bg-warning me-1">Pending</span>';
-                            break;
-                    }
-                    ?>
-                </td>
-                <td>₦<?php echo $invoice['total_price']; ?></td>
-                <td><?php echo $invoice['created_at']; ?></td>
-            </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
-    <br>
-    <div class="card-footer d-flex align-items-center">
-        <ul class="pagination m-0 ms-auto">
-            <?php if ($currentPage > 1): ?>
-                <li class="page-item">
-                    <a class="page-link" href="?page=<?php echo ($currentPage - 1); ?>" tabindex="-1" aria-disabled="true">prev</a>
-                </li>
-            <?php endif; ?>
-            <?php for ($page = 1; $page <= ceil(count($invoices) / $recordsPerPage); $page++): ?>
-                <li class="page-item<?php echo ($currentPage == $page ? ' active' : ''); ?>">
-                    <a class="page-link" href="?page=<?php echo $page; ?>"><?php echo $page; ?></a>
-                </li>
-            <?php endfor; ?>
-            <?php if ($currentPage < ceil(count($invoices) / $recordsPerPage)): ?>
-                <li class="page-item">
-                    <a class="page-link" href="?page=<?php echo ($currentPage + 1); ?>">next</a>
-                </li>
-            <?php endif; ?>
-        </ul>
+        <a class="see_products" href="">See all Products</a>
     </div>
 </div>
 
+      
 
-        
-        <style>
-          .bg-failed{
-            background-color: red !important;
-          }
 
-          .link{
-            color: darkblue !important;
-            cursor: pointer;
-          }
-        </style>
-        <script>
-    function copyToClipboard(text) {
-      var tempInput = document.createElement("input");
-      tempInput.value = text;
-      document.body.appendChild(tempInput);
-      tempInput.select();
-      document.execCommand("copy");
-      document.body.removeChild(tempInput);
-      alert("Payment link copied, share it with the buyer for seamless payment: " + text);
-    }
-  </script>
-             
+          
         <footer class="footer footer-transparent d-print-none">
           <div class="container-xl">
             <div class="row text-center align-items-center flex-row-reverse">
