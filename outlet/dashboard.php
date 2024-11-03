@@ -222,7 +222,7 @@ mysqli_close($conn);
                   </li>
 
                   <li class="nav-item">
-                    <a class="nav-link" href="./icons.html" >
+                    <a class="nav-link" href="profile.php" >
                       <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/ghost -->
                         <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 11a7 7 0 0 1 14 0v7a1.78 1.78 0 0 1 -3.1 1.4a1.65 1.65 0 0 0 -2.6 0a1.65 1.65 0 0 1 -2.6 0a1.65 1.65 0 0 0 -2.6 0a1.78 1.78 0 0 1 -3.1 -1.4v-7" /><path d="M10 10l.01 0" /><path d="M14 10l.01 0" /><path d="M10 14a3.5 3.5 0 0 0 4 0" /></svg>
                       </span>
@@ -253,11 +253,10 @@ mysqli_close($conn);
                       </span>
                     </a>
                   </li>
-
+                  <!--
                   <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#navbar-help" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button" aria-expanded="false" >
-                      <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/lifebuoy -->
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" /><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M15 15l3.35 3.35" /><path d="M9 15l-3.35 3.35" /><path d="M5.65 5.65l3.35 3.35" /><path d="M18.35 5.65l-3.35 3.35" /></svg>
+                      <span class="nav-link-icon d-md-none d-lg-inline-block"><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" /><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M15 15l3.35 3.35" /><path d="M9 15l-3.35 3.35" /><path d="M5.65 5.65l3.35 3.35" /><path d="M18.35 5.65l-3.35 3.35" /></svg>
                       </span>
                       <span class="nav-link-title">
                         Help
@@ -274,23 +273,15 @@ mysqli_close($conn);
                         Source code
                       </a>
                       <a class="dropdown-item text-pink" href="https://github.com/sponsors/codecalm" target="_blank" rel="noopener">
-                        <!-- Download SVG icon from http://tabler-icons.io/i/heart -->
+                       
                         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-inline me-1" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" /></svg>
                         Sponsor project!
                       </a>
                     </div>
                   </li>
-                </ul>
+                </ul>-->
                 <div class="my-2 my-md-0 flex-grow-1 flex-md-grow-0 order-first order-md-last">
-                  <form action="./" method="get" autocomplete="off" novalidate>
-                    <div class="input-icon">
-                      <span class="input-icon-addon">
-                        <!-- Download SVG icon from http://tabler-icons.io/i/search -->
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" /><path d="M21 21l-6 -6" /></svg>
-                      </span>
-                      <input type="text" value="" class="form-control" placeholder="Search…" aria-label="Search in website">
-                    </div>
-                  </form>
+                
                 </div>
               </div>
             </div>
@@ -395,8 +386,7 @@ function fetchAndAppendProducts() {
                                         <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /><path d="M12 19m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /><path d="M12 5m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /></svg>
                                     </a>
                                     <div class="dropdown-menu dropdown-menu-end">
-                                        <a href="#" class="dropdown-item">Go Live</a>
-                                        <a href="#" class="dropdown-item">Promote</a>
+                                      
                                         <a href="#" class="dropdown-item text-danger">Delete</a>
                                     </div>
                                 </div>
@@ -437,7 +427,6 @@ fetchAndAppendProducts();
         </div>
        
     </div>
-      
         <div class="page-body">
           <div class="container-xl">
             <div class="row row-cards">
@@ -447,11 +436,12 @@ fetchAndAppendProducts();
                     <div class="card card-sm">
                       <div class="card-body">
                         <div class="row align-items-center">
-                          <div class="col-auto">
-                            <span class="bg-primary text-white avatar"><!-- Download SVG icon from http://tabler-icons.io/i/currency-dollar -->
+                          <!--<div class="col-auto">
+                            <span class="bg-primary text-white avatar">
                               <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M16.7 8a3 3 0 0 0 -2.7 -2h-4a3 3 0 0 0 0 6h4a3 3 0 0 1 0 6h-4a3 3 0 0 1 -2.7 -2" /><path d="M12 3v3m0 12v3" /></svg>
                             </span>
                           </div>
+                          
                           <div class="col">
                             <div class="font-weight-medium">
                               132 Sales
@@ -460,6 +450,7 @@ fetchAndAppendProducts();
                               12 waiting payments
                             </div>
                           </div>
+                        -->
                         </div>
                       </div>
                     </div>
@@ -468,8 +459,8 @@ fetchAndAppendProducts();
                     <div class="card card-sm">
                       <div class="card-body">
                         <div class="row align-items-center">
-                          <div class="col-auto">
-                            <span class="bg-green text-white avatar"><!-- Download SVG icon from http://tabler-icons.io/i/shopping-cart -->
+                          <!--<div class="col-auto">
+                            <span class="bg-green text-white avatar">
                               <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M17 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M17 17h-11v-14h-2" /><path d="M6 5l14 1l-1 7h-13" /></svg>
                             </span>
                           </div>
@@ -480,7 +471,7 @@ fetchAndAppendProducts();
                             <div class="text-muted">
                               32 shipped
                             </div>
-                          </div>
+                          </div>--->
                         </div>
                       </div>
                     </div>
@@ -489,8 +480,8 @@ fetchAndAppendProducts();
                     <div class="card card-sm">
                       <div class="card-body">
                         <div class="row align-items-center">
-                          <div class="col-auto">
-                            <span class="bg-twitter text-white avatar"><!-- Download SVG icon from http://tabler-icons.io/i/brand-twitter -->
+                         <!-- <div class="col-auto">
+                            <span class="bg-twitter text-white avatar">
                               <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c0 -.249 1.51 -2.772 1.818 -4.013z" /></svg>
                             </span>
                           </div>
@@ -501,7 +492,7 @@ fetchAndAppendProducts();
                             <div class="text-muted">
                               16 reviews
                             </div>
-                          </div>
+                          </div>-->
                         </div>
                       </div>
                     </div>
@@ -510,8 +501,8 @@ fetchAndAppendProducts();
                     <div class="card card-sm">
                       <div class="card-body">
                         <div class="row align-items-center">
-                          <div class="col-auto">
-                            <span class="bg-facebook text-white avatar"><!-- Download SVG icon from http://tabler-icons.io/i/brand-facebook -->
+                          <!--<div class="col-auto">
+                            <span class="bg-facebook text-white avatar">
                               <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M7 10v4h3v7h4v-7h3l1 -4h-4v-2a1 1 0 0 1 1 -1h3v-4h-3a5 5 0 0 0 -5 5v2h-3" /></svg>
                             </span>
                           </div>
@@ -522,7 +513,7 @@ fetchAndAppendProducts();
                             <div class="text-muted">
                               21 today
                             </div>
-                          </div>
+                          </div>-->
                         </div>
                       </div>
                     </div>
@@ -530,7 +521,7 @@ fetchAndAppendProducts();
                 </div>
               </div>
               
-
+            
               <div class="col-12">
                 <div class="card">
                   <div class="card-header">

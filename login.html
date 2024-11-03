@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<!-- Mirrored from wedo.dexignzone.com/xhtml/login.html by HTTrack Website Copier/3.x [XR&CO'2014], Mon, 19 Feb 2024 21:20:57 GMT -->
 <head>
 	
     <!-- Title -->
@@ -108,14 +107,11 @@
           if (xhr.readyState == 4) {
               if (xhr.status == 200) {
                   document.getElementById('response-message').innerHTML = xhr.responseText;
-  
-                  // Check for success message in the response
+
                   if (xhr.responseText.trim() === 'Login Successful') {
-                      // Redirect to login.html
                       window.location.href = 'user.php';
                   }
               } else {
-                  // Handle other HTTP status codes or errors
                   console.error('Error: ' + xhr.status);
               }
           }
@@ -125,7 +121,6 @@
   }
   
   function validateForm() {
-      // Implement any client-side validation if needed
       return true;
   }
 </script>
@@ -137,5 +132,4 @@
 <script src="assets/js/custom.js"></script>
 </body>
 
-<!-- Mirrored from wedo.dexignzone.com/xhtml/login.html by HTTrack Website Copier/3.x [XR&CO'2014], Mon, 19 Feb 2024 21:20:57 GMT -->
 </html>

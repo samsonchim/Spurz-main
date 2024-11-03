@@ -1,54 +1,69 @@
 <?php
 session_start();
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "spurz";
 
-// Validate CSRF token
-if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-    die("CSRF token validation failed.");
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
 }
 
-// Include Flutterwave library
-require 'path/to/flutterwave-php/init.php';
+// Get transaction reference from the URL
+$tx_ref = isset($_GET['tx_ref']) ? $_GET['tx_ref'] : '';
+$transaction_id = isset($_GET['transaction_id']) ? $_GET['transaction_id'] : '';
 
-// Set your Flutterwave keys
-$public_key = 'FLWPUBK_TEST-6595882c69b3985611b08d8eef317b23-X';
-$secret_key = 'FLWSECK_TEST-988174279b76cfa6f7822f42dc3bb401-X';
-$encryption_key = 'FLWSECK_TEST14170e76c5d7';
-
-// Initialize Flutterwave
-Flutterwave::setApiKey($secret_key);
-Flutterwave::setEncryptionKey($encryption_key);
-
-// Collect payment details from the form
-$id = $_POST['id'];
-$total_due = $_POST['total_due'];
-$currency = $_POST['currency'];
-$customer_name = $_POST['customer_name'];
-$product_name = $_POST['product_name'];
-
-// Assemble payment details
-$payment_details = [
-    'tx_ref' => uniqid('tx_'), // Generate a unique transaction reference
-    'amount' => $total_due,
-    'currency' => $currency,
-    'redirect_url' => 'http://localhost/paid.php', // Replace with your actual redirect URL
-    'customer' => [
-        'email' => 'customer@example.com', // Update with customer's email
-        'name' => $customer_name,
-    ],
-    'customizations' => [
-        'title' => 'Product Purchase',
-        'description' => $product_name,
-    ],
-];
-
-// Initiate payment
-try {
-    $response = Flutterwave\Payment::initialize($payment_details);
-    $payment_link = $response['data']['link']; // Get the payment link
-
-    // Redirect user to the payment link
-    header("Location: $payment_link");
-    exit;
-} catch (Exception $e) {
-    die('Error initiating payment: ' . $e->getMessage());
+if (!isset($_SESSION['total_due'], $_SESSION['currency'], $_SESSION['customer_name'], $_SESSION['product_name'], $_SESSION['csrf_token'])) {
+    die("Session variables not set.");
 }
+
+$total_due = $_SESSION['total_due'];
+$currency = $_SESSION['currency'];
+$customer_name = $_SESSION['customer_name'];
+$product_name = $_SESSION['product_name'];
+$csrf_token = $_SESSION['csrf_token'];
+
+// Verify Monnify transaction via API
+$curl = curl_init();
+curl_setopt_array($curl, array(
+  CURLOPT_URL => "https://api.monnify.com/api/v1/transaction-status?transactionReference=" . urlencode($tx_ref),
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_HTTPHEADER => array(
+    "Authorization: Bearer UK1QQVE8Q6YF058ZS7W5VQ29775WF49D" 
+  ),
+));
+
+$response = curl_exec($curl);
+$http_status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+curl_close($curl);
+
+$response = json_decode($response, true);
+
+if ($http_status === 200 && $response && isset($response['paymentStatus']) && $response['paymentStatus'] === 'PAID') {
+    $stmt = $conn->prepare("INSERT INTO transactions (csrf_token, total_due, currency, customer_name, product_name, transaction_id, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())");
+    
+    $status = 'successful';
+
+    $stmt->bind_param("sdsssss", $csrf_token, $total_due, $currency, $customer_name, $product_name, $transaction_id, $status);
+    
+    if ($stmt->execute()) {
+        header("Location: thank-you.html");
+        exit();
+    } else {
+        echo "Error: " . $stmt->error;
+    }
+    $stmt->close();
+} else {
+    error_log("Monnify API error: HTTP Status $http_status - Response: " . json_encode($response));
+
+    header("Location: failed.html");
+    exit();
+}
+
+// Close database connection
+$conn->close();
+?>

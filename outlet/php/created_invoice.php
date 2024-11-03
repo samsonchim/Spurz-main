@@ -61,6 +61,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $expectedDeliveryDate = $_POST['expected_delivery_date'];
     $currency = $_POST['currency'];
     $phone_no = $_POST['phone_no'];
+    $customer_email = $_POST['customer_email'];
     
     // Sanitize form data
     $customerName = mysqli_real_escape_string($conn, $customerName);
@@ -70,13 +71,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $waybillPrice = mysqli_real_escape_string($conn, $waybillPrice);
     $expectedDeliveryDate = mysqli_real_escape_string($conn, $expectedDeliveryDate);
     $phone_no = mysqli_real_escape_string($conn, $phone_no);
+    $customer_email = mysqli_real_escape_string($conn, $customer_email);
 
     // Check if the product ID is empty (indicating a new record)
     if (empty($productId)) {
         // Create new record
         // Retrieve user ID from session
         $userId = $_SESSION['id'];
-        $sql = "INSERT INTO invoices (user_id, currency, customer_name, product_name, customer_address, total_price, waybill_price, expected_delivery_date, phone_no) VALUES ('$userId', '$currency', '$customerName', '$productName', '$customerAddress', '$totalPrice', '$waybillPrice', '$expectedDeliveryDate', '$phone_no')";
+        $sql = "INSERT INTO invoices (user_id, currency, customer_name, product_name, customer_address, total_price, waybill_price, expected_delivery_date, phone_no, customer_email) VALUES ('$userId', '$currency', '$customerName', '$productName', '$customerAddress', '$totalPrice', '$waybillPrice', '$expectedDeliveryDate', '$phone_no', '$customer_email')";
     } else {
         // Update existing record
         $productId = mysqli_real_escape_string($conn, $productId); // Sanitize the ID

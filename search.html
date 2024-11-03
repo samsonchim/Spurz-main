@@ -1,28 +1,29 @@
+
 <!DOCTYPE html>
 <html lang="en">
-
-<!-- Mirrored from wedo.dexignzone.com/xhtml/search.html by HTTrack Website Copier/3.x [XR&CO'2014], Mon, 19 Feb 2024 21:19:54 GMT -->
 <head>
 	
 	<!-- Title -->
-	<title>Wedo - Ecommerce Mobile App Template ( Bootstrap + PWA )</title>
+	<title>Spurz: Buy and Sale, Cheap</title>
 
 	<!-- Meta -->
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, minimal-ui, viewport-fit=cover">
 	<meta name="theme-color" content="#FE4487">
-	<meta name="author" content="DexignZone">
+	<meta name="author" content="Samson Chimaraoke">
 	<meta name="robots" content="index, follow"> 
-	<meta name="keywords" content="android, ios, mobile, application template, progressive web app, ui kit, multiple color, dark layout">
-	<meta name="description" content="Revolutionize your online store with our Ecommerce App Template. Seamless shopping, secure payments, and personalized recommendations for an exceptional user experience">
-	<meta property="og:title" content="Wedo - Ecommerce Mobile App Template ( Bootstrap + PWA )">
-	<meta property="og:description" content="Revolutionize your online store with our Ecommerce App Template. Seamless shopping, secure payments, and personalized recommendations for an exceptional user experience.">
-	<meta property="og:image" content="social-image.png">
+	<meta name="keywords" content="buy online, sell online, legit online vendors, reach customers faster, nigeria dropshipping">
+	<meta name="description" content="Discover a wide range of products from trusted online vendors. Shop effortlessly for the best deals on electronics, fashion, home goods, and more. Enjoy a seamless buying experience with secure payments and fast delivery. Start shopping today!">
+	<meta property="og:title" content="Spurz: Buy Cheap">
+	<meta name="description" content="Discover a wide range of products from trusted online vendors. Shop effortlessly for the best deals on electronics, fashion, home goods, and more. Enjoy a seamless buying experience with secure payments and fast delivery. Start shopping today!">
+	<meta property="og:image" content="assets/this.jpg">
 	<meta name="format-detection" content="telephone=no">
 
 	<!-- Favicons Icon -->
 	<link rel="shortcut icon" type="image/x-icon" href="assets/images/favicon.png">
 	
+	<!-- PWA Version -->
+	<link rel="manifest" href="manifest.json">
     
     <!-- Global CSS -->
 	<link href="assets/vendor/bootstrap-select/dist/css/bootstrap-select.min.css" rel="stylesheet">
@@ -33,20 +34,33 @@
     <link rel="stylesheet" class="main-css" type="text/css" href="assets/css/style.css">
 	
     <!-- Google Fonts -->
-	<link rel="preconnect" href="https://fonts.googleapis.com/">
-	<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
-	<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700;800&amp;family=Poppins:wght@100;200;300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700;800&family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
+
+	<!-- Slick Carousel CSS -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css"/>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css"/>
+
+	<!-- jQuery -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+	<!-- Slick Carousel JS -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>
+
+
+	
 </head>   
-<body class="bg-white">
+<body>
 <div class="page-wrapper">
     
 	<!-- Preloader -->
 	<div id="preloader">
 		<div class="loader">
-			<div class="load-circle"><div></div><div></div></div>
+			<div class="cart"></div><div></div></div>
 		</div>
-	</div>
+	</div> 
     <!-- Preloader end-->
 	
 	<!-- Header -->
@@ -69,75 +83,7 @@
 		<div class="container">
 			<div class="recent-search-list">
 				<ul>
-					<li>
-						<a href="product.html" class="search-content">
-							<i class="icon feather icon-clock me-2"></i>
-							<span>boat earbuds</span>
-							<i class="icon feather icon-arrow-up-left"></i>
-						</a>
-					</li>
-					<li>
-						<a href="product.html" class="search-content">
-							<i class="icon feather icon-clock me-2"></i>
-							<span>mobile phones</span>
-							<i class="icon feather icon-arrow-up-left"></i>
-						</a>
-					</li>
-					<li>
-						<a href="product.html" class="search-content">
-							<i class="icon feather icon-clock me-2"></i>
-							<span>realme earphones</span>
-							<i class="icon feather icon-arrow-up-left"></i>
-						</a>
-					</li><li>
-						<a href="product.html" class="search-content">
-							<i class="icon feather icon-clock me-2"></i>
-							<span>vivo t1 5g</span>
-							<i class="icon feather icon-arrow-up-left"></i>
-						</a>
-					</li>
-					<li>
-						<a href="product.html" class="search-content">
-							<i class="icon feather icon-clock me-2"></i>
-							<span>vivo t1 5g</span>
-							<i class="icon feather icon-arrow-up-left"></i>
-						</a>
-					</li>
-					<li>
-						<a href="product.html" class="search-content">
-							<i class="icon feather icon-clock me-2"></i>
-							<span>washing machine</span>
-							<i class="icon feather icon-arrow-up-left"></i>
-						</a>
-					</li>
-					<li>
-						<a href="product.html" class="search-content">
-							<i class="icon feather icon-clock me-2"></i>
-							<span>Air conditioner</span>
-							<i class="icon feather icon-arrow-up-left"></i>
-						</a>
-					</li>
-					<li>
-						<a href="product.html" class="search-content">
-							<i class="icon feather icon-clock me-2"></i>
-							<span>refrigerator</span>
-							<i class="icon feather icon-arrow-up-left"></i>
-						</a>
-					</li>
-					<li>
-						<a href="product.html" class="search-content">
-							<i class="icon feather icon-clock me-2"></i>
-							<span>home theatre</span>
-							<i class="icon feather icon-arrow-up-left"></i>
-						</a>
-					</li>
-					<li>
-						<a href="product.html" class="search-content">
-							<i class="icon feather icon-clock me-2"></i>
-							<span>boat earbuds</span>
-							<i class="icon feather icon-arrow-up-left"></i>
-						</a>
-					</li>
+					
 				</ul>
 			</div>
 		</div>
@@ -152,6 +98,83 @@
 <!--**********************************
     Scripts
 ***********************************-->
+
+<script>
+	$(document).ready(function () {
+    const maxSearches = 6;
+    
+    function saveSearchTerm(term) {
+        let searches = JSON.parse(localStorage.getItem('recentSearches')) || [];
+
+        searches = searches.filter(item => item !== term);
+        searches.unshift(term);
+
+        if (searches.length > maxSearches) {
+            searches.pop();
+        }
+
+        localStorage.setItem('recentSearches', JSON.stringify(searches));
+        displayRecentSearches();
+    }
+
+    function displayRecentSearches() {
+        const searches = JSON.parse(localStorage.getItem('recentSearches')) || [];
+        const recentSearchList = $('.recent-search-list ul');
+        recentSearchList.empty();
+
+        searches.forEach(search => {
+            const searchItem = `
+                <li>
+                    <a href="javascript:void(0);" class="search-content" data-term="${search}">
+                        <i class="icon feather icon-clock me-2"></i>
+                        <span>${search}</span>
+                        <i class="icon feather icon-arrow-up-left"></i>
+                    </a>
+                </li>`;
+            recentSearchList.append(searchItem);
+        });
+    }
+
+    displayRecentSearches();
+
+    // Handle search on clicking the search icon
+    $('.search-icon').on('click', function () {
+        const searchTerm = $('.main-in').val().trim();
+        
+        if (searchTerm) {
+            saveSearchTerm(searchTerm);
+            navigateToProductPage(searchTerm);
+        }
+    });
+
+    // Handle search by ckicking enter key
+    $('.main-in').on('keypress', function (e) {
+        if (e.which === 13) { 
+            e.preventDefault();
+            const searchTerm = $(this).val().trim();
+            
+            if (searchTerm) {
+                saveSearchTerm(searchTerm);
+                navigateToProductPage(searchTerm);
+            }
+        }
+    });
+
+    // Handle clicks on recent search items
+    $(document).on('click', '.search-content', function () {
+        const searchTerm = $(this).data('term');
+        navigateToProductPage(searchTerm);
+    });
+
+    // Redirect to product.html with the search term as a parameter
+    function navigateToProductPage(term) {
+        const url = `product.html?search=${encodeURIComponent(term)}`;
+        window.location.href = url;
+    }
+});
+
+
+</script>
 <script src="assets/js/jquery.js"></script>
 <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="assets/vendor/swiper/swiper-bundle.min.js"></script><!-- Swiper -->
@@ -162,5 +185,4 @@
 
 </body>
 
-<!-- Mirrored from wedo.dexignzone.com/xhtml/search.html by HTTrack Website Copier/3.x [XR&CO'2014], Mon, 19 Feb 2024 21:19:54 GMT -->
 </html>

@@ -59,7 +59,7 @@
 						<a href="javascript:void(0);" class="back-btn">
 							<i class="icon feather icon-chevron-left"></i>
 						</a>
-						<h6 class="title">Products</h6>
+						<h6 class="title">Fashion Products</h6>
 					</div>
 					<div class="mid-content">
 					</div>
@@ -112,7 +112,7 @@
 	document.addEventListener('DOMContentLoaded', function() {
     function fetchProducts() {
         const xhr = new XMLHttpRequest();
-        xhr.open('GET', 'php/products.php', true);
+        xhr.open('GET', 'php/fashion-products.php', true);
         xhr.onload = function() {
             if (this.status === 200) {
                 try {
@@ -131,6 +131,14 @@
         xhr.send();
     }
 
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
     function displayProducts(products) {
         const homeTabPane = document.getElementById('home-tab-pane2');
         const profileTabPane = document.getElementById('profile-tab-pane2');
@@ -145,41 +153,56 @@
         profileTabPane.innerHTML = '';
         contactTabPane.innerHTML = '';
         
+        // Display products in the home tab
         products.forEach(product => {
-            const productHtml = `
-                <div class="col-12">
-                    <div class="product-list">
-                        <div class="dz-media">
-                            <img src="${product.image}" alt="">
-                            <a href="javascript:void(0);" class="item-bookmark">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-heart"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-                            </a>
-                        </div>
-                        <div class="product-content">
-                            <div class="dz-review-meta mb-1">
-                                <h6 class="review">4.0<i class="fa-solid fa-star ms-1"></i><span>(265 Review)</span></h6>
-                            </div>
-                            <h6 class="title font-14"><a href="product-detail.php?id=${product.product_id}">${product.product_name}</a></h6>
-                            <div class="product-footer">
-                                <h5 class="price mb-0">₦${product.price}<del>₦${(product.price * 1.2).toFixed(2)}</del></h5>
-                                <small>45%OFF</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            // Display products in different tabs
+            const productHtml = createProductHtml(product);
             homeTabPane.innerHTML += productHtml;
+        });
+
+        // Shuffle and display products in the profile tab
+        const shuffledProfileProducts = shuffleArray([...products]);
+        shuffledProfileProducts.forEach(product => {
+            const productHtml = createProductHtml(product);
             profileTabPane.innerHTML += productHtml;
+        });
+
+        // Shuffle and display products in the contact tab
+        const shuffledContactProducts = shuffleArray([...products]);
+        shuffledContactProducts.forEach(product => {
+            const productHtml = createProductHtml(product);
             contactTabPane.innerHTML += productHtml;
         });
     }
 
+    function createProductHtml(product) {
+        return `
+            <div class="col-12">
+                <div class="product-list">
+                    <div class="dz-media">
+                        <img src="${product.image}" alt="">
+                        <a href="javascript:void(0);" class="item-bookmark">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-heart"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                        </a>
+                    </div>
+                    <div class="product-content">
+                        <div class="dz-review-meta mb-1">
+                            <h6 class="review">4.0<i class="fa-solid fa-star ms-1"></i><span>...</span></h6>
+                        </div>
+                        <h6 class="title font-14"><a href="product-detail.php?id=${product.product_id}">${product.product_name}</a></h6>
+                        <div class="product-footer">
+                            <h5 class="price mb-0">₦${product.price}<del>₦${(product.price * 1.2).toFixed(2)}</del></h5>
+                            <small>45%OFF</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
     fetchProducts();
 });
-
 </script>
+
 <script src="assets/js/jquery.js"></script>
 <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="assets/vendor/swiper/swiper-bundle.min.js"></script><!-- Swiper -->

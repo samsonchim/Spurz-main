@@ -1,15 +1,22 @@
 self.addEventListener('install', (e) => {
 	e.waitUntil(
-		caches.open('https://wedo.dexignzone.com/xhtml/page-error-404.html').then((cache) => cache.addAll([
-			'/'
-		])),
+		caches.open('my-cache').then((cache) => {
+			return cache.addAll([
+				'/', 
+			]);
+		})
 	);
 });
 
 self.addEventListener('fetch', (e) => {
 	e.respondWith(
-		caches.match(e.request).then(function (response) {
-			return response || fetch(e.request);
+		caches.match(e.request).then((response) => {
+			return response || fetch(e.request).then((networkResponse) => {
+				return caches.open('my-cache').then((cache) => {
+					cache.put(e.request, networkResponse.clone());
+					return networkResponse;
+				});
+			});
 		})
 	);
 });

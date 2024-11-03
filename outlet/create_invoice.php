@@ -52,7 +52,7 @@ if ($stmt) {
         echo "Error executing the statement: " . mysqli_error($conn);
     }
 
-    $customerName = $productName = $customerAddress = $phone_no = $totalPrice = $waybillPrice = $expectedDeliveryDate = "";
+    $customerName = $productName = $customerAddress = $phone_no = $customer_email = $totalPrice = $waybillPrice = $expectedDeliveryDate = "";
 
     // Check if product ID is provided in the URL parameter
     if (isset($_GET['id'])) {
@@ -73,6 +73,7 @@ if ($stmt) {
             $waybillPrice = $row['waybill_price'];
             $expectedDeliveryDate = $row['expected_delivery_date'];
             $phone_no = $row['phone_no'];
+            $customer_email = $row['customer_email'];
            // $business_logo = $row['business_logo'];
         } else {
             echo "No product found with ID: $productId";
@@ -356,6 +357,13 @@ $conn->close();
                                 <div class="mb-3">
                                   <label class="form-label">Customer's number</label>
                                   <input type="number" name="phone_no" class="form-control" placeholder="Customer's Phone Number" value="<?php echo $phone_no; ?>" required>
+                                </div>
+                              </div>
+
+                              <div class="col-sm-6 col-md-3">
+                                <div class="mb-3">
+                                  <label class="form-label">Customer's Email</label>
+                                  <input type="email" name="customer_email" class="form-control" placeholder="Customer's Email" value="<?php echo $customer_email; ?>" required>
                                 </div>
                               </div>
                               <div class="col-sm-6 col-md-4">

@@ -39,6 +39,17 @@
 	<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700;800&family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
 
+	<!-- Slick Carousel CSS -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css"/>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css"/>
+
+	<!-- jQuery -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+	<!-- Slick Carousel JS -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>
+
+
 	
 </head>   
 <body>
@@ -109,12 +120,7 @@
 					</a>
 				</li>
 				<li>
-					<a class="nav-link" href="wishlist.html">
-						<span class="dz-icon">
-							<i class="icon feather icon-heart"></i>
-						</span>
-						<span>Wishlist</span>
-					</a>
+					
 				</li>
 				<li>
 					<a class="nav-link" href="order.html">
@@ -183,23 +189,23 @@
 			<div class="category-area">
 				<ul class="row g-3">
 					<li class="category-item col-3">
-						<a href="category.html">
+						<a href="products-home.html">
 							<div class="media media-55">
-								<img src="assets/images/category/mobile.png" alt="">
+								<img src="assets/images/category/furniture.png" alt="">
 							</div>
-							<span>Mobiles</span>
+							<span>Home</span>
 						</a>
 					</li>
 					<li class="category-item col-3">
-						<a href="category.html">
+						<a href="products-electronics.html">
 							<div class="media media-55">
 								<img src="assets/images/category/electronics.png" alt="">
 							</div>
-							<span>Electronics</span>
+							<span>Electronics & Gadgets</span>
 						</a>
 					</li>
 					<li class="category-item col-3">
-						<a href="category.html">
+						<a href="product-fashion.html">
 							<div class="media media-55">
 								<img src="assets/images/category/fashion.png" alt="">
 							</div>
@@ -211,7 +217,7 @@
 							<div class="media media-55">
 								<img src="assets/images/category/furniture.png" alt="">
 							</div>
-							<span>Furniture</span>
+							<span>Outdoors</span>
 						</a>
 					</li>
 					<li class="category-item col-3">
@@ -219,7 +225,7 @@
 							<div class="media media-55">
 								<img src="assets/images/category/grocery.png" alt="">
 							</div>
-							<span>Grocery</span>
+							<span>Edibles</span>
 						</a>
 					</li>
 					<li class="category-item col-3">
@@ -227,7 +233,7 @@
 							<div class="media media-55">
 								<img src="assets/images/category/appliances.png" alt="">
 							</div>
-							<span>Appliances</span>
+							<span>Digitals Products</span>
 						</a>
 					</li>
 					<li class="category-item col-3">
@@ -235,7 +241,7 @@
 							<div class="media media-55">
 								<img src="assets/images/category/toys.png" alt="">
 							</div>
-							<span>Toys</span>
+							<span>Education Related</span>
 						</a>
 					</li>
 					<li class="category-item col-3">
@@ -277,47 +283,34 @@
 			</div>	
 			<!-- ComingSoon End -->
 			
+			<!-- Most Popular -->
 			<div class="title-bar">
 				<h6 class="title mb-0">Most Popular</h6>
 				<a href="product-list.html">View all <i class="icon feather icon-chevron-right"></i></a>
 			</div>
-			
-			<!-- Shop Section Strat 
-			<div class="swiper product-swiper">
-				<div class="swiper-wrapper">
-	
-				</div>
-				<div class="swiper-pagination"></div>
-				<div class="swiper-button-next"></div>
-				<div class="swiper-button-prev"></div>
-			</div>
-			
-			 Shop Section End -->
-			
-			<!-- Product offer Start -->
+					
 			<div class="product-offer">
 				<div class="row g-3" id="product-container">
 					<!-- Product cards will be dynamically inserted here -->
 				</div>
 			</div>
-			
-			<!-- Product offer End -->
-			
+			<!-- Most Popular End-->
+
+
+			<!-- Flash Sale -->
 			<div class="title-bar">
-				<h6 class="title mb-0">Popular Items</h6>
+				<h6 class="title mb-0">Flash Sale</h6>
 				<a href="product-list.html">View all <i class="icon feather icon-chevron-right"></i></a>
 			</div>
-			
-			<!-- Product Item list Start -->
-			<div class="product-items-list">
-				<ul id="product-list">
-					<!-- Products will be dynamically added here -->
-				</ul>
+			<div class="flash">
+				<div class="row g-3" id="product-container">
+					<!-- Product cards will be dynamically inserted here -->
+				</div>
 			</div>
+			<!-- Flash Sales End -->
+					
 			
-			<!-- Product Item list End -->
-			
-			<!-- Top Selection Start -->
+			<!-- Top Selection Start 
 			<div class="top-selection">
 				<div class="title-bar mt-0">
 					<h6 class="title text-white">Top Seleciton</h6>
@@ -377,12 +370,12 @@
 					</div>
 				</div>	
 			</div>	
-			<!-- Top Selection End -->
+			Top Selection End -->
 		</div>
 	</div>
 	<!-- Page Content End -->
 	
-	<!-- Menubar -->
+	<!-- Menubar 
 	<div class="menubar-area footer-fixed rounded-0 border-top">
 		<div class="toolbar-inner menubar-nav">
 			<a href="index.html" class="nav-link active">
@@ -403,7 +396,7 @@
 			</a>
 		</div>
 	</div>
-	<!-- Menubar -->
+	 Menubar -->
 	<!-- PWA Offcanvas -->
 	<div class="offcanvas offcanvas-bottom pwa-offcanvas">
 		<div class="container">
@@ -429,10 +422,9 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
  $(document).ready(function() {
-    // Function to fetch products and display them
     function fetchProducts() {
         $.ajax({
-            url: 'fetch-popular.php',
+            url: 'php/fetch-popular.php',
             method: 'GET',
             dataType: 'json',
             success: function(data) {
@@ -446,12 +438,13 @@
                             <a href="product-detail.php?id=${product.product_id}">
                                 <div class="shop-card style-3">
                                     <div class="dz-media">
-                                        <img src="${product.image}" alt="image">    
+                                        <img class="product-image" src="${product.image}" alt="image">    
                                     </div>
                                     <div class="dz-content">
-                                        <span class="offer">${product.product_category}</span>
-										<h6 class="title">${product.product_name}</h6>
+										<h5 class="product-name">${product.product_name}</h5>
 										<h6 class="title">Price: ₦${product.price}</h6>
+                                        <p class="offer">${product.product_category}</p>
+										
                                     </div>
                                 </div>
                             </a>
@@ -459,7 +452,10 @@
                     
                     productContainer.append(productHtml);
                 });
+
+				
             },
+
             error: function(xhr, status, error) {
                 console.error("Error fetching products:", error);
             }
@@ -470,73 +466,53 @@
 });
 
 
-$(document).ready(function() {
-    $.ajax({
-        url: 'fetch-popular.php', // Replace with your PHP file path
-        method: 'GET',
-        dataType: 'json',
-        success: function(data) {
-            var $list = $('.product-items-list ul');
-            $list.empty(); // Clear existing content
-            
-            $.each(data, function(index, product) {
-                var html = `
-                    <li>
-                        <div class="product-items">
-                             <a href="product-detail.php?id=${product.product_id}">
-                                <div class="media media-80 me-2">
-                                    <img src="${product.image}" alt="${product.product_name}">
-                                </div>
-                            </a>
-                            <a href="product-detail.html?id=${product.product_id}">
-                                <div class="product-content">
-                                    <h6 class="title">${product.product_name}</h6>
-                                    <div class="desc">${product.product_description}</div>
-                                    <div class="product-footer">
-                                        <span class="offer">20% off</span> <!-- Placeholder offer, adjust if needed -->
-                                     <span class="price">
-										₦${product.price} <!-- Original price -->
-										<del>₦${(product.price * 1.2).toFixed(2)}</del> <!-- Discounted price (10% off) -->
-									</span>
 
+
+//Flash Sales 
+$(document).ready(function() {
+    function fetchProducts() {
+        $.ajax({
+            url: 'php/fetch-flash.php',
+            method: 'GET',
+            dataType: 'json',
+            success: function(data) {
+                let productContainer = $('.flash .row');
+                productContainer.empty(); 
+
+                data.forEach(product => {
+                    // Create the HTML structure for each product
+                    let productHtml = `
+                        <div class="col-4">
+                            <a href="product-detail.php?id=${product.product_id}">
+                                <div class="shop-card style-3">
+                                    <div class="dz-media">
+                                        <img class="product-image" src="${product.image}" alt="image">    
+                                    </div>
+                                    <div class="dz-content">
+										<h5 class="product-name">${product.product_name}</h5>
+										<h6 class="title">Price: ₦${product.price}</h6>
+                                        <p class="offer">${product.product_category}</p>
+										
                                     </div>
                                 </div>
                             </a>
-                            <a href="product-detail.html?id=${product.product_id}" class="dz-icon"><i class="icon feather icon-shopping-cart"></i></a>
-                        </div>
-                    </li>
-                `;
-                $list.append(html);
-            });
-        },
-        error: function(jqXHR, textStatus, errorThrown) {
-            console.log('Error fetching products:', textStatus, errorThrown);
-        }
-    });
-});
-</script>
+                        </div>`;
+                    
+                    productContainer.append(productHtml);
+                });
 
-<script>
-	self.addEventListener('install', function(event) {
-    event.waitUntil(
-        caches.open('spurz-cache').then(function(cache) {
-            return cache.addAll([
-                '/',
-                '/index.html',
-                '/assets/css/style.css',
-                '/assets/js/main.js',
-            ]);
-        })
-    );
+				
+            },
+
+            error: function(xhr, status, error) {
+                console.error("Error fetching products:", error);
+            }
+        });
+    }
+
+    fetchProducts();
 });
 
-self.addEventListener('fetch', function(event) {
-    event.respondWith(
-        caches.match(event.request).then(function(response) {
-            return response || fetch(event.request);
-        })
-    );
-});
 
 </script>
 <script src="assets/js/jquery.js"></script>
@@ -552,3 +528,43 @@ self.addEventListener('fetch', function(event) {
 
 </body>
 </html>
+
+<style>
+	.product-name{
+		font-size: 18px !important;
+		text-align: left;
+	}
+
+	.title{
+		text-align: left !important;
+	}
+
+	.dz-media {
+    position: relative;
+    overflow: hidden;
+	}
+
+	.product-image {
+		width: 100%;       
+		height: 100% !important; 
+		object-fit: cover; 
+	}
+
+	.slick-prev, .slick-next {
+    background-color: #333;
+    color: #fff;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.slick-prev:hover, .slick-next:hover {
+    background-color: #555;
+}
+
+.offer{
+	text-align: left !important;
+}
+
+
+</style>

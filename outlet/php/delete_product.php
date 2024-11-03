@@ -1,5 +1,4 @@
 <?php
-// Include your database connection code here
 $servername = "localhost";
 $username = "root";
 $password = "";
@@ -11,12 +10,10 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Start session
 session_start();
 
-// Check if the user is logged in
+
 if (!isset($_SESSION['id'])) {
-    // Redirect to signup page if not logged in
     header("Location: outlet/signup.html");
     exit();
 }

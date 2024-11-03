@@ -22,7 +22,6 @@ function sanitize_input($data) {
 
 // Check if ID parameter is set in the URL
 if (isset($_GET['id'])) {
-    // Sanitize the ID parameter
     $id = sanitize_input($_GET['id']);
 
     // Prepare SQL statement to fetch data based on ID
@@ -70,7 +69,6 @@ if (isset($_GET['id'])) {
 <html lang="en">
 
 
-<!-- Mirrored from htmldemo.net/destry/destry/shop-left-sidebar.html by HTTrack Website Copier/3.x [XR&CO'2014], Tue, 09 Aug 2022 13:12:11 GMT -->
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -78,13 +76,12 @@ if (isset($_GET['id'])) {
     <!-- Favicons -->
     <link rel="shortcut icon" href="outlet/assetsimages/favicon.ico">
 
-    <!-- Vendor CSS (Icon Font) -->
+
 
     <link rel="stylesheet" href="outlet/assets/css/vendor/fontawesome.min.css">
     <link rel="stylesheet" href="outlet/assets/css/vendor/pe-icon-7-stroke.min.css">
 
 
-    <!-- Plugins CSS (All Plugins Files) -->
 
     <link rel="stylesheet" href="outlet/assets/css/plugins/swiper-bundle.min.css" />
     <link rel="stylesheet" href="outlet/assets/css/plugins/animate.min.css" />
@@ -93,22 +90,9 @@ if (isset($_GET['id'])) {
     <link rel="stylesheet" href="outlet/assets/css/plugins/jquery-ui.min.css" />
     <link rel="stylesheet" href="outlet/assets/css/plugins/lightgallery.min.css" />
 
-
-    <!-- Main Style CSS -->
-
-
     <link rel="stylesheet" href="outlet/assets/css/style.css" />
 
 
-
-    <!-- Use the minified version files listed below for better performance and remove the files listed above -->
-
-
-    <!-- 
-    <link rel="stylesheet" href="outlet/assets/css/vendor.min.css">
-    <link rel="stylesheet" href="outlet/assets/css/plugins.min.css">
-    <link rel="stylesheet" href="outlet/assets/css/style.min.css"> 
-    -->
 </head>
 
 <body>
@@ -118,8 +102,6 @@ if (isset($_GET['id'])) {
         <div class="header-top bg-light">
             <div class="container">
                 <div class="row row-cols-xl-2 align-items-center">
-
-                    <!-- Header Top Language, Currency & Link Start -->
                     <div class="col d-none d-lg-block">
                         <div class="header-top-lan-curr-link">
                             <div class="header-top-links">
@@ -127,7 +109,6 @@ if (isset($_GET['id'])) {
                             </div>
                         </div>
                     </div>
-                    <!-- Header Top Language, Currency & Link End -->
 
                     <!-- Header Top Message Start -->
                     <div class="col">
@@ -173,32 +154,28 @@ if (isset($_GET['id'])) {
                         <div class="col-xl-2 col-6">
                             <div class="header-actions">
 
-                                <!-- User Account Header Action Button Start -->
+                             
                                 <a href="login-register.html" class="header-action-btn d-none d-md-block"><i class="pe-7s-user"></i></a>
-                                <!-- User Account Header Action Button End -->
-
-                                <!-- Wishlist Header Action Button Start -->
+                           
                                 <a href="wishlist.html" class="header-action-btn header-action-btn-wishlist d-none d-md-block">
                                     <i class="pe-7s-like"></i>
                                 </a>
-                                <!-- Wishlist Header Action Button End -->
+                               
 
                                 <!-- Shopping Cart Header Action Button Start 
                                 <a href="cart.php?id=<?php echo $id; ?>" class="header-action-btn header-action-btn-cart">
                                     <i class="pe-7s-shopbag"></i>
                                     <span class="header-action-num"></span>
                                 </a>-->
-                                <!-- Shopping Cart Header Action Button End -->
-
-                                <!-- Mobile Menu Hambarger Action Button Start -->
+                             
                                 <a href="javascript:void(0)" class="header-action-btn header-action-btn-menu d-xl-none d-lg-block">
                                     <i class="fa fa-bars"></i>
                                 </a>
-                                <!-- Mobile Menu Hambarger Action Button End -->
+                               
 
                             </div>
                         </div>
-                        <!-- Header Action End -->
+                       
 
                     </div>
                 </div>
@@ -234,12 +211,7 @@ if (isset($_GET['id'])) {
                             </li>
                     </nav>
                 </div>
-                <!-- Mobile Menu End -->
-
-                <!-- Language, Currency & Link Start -->
-               
-
-                <!-- Contact Links/Social Links Start -->
+             
                 <div class="mt-auto">
 
                     <!-- Contact Links Start -->
@@ -248,26 +220,10 @@ if (isset($_GET['id'])) {
                         <li><i class="fa fa-envelope-o"></i><a href="mailto:<?php echo $email?>"> <?php echo $email?></a></li>
                         <li><i class="fa fa-marker"></i> <span><?php echo $location?></span> </li>
                     </ul>
-                    <!-- Contact Links End -->
 
-                    <!-- Social Widget Start -->
-                    <div class="widget-social">
-                        <a title="Facebook" href="#"><i class="fa fa-facebook-f"></i></a>
-                        <a title="Twitter" href="#"><i class="fa fa-twitter"></i></a>
-                        <a title="Linkedin" href="#"><i class="fa fa-linkedin"></i></a>
-                        <a title="Youtube" href="#"><i class="fa fa-youtube"></i></a>
-                        <a title="Vimeo" href="#"><i class="fa fa-vimeo"></i></a>
-                    </div>
-                    <!-- Social Widget Ende -->
                 </div>
-                <!-- Contact Links/Social Links End -->
             </div>
-            <!-- Mobile Menu Inner End -->
         </div>
-        <!-- Mobile Menu End -->
-
-      
-    
 
     </div>
 
@@ -289,19 +245,14 @@ if (isset($_GET['id'])) {
                 </div>
             </div>
         </div>
-        <!-- Breadcrumb Area End -->
 
     </div>
-    <!-- Breadcrumb Section End -->
 
-    <!-- Shop Section Start -->
     <div class="section section-margin">
         <div class="container">
             <div class="row flex-row-reverse">
                 <div class="col-lg-9 col-12 col-custom">
 
-                   
-                        <!-- Shopt Top Bar Right End -->
 
                     </div>
                     <!--shop toolbar end-->
@@ -318,24 +269,17 @@ if (isset($_GET['id'])) {
                                                     display: none;
                                                     width: 100%; 
                                                     height: 100%;
-                                                    object-fit: cover; /* Ensures images maintain aspect ratio and cover the container */
-                                                    }
-
-                                                    /* Show the first image initially */
+                                                    object-fit: cover; 
+                                                 }
                                                     .carousel img:first-child {
                                                     display: block;
                                                     }
 
                                             </style>
-                    <!-- Shop Wrapper Start -->
-                    <div class="row shop_wrapper grid_3">
+                        <div class="row shop_wrapper grid_3">
+<?php
 
-                        <!-- Single Product Start -->
-                       <?php
-// Assuming $id contains the user_id you want to filter products for
-
-// Define pagination parameters
-$itemsPerPage = 9; // Number of products per page
+$itemsPerPage = 9; 
 
 // Fetch products from the database based on user_id
 $sql = "SELECT COUNT(*) AS total FROM products WHERE user_id = ?";
@@ -349,7 +293,7 @@ $totalProducts = $row['total'];
 // Calculate total number of pages
 $totalPages = ceil($totalProducts / $itemsPerPage);
 
-// Get current page number (default to 1 if not provided)
+// Get current page number=
 $page = isset($_GET['page']) ? $_GET['page'] : 1;
 
 // Calculate the offset for pagination
@@ -369,31 +313,26 @@ if ($result->num_rows > 0) {
         $product_name = htmlspecialchars($row['product_name']);
         $product_description = htmlspecialchars($row['product_description']);
         $price = $row['price'];
-        $product_id = $row['product_id']; // Assuming you have product_id in your database
+        $product_id = $row['product_id'];
 
-        // Calculate the old price (20% less than the new price)
         $old_price = $price * 1.3;
 
-        // Output HTML structure with fetched product details
-        ?>
+       ?>
         <div class="col-lg-4 col-md-4 col-sm-6 product" data-aos="fade-up" data-aos-delay="200">
             <div class="product-inner">
                 <div class="thumb">
                     <div id="carousel-<?php echo $product_id; ?>" class="carousel">
                         <?php
-                        // Output images here for this product
                         for ($i = 1; $i <= 3; $i++) {
                             $image_path = "outlet/php/uploads/{$product_id}_({$i}).png";
-                            // Check if the image file exists
+
                             if (file_exists($image_path)) {
                                 echo '<img class="carousel-item" src="' . $image_path . '" alt="Product Image">';
                             }
                         }
                         ?>
                     </div>
-                    <div class="actions">
-                        <a href="" title="Like Product" class="action wishlist"><i class="pe-7s-like"></i></a>
-                    </div>
+                   66
                 </div>
                 <div class="content">
                     <h5 class="title"><a href="single-product.html"><?php echo $product_name; ?></a></h5>
@@ -416,7 +355,7 @@ if ($result->num_rows > 0) {
     echo 'No products found.';
 }
 
-// Close the prepared statement and the database connection
+
 $stmt->close();
 $conn->close();
 ?>
@@ -505,60 +444,11 @@ $conn->close();
                             </ul>
                             <!-- Contact Address End -->
 
-                            <!-- Soclial Link Start -->
-                            <div class="widget-social justify-content-start mt-4">
-                                <a title="Facebook" href="#"><i class="fa fa-facebook-f"></i></a>
-                                <a title="Twitter" href="#"><i class="fa fa-twitter"></i></a>
-                                <a title="Linkedin" href="#"><i class="fa fa-linkedin"></i></a>
-                                <a title="Youtube" href="#"><i class="fa fa-youtube"></i></a>
-                                <a title="Vimeo" href="#"><i class="fa fa-vimeo"></i></a>
-                            </div>
+                         
                             <!-- Social Link End -->
                         </div>
                     </div>
-                    <div class="col-12 col-sm-6 col-lg-2 col-xl-2 mb-10" data-aos="fade-up" data-aos-delay="300">
-                        <div class="single-footer-widget">
-                            <h2 class="widget-title">Information</h2>
-                            <ul class="widget-list">
-                                <li><a href="about.html">Privacy Policy</a></li>
-                                <li><a href="about.html">Terms & Conditions</a></li>
-                                <li><a href="about.html">Customer Service</a></li>
-                                <li><a href="about.html">Return Policy</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="col-12 col-sm-6 col-lg-2 col-xl-2 mb-10" data-aos="fade-up" data-aos-delay="400">
-                        <div class="single-footer-widget aos-init aos-animate">
-                            <h2 class="widget-title">My Account</h2>
-                            <ul class="widget-list">
-                                <li><a href="account.html">My Account</a></li>
-                                <li><a href="wishlist.html">Wishlist</a></li>
-                                <li><a href="contact.html">Help Center</a></li>
-                                <li><a href="contact.html">Terms and Condition</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="col-12 col-sm-6 col-lg-4 col-xl-4 mb-10" data-aos="fade-up" data-aos-delay="500">
-                        <div class="single-footer-widget">
-                            <h2 class="widget-title">Newsletter</h2>
-                            <div class="widget-body">
-                                <p class="desc-content mb-0">Get E-mail updates about our latest shop and special offers.</p>
-
-                                <!-- Newsletter Form Start -->
-                                <div class="newsletter-form-wrap pt-4">
-                                    <form id="mc-form" class="mc-form">
-                                        <input type="email" id="mc-email" class="form-control email-box mb-4" placeholder="Enter your email here.." name="EMAIL">
-                                        <button id="mc-submit" class="newsletter-btn btn btn-primary btn-hover-dark" type="submit">Subscribe</button>
-                                    </form>
-                                    <!-- mailchimp-alerts Start -->
-                                    <div class="mailchimp-alerts text-centre">
-                                        <div class="mailchimp-submitting"></div><!-- mailchimp-submitting end -->
-                                        <div class="mailchimp-success text-success"></div><!-- mailchimp-success end -->
-                                        <div class="mailchimp-error text-danger"></div><!-- mailchimp-error end -->
-                                    </div>
-                                    <!-- mailchimp-alerts end -->
-                                </div>
-                                <!-- Newsletter Form End -->
+                  
 
                             </div>
                         </div>
