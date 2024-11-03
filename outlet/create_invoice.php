@@ -16,7 +16,6 @@ session_start();
 
 // Check if the user is logged in
 if (!isset($_SESSION['id'])) {
-    // Redirect to the login page if not logged in
     header("Location: login.html");
     exit();
 }
@@ -505,7 +504,7 @@ function updateFormattedNumber(inputId) {
   // Get the input element
   var input = document.getElementById(inputId);
   // Get the numeric value entered by the user
-  var numericValue = parseFloat(input.value.replace(/,/g, '')); // Remove commas from the input
+  var numericValue = parseFloat(input.value.replace(/,/g, '')); 
   // Format the numeric value
   var formattedValue = formatNumber(numericValue);
   // Update the input value with the formatted number

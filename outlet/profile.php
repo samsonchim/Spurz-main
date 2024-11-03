@@ -1,5 +1,4 @@
 <?php
-// Include your database connection code here
 $servername = "localhost";
 $username = "root";
 $password = "";
@@ -28,11 +27,9 @@ $user_id = $_SESSION['id'];
 $image_path = "php/logo/$user_id.png";
 $default_image_path = "php/logo/000m.png";
 
-// Check if the user image exists, otherwise use the default image
 $image_url = (file_exists($image_path)) ? $image_path : $default_image_path;
 
 
-// Fetch data from the outlets table using the active session ID
 $sql = "SELECT * FROM outlets WHERE id = ?";
 $stmt = $conn->prepare($sql);
 

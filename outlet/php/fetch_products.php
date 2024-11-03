@@ -24,7 +24,7 @@ if (!isset($_SESSION['id'])) {
 // Retrieve user ID from the session
 $user_id = $_SESSION['id'];
 
-// Fetch all products for the logged-in user (no LIMIT, so it fetches everything)
+
 $sql = "SELECT product_id, product_name, product_category, price FROM products WHERE user_id = ? ORDER BY product_id DESC";
 $stmt = $conn->prepare($sql);
 

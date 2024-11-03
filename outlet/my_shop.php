@@ -1,5 +1,4 @@
 <?php
-// Include your database connection code here
 $servername = "localhost";
 $username = "root";
 $password = "";
@@ -73,7 +72,6 @@ if ($stmt) {
 <html lang="en">
 
 
-<!-- Mirrored from htmldemo.net/destry/destry/shop-list-fullwidth.html by HTTrack Website Copier/3.x [XR&CO'2014], Tue, 09 Aug 2022 13:12:11 GMT -->
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -289,9 +287,7 @@ echo '  </ul>
 // Close the database connection
 $conn->close();
 ?>
-    <!-- Shop Section End -->
 
-    <!-- Vendors JS -->
 
 
     <script src="assets/js/vendor/bootstrap.bundle.min.js"></script>

@@ -350,7 +350,7 @@ function fetchAndAppendProducts() {
                 const product = data[i];
 
                 // Generate the URL for the first product image based on the product ID
-                const imageUrl = `php/uploads/${product.product_id}_(1).png`; // Assuming the image extension is always PNG
+                const imageUrl = `php/uploads/${product.product_id}_(1).png`; 
 
                 // Create a new card element
                 const card = document.createElement('div');

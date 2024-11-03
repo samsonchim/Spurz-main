@@ -46,7 +46,6 @@ if ($stmt) {
         ];
     }
 
-    // Output JSON response for debugging
     header('Content-Type: application/json');
     echo json_encode($products, JSON_PRETTY_PRINT);
 

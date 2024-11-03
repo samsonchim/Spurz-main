@@ -1,5 +1,5 @@
 <?php
-session_start(); // Start the session
+session_start(); 
 
 $servername = "localhost";
 $username = "root";
@@ -68,10 +68,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if (mysqli_stmt_execute($stmt)) {
             // Set session variables
-            $_SESSION['id'] = mysqli_insert_id($conn); // Assuming 'id' is your auto-increment primary key
+            $_SESSION['id'] = mysqli_insert_id($conn); 
             $_SESSION['businessName'] = $businessName;
         
-            // Echo a success message instead of redirecting
             echo "Registration Successful";
             exit();
         } else {

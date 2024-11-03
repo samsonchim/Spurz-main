@@ -16,7 +16,6 @@ session_start();
 
 // Check if the user is logged in
 if (!isset($_SESSION['id'])) {
-    // Return an error message using JSON
     echo json_encode(['status' => 'error', 'message' => 'User not logged in.']);
     exit();
 }
@@ -30,7 +29,6 @@ if (isset($_POST['old_password']) && isset($_POST['new_password'])) {
     $old_password = $_POST['old_password'];
     $new_password = $_POST['new_password'];
 
-    // Hash the old password for comparison with the one stored in the database
     $checkPasswordSql = "SELECT password FROM outlets WHERE id = '$user_id'";
     $result = $conn->query($checkPasswordSql);
 

@@ -1,5 +1,4 @@
 <?php
-// Include your database connection code here
 $servername = "localhost";
 $username = "root";
 $password = "";
@@ -695,15 +694,12 @@ if ($stmt) {
             $product_id = $row['product_id'];
             $product_name = $row['product_name'];
 
-            // Fetch images for the current product
-           // Fetch images for the current product
             $images = array();
             for ($i = 1; $i <= 3; $i++) {
                 $image_path = $image_path = "php/uploads/{$product_id}_({$i}).png";
                 if (file_exists($image_path)) {
                     $images[] = $image_path;
                 } else {
-                    // Break the loop if no more images are found
                     break;
                 }
             }

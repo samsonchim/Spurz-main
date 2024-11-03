@@ -16,7 +16,6 @@ session_start();
 
 // Check if the user is logged in
 if (!isset($_SESSION['id'])) {
-    // Redirect to the login page if not logged in
     echo "You are not logged in.";
     exit();
 }

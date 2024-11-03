@@ -1,5 +1,5 @@
 <?php
-// Include your database connection code here
+
 $servername = "localhost";
 $username = "root";
 $password = "";
@@ -16,7 +16,6 @@ session_start();
 
 // Check if the user is logged in
 if (!isset($_SESSION['id'])) {
-    // Redirect to the login page if not logged in
     header("Location: ../login.html");
     exit();
 }
@@ -27,7 +26,7 @@ $message = "";
 // Check if the form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Retrieve form data
-    $productId = $_POST['product_id']; // Retrieve the ID from the hidden input field
+    $productId = $_POST['product_id']; 
 
     // Check if the product ID exists and is not empty
     if (!empty($productId)) {
@@ -42,10 +41,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             // Check if the status is "Paid" or "Received"
             if ($status === "Paid" || $status === "Received") {
-                // Display message and redirect back to dashboard
                 $message = "Payment has been made. You can't edit this invoice.";
                 echo "<script>setTimeout(function(){ window.location.href = '../dashboard.php'; }, 5000);</script>";
-                exit(); // Stop further execution
+                exit();
             }
         } else {
             $message = "Error fetching invoice status: " . mysqli_error($conn);
@@ -73,10 +71,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $phone_no = mysqli_real_escape_string($conn, $phone_no);
     $customer_email = mysqli_real_escape_string($conn, $customer_email);
 
-    // Check if the product ID is empty (indicating a new record)
+ 
     if (empty($productId)) {
-        // Create new record
-        // Retrieve user ID from session
         $userId = $_SESSION['id'];
         $sql = "INSERT INTO invoices (user_id, currency, customer_name, product_name, customer_address, total_price, waybill_price, expected_delivery_date, phone_no, customer_email) VALUES ('$userId', '$currency', '$customerName', '$productName', '$customerAddress', '$totalPrice', '$waybillPrice', '$expectedDeliveryDate', '$phone_no', '$customer_email')";
     } else {
@@ -110,21 +106,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
-  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black background for blur effect */
+  background-color: rgba(0, 0, 0, 0.5); 
 }
 
 .container {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh; /* Full viewport height */
+  height: 100vh; 
 }
 
 .popup-box {
   background-color: #fff;
   padding: 20px;
   border-radius: 10px;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3); /* Drop shadow */
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3); 
 }
 
 p {

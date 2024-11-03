@@ -57,7 +57,6 @@ if (isset($_SESSION['id'])) {
         // Get the last inserted product ID
         $lastProductId = $stmt->insert_id;
 
-            // Rename and move the images to the specified format
         foreach ($uploadedFiles as $key => $image) {
             $newFileName = $lastProductId . "_(" . ($key + 1) . ").png";
             $newFilePath = $targetDir . $newFileName;
@@ -67,7 +66,6 @@ if (isset($_SESSION['id'])) {
         // Product saved successfully
         echo json_encode(array('success' => true));
     } else {
-        // Error in saving the product
         echo json_encode(array('success' => false, 'message' => 'Error in saving the product'));
     }
 
