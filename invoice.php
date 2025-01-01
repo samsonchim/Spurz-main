@@ -222,46 +222,103 @@ $conn->close();
     <!-- Tabler Core -->
     <script src="./dist/js/tabler.min.js?1684106062" defer></script>
     <script src="./dist/js/demo.min.js?1684106062" defer></script>
-    <script src="https://sdk.monnify.com/plugin/monnify.js"></script>
-
-<script>
+    <script src="https://js.paystack.co/v1/inline.js"></script>
+    <script>
 function makePayment() {
-    const tx_ref = document.getElementById("tx_ref").value;
-    const total_due = document.getElementById("total_due").value;
-    const currency = document.getElementById("currency").value;
-    const customer_name = document.getElementById("customer_name").value;
-    const customer_email = document.getElementById("customer_email").value;
-    const phone_no = document.getElementById("phone_no").value;
+    const tx_ref = `spurz-${Math.random().toString(36).substr(2, 9)}`;
+    const total_due = document.getElementById("total_due").value.trim();
+    const currency = document.getElementById("currency").value.trim();
+    const customer_name = document.getElementById("customer_name").value.trim();
+    const customer_email = document.getElementById("customer_email").value.trim();
+    const phone_no = document.getElementById("phone_no").value.trim();
+    const product_name = document.getElementById("product_name").value.trim();
 
-    MonnifySDK.initialize({
-        amount: total_due,
+    // Validate required fields
+    if (!total_due || !currency || !customer_name || !customer_email || !phone_no || !product_name) {
+        alert("Please fill in all required fields.");
+        return;
+    }
+
+    // Save transaction details temporarily in localStorage
+    const transactionDetails = {
+        tx_ref,
+        total_due,
+        currency,
+        customer_name,
+        customer_email,
+        phone_no,
+        product_name
+    };
+
+    localStorage.setItem("transactionDetails", JSON.stringify(transactionDetails));
+
+    const handler = PaystackPop.setup({
+        key: 'pk_test_0b8d27dd9b07aed5a917d639a77cec404aac7d87', // Replace with your public key
+        email: customer_email,
+        amount: parseFloat(total_due) * 100, // Paystack expects amount in kobo
         currency: currency,
-        reference: tx_ref,
-        customerName: customer_name,
-        customerEmail: customer_email,
-        customerPhoneNumber: phone_no,
-        paymentDescription: "Payment for Order #" + tx_ref,
-        contractCode: "3426535350", 
-        apiKey: "MK_TEST_64YYRM7JCQ",
-        onComplete: function(response) {
-            if (response.status === "SUCCESS") {
-                window.location.href = "pay.php?tx_ref=" + tx_ref + "&transaction_id=" + response.transactionReference;
-            } else {
-                window.location.href = "failed.html";
-            }
+        ref: tx_ref, // Reference must be unique for each transaction
+        callback: function (response) {
+            // Payment was successful
+            const transaction_id = response.reference;
+            processTransaction(transaction_id);
         },
-        onClose: function(data) {
-      
+        onClose: function () {
+            alert('Transaction was not completed, window closed.');
         }
     });
+
+    handler.openIframe();
 }
 
+function processTransaction(transaction_id) {
+    const transactionDetails = JSON.parse(localStorage.getItem("transactionDetails"));
 
+    // Ensure transaction details exist
+    if (!transactionDetails) {
+        alert("Transaction details are missing. Please try again.");
+        return;
+    }
+
+    // Prepare data to send to the server
+    const formData = new FormData();
+    formData.append("tx_ref", transactionDetails.tx_ref);
+    formData.append("transaction_id", transaction_id);
+    formData.append("total_due", transactionDetails.total_due);
+    formData.append("currency", transactionDetails.currency);
+    formData.append("customer_name", transactionDetails.customer_name);
+    formData.append("customer_email", transactionDetails.customer_email);
+    formData.append("phone_no", transactionDetails.phone_no);
+    formData.append("product_name", transactionDetails.product_name);
+
+    // Send transaction details to the server
+    fetch("pay.php", {
+        method: "POST",
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            alert("Payment successful! Transaction details saved.");
+            localStorage.removeItem("transactionDetails");
+            window.location.href = "thank-you.html?transaction_id=" + transaction_id;
+        } else {
+            alert(`Payment successful, but saving transaction failed: ${data.message}`);
+            window.location.href = "failed.html";
+        }
+    })
+    .catch(error => {
+        console.error("Error saving transaction:", error);
+        alert("An error occurred while saving the transaction. Please contact support.");
+        window.location.href = "failed.html";
+    });
+}
 </script>
 
-  </body>
+</body>
 </html>
-
-<?php
-ob_end_flush(); 
-?>

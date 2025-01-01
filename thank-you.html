@@ -114,7 +114,10 @@
     </div>
 
     <script>
-        // Get the tracking ID and display it on the page for the user!
+      const urlParams = new URLSearchParams(window.location.search);
+      const transactionId = urlParams.get('transaction_id');
+
+      document.getElementById('trackId').innerText = transactionId;
        
     </script>
 </body>

@@ -1,0 +1,21 @@
+Received data: []
+Received data: {
+    "tx_ref": "spurz-20s6rrjs9",
+    "transaction_id": "spurz-20s6rrjs9",
+    "total_due": "5000",
+    "currency": "NGN",
+    "customer_name": "Fred Johnson",
+    "customer_email": "chimaraokesamson@gmail.com",
+    "phone_no": "09162035539",
+    "product_name": "Wrist Watch"
+}
+Received data: {
+    "tx_ref": "spurz-acvp1pfzg",
+    "transaction_id": "spurz-acvp1pfzg",
+    "total_due": "5000",
+    "currency": "NGN",
+    "customer_name": "Fred Johnson",
+    "customer_email": "chimaraokesamson@gmail.com",
+    "phone_no": "09162035539",
+    "product_name": "Wrist Watch"
+}
