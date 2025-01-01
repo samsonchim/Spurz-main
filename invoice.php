@@ -305,6 +305,7 @@ function processTransaction(transaction_id) {
     .then(data => {
         if (data.success) {
             alert("Payment successful! Transaction details saved.");
+            // Remove the transaction details from localStorage after confirming server success
             localStorage.removeItem("transactionDetails");
             window.location.href = "thank-you.html?transaction_id=" + transaction_id;
         } else {
@@ -318,6 +319,7 @@ function processTransaction(transaction_id) {
         window.location.href = "failed.html";
     });
 }
+
 </script>
 
 </body>

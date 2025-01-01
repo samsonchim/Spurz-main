@@ -19,3 +19,13 @@ Received data: {
     "phone_no": "09162035539",
     "product_name": "Wrist Watch"
 }
+Received data: {
+    "tx_ref": "spurz-o6grp3mpi",
+    "transaction_id": "spurz-o6grp3mpi",
+    "total_due": "5000",
+    "currency": "NGN",
+    "customer_name": "Fred Johnson",
+    "customer_email": "chimaraokesamson@gmail.com",
+    "phone_no": "09162035539",
+    "product_name": "Wrist Watch"
+}
