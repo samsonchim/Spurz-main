@@ -59,7 +59,7 @@
 						<a href="javascript:void(0);" class="back-btn">
 							<i class="icon feather icon-chevron-left"></i>
 						</a>
-						<h6 class="title">Return to Search</h6>
+						<h6 class="title">Return to Home</h6>
 					</div>
 					<div class="mid-content">
 					</div>
@@ -78,7 +78,7 @@
                 <ul class="nav nav-tabs" id="myTab2" role="tablist">
                     <li class="tab-active-indicator" style="width: 90.7188px; transform: translateX(0px);"></li>
                     <li class="nav-item active" role="presentation">
-                        <button class="nav-link active" id="home-tab2" data-bs-toggle="tab" data-bs-target="#home-tab-pane2" type="button" role="tab" aria-controls="home-tab-pane2" aria-selected="true">Search Results</button>
+                        <button class="nav-link active" id="home-tab2" data-bs-toggle="tab" data-bs-target="#home-tab-pane2" type="button" role="tab" aria-controls="home-tab-pane2" aria-selected="true">Wishlist</button>
                     </li>
                 </ul>
             </div>
@@ -97,35 +97,46 @@
 ***********************************-->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        function getSearchQuery() {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get('search') || '';
+        function getLikedProducts() {
+            // Retrieve liked product IDs from localStorage
+            const likedProducts = JSON.parse(localStorage.getItem('likedProducts')) || [];
+            return likedProducts;
         }
 
-        function fetchProducts(searchQuery) {
+        function fetchLikedProducts(productIds) {
+            if (productIds.length === 0) {
+                console.error('No liked products found.');
+                return;
+            }
+
             const xhr = new XMLHttpRequest();
-            xhr.open('GET', `php/search-products.php?query=${encodeURIComponent(searchQuery)}`, true);
+            xhr.open('POST', 'php/fetch-liked-products.php', true); // Server endpoint to fetch liked product details
+            xhr.setRequestHeader('Content-Type', 'application/json');
+
             xhr.onload = function() {
-                if (this.status === 200) {
+                if (xhr.status === 200) {
                     try {
-                        const products = JSON.parse(this.responseText);
+                        const products = JSON.parse(xhr.responseText);
                         displayProducts(products);
                     } catch (error) {
                         console.error('Error parsing JSON:', error);
                     }
                 } else {
-                    console.error('Failed to fetch products. Status:', this.status);
+                    console.error('Failed to fetch liked products. Status:', xhr.status);
                 }
             };
+
             xhr.onerror = function() {
                 console.error('Request error.');
             };
-            xhr.send();
+
+            // Send the list of product IDs to the server
+            xhr.send(JSON.stringify({ productIds }));
         }
 
         function displayProducts(products) {
             const homeTabPane = document.getElementById('home-tab-pane2');
-            
+
             if (!homeTabPane) {
                 console.error('Tab pane is missing.');
                 return;
@@ -144,7 +155,7 @@
                 <div class="col-12">
                     <div class="product-list">
                         <div class="dz-media">
-                           <img src="outlet/php/uploads/{$product_id}_(1).png" alt="">
+                            <img src="outlet/php/uploads/${product.product_id}_(1).png" alt="">
                             <a href="javascript:void(0);" class="item-bookmark">
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-heart"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
                             </a>
@@ -164,12 +175,9 @@
             `;
         }
 
-        const searchQuery = getSearchQuery();
-        if (searchQuery) {
-            fetchProducts(searchQuery);
-        } else {
-            console.error('No search query found.');
-        }
+        // Fetch liked product details
+        const likedProducts = getLikedProducts();
+        fetchLikedProducts(likedProducts);
     });
 </script>
 
