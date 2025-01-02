@@ -70,151 +70,109 @@
 		</header>
 	<!-- Header -->
 	
-	
 	<!-- Page Content Start -->	
-	<div class="page-content space-top">
-		<div class="container p-0">
-			<!-- Catagory Start -->
-			<div class="swiper filter-swiper">
-				<div class="swiper-wrapper">
-					<div class="swiper-slide">
-						<a href="javascript:void(0);" class="filter-btn" data-bs-toggle="offcanvas" data-bs-target="#offcanvasBottom1" aria-controls="offcanvasBottom1">
-							<i class="icon feather icon-sliders"></i>	
-							<span>Sort By</span>
-							<i class="icon feather icon-chevron-down"></i>
-						</a>                                    
-					</div>
-					<div class="swiper-slide">
-						<a href="filter.html" class="filter-btn">
-							<i class="icon feather icon-filter"></i>	
-							<span>Filter</span>
-						</a>                                    
-					</div>
-					<div class="swiper-slide">
-						<a href="javascript:void(0);" class="filter-btn" data-bs-toggle="offcanvas" data-bs-target="#offcanvasBottom2" aria-controls="offcanvasBottom2">
-							<span>Brand</span>
-							<i class="icon feather icon-chevron-down"></i>
-						</a>                                    
-					</div>
-					<div class="swiper-slide">
-						<a href="javascript:void(0);" class="filter-btn"  data-bs-toggle="offcanvas" data-bs-target="#offcanvasBottom3" aria-controls="offcanvasBottom2">
-							<span>Discount</span>
-							<i class="icon feather icon-chevron-down"></i>
-						</a>                                    
-					</div>
-				</div>
-			</div>
-			<!-- Catagory End -->
-			
-			<div class="container">
-				<h1>Product Search</h1>
-				<input type="text" id="search-input" placeholder="Search for products...">
-				<div id="search-results" class="row">
-					
-				
-				</div>
-			</div>
-	<!-- Page Content End -->
-	<div class="offcanvas offcanvas-bottom dz-filter-canvas" tabindex="-1" id="offcanvasBottom1" aria-labelledby="offcanvasBottomLabel1">
-		<button type="button" class="btn-close drage-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-		<div class="offcanvas-header border-0">
-			<button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close">
-				<i class="icon feather icon-x"></i>
-			</button>
-			<h6 class="offcanvas-title" id="offcanvasBottomLabel1">Filters</h6>
-		</div>
-		<div class="offcanvas-body">
-			<div class="form-check">
-				<label class="form-check-label" for="flexRadioDefault1">
-					What's new
-				</label>
-				<input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
-			</div>
-			<div class="form-check">
-				<label class="form-check-label" for="flexRadioDefault2">
-					Price - high to low
-				</label>
-				<input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2">
-			</div>
-			<div class="form-check">
-				<label class="form-check-label" for="flexRadioDefault3">
-					Price - low to high
-				</label>
-				<input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault3">
-			</div>
-			<div class="form-check">
-				<label class="form-check-label" for="flexRadioDefault4">
-					Popularity
-				</label>
-				<input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault4">
-			</div>
-			<div class="form-check">
-				<label class="form-check-label" for="flexRadioDefault5">
-					Discount
-				</label>
-				<input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault5">
-			</div>
-		</div>
-	</div>
-	<div class="offcanvas offcanvas-bottom dz-filter-canvas" tabindex="-1" id="offcanvasBottom2" aria-labelledby="offcanvasBottomLabel2">
-		<button type="button" class="btn-close drage-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-		<div class="offcanvas-header border-0">
-			<button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close">
-				<i class="icon feather icon-x"></i>
-			</button>
-			<h6 class="offcanvas-title" id="offcanvasBottomLabel2">Filters</h6>
-		</div>
-		<div class="offcanvas-body">
-			<div class="filter-content">
-				<div class="form-check">
-					<label class="form-check-label" for="brand1">
-						Roadstar
-					</label>
-					<input class="form-check-input" type="checkbox" value="" id="brand1">
-				</div>
-				<div class="form-check">
-					<label class="form-check-label" for="brand2">
-						Peter England
-					</label>
-					<input class="form-check-input" type="checkbox" value="" id="brand2">
-				</div>
-				<div class="form-check">
-					<label class="form-check-label" for="brand3">
-						Flying Machine
-					</label>
-					<input class="form-check-input" type="checkbox" value="" id="brand3">
-				</div>
-				<div class="form-check">
-					<label class="form-check-label" for="brand4">
-						killer
-					</label>
-					<input class="form-check-input" type="checkbox" value="" id="brand4">
-				</div>
-				<div class="form-check">
-					<label class="form-check-label" for="brand5">
-						Levi's
-					</label>
-					<input class="form-check-input" type="checkbox" value="" id="brand5">
-				</div>
-				<div class="form-check">
-					<label class="form-check-label" for="brand6">
-						Puma
-					</label>
-					<input class="form-check-input" type="checkbox" value="" id="brand6">
-				</div>
-				<div class="form-check">
-					<label class="form-check-label" for="brand7">
-						Wildcraft
-					</label>
-					<input class="form-check-input" type="checkbox" value="" id="brand7">
-				</div>
-			</div>
-		</div>
-	</div>
-	
+<div class="page-content space-top">
+    <div class="container p-0">
+        <div class="dz-tab style-1 tab-fixed">
+            <div class="tab-slide-effect">
+                <ul class="nav nav-tabs" id="myTab2" role="tablist">
+                    <li class="tab-active-indicator" style="width: 90.7188px; transform: translateX(0px);"></li>
+                    <li class="nav-item active" role="presentation">
+                        <button class="nav-link active" id="home-tab2" data-bs-toggle="tab" data-bs-target="#home-tab-pane2" type="button" role="tab" aria-controls="home-tab-pane2" aria-selected="true">Search Results</button>
+                    </li>
+                </ul>
+            </div>
+            <div class="tab-content" id="myTabContent2">
+                <div class="tab-pane fade active show" id="home-tab-pane2" role="tabpanel" aria-labelledby="home-tab2" tabindex="0">
+                    <!-- Products will be inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Page Content End -->
+
 <!--**********************************
     Scripts
 ***********************************-->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        function getSearchQuery() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('search') || '';
+        }
+
+        function fetchProducts(searchQuery) {
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', `php/search-products.php?query=${encodeURIComponent(searchQuery)}`, true);
+            xhr.onload = function() {
+                if (this.status === 200) {
+                    try {
+                        const products = JSON.parse(this.responseText);
+                        displayProducts(products);
+                    } catch (error) {
+                        console.error('Error parsing JSON:', error);
+                    }
+                } else {
+                    console.error('Failed to fetch products. Status:', this.status);
+                }
+            };
+            xhr.onerror = function() {
+                console.error('Request error.');
+            };
+            xhr.send();
+        }
+
+        function displayProducts(products) {
+            const homeTabPane = document.getElementById('home-tab-pane2');
+            
+            if (!homeTabPane) {
+                console.error('Tab pane is missing.');
+                return;
+            }
+
+            homeTabPane.innerHTML = '';
+
+            products.forEach(product => {
+                const productHtml = createProductHtml(product);
+                homeTabPane.innerHTML += productHtml;
+            });
+        }
+
+        function createProductHtml(product) {
+            return `
+                <div class="col-12">
+                    <div class="product-list">
+                        <div class="dz-media">
+                            <img src="${product.image}" alt="">
+                            <a href="javascript:void(0);" class="item-bookmark">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-heart"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                            </a>
+                        </div>
+                        <div class="product-content">
+                            <div class="dz-review-meta mb-1">
+                                <h6 class="review">4.0<i class="fa-solid fa-star ms-1"></i><span>...</span></h6>
+                            </div>
+                            <h6 class="title font-14"><a href="product-detail.php?id=${product.product_id}">${product.product_name}</a></h6>
+                            <div class="product-footer">
+                                <h5 class="price mb-0">₦${product.price}<del>₦${(product.price * 1.2).toFixed(2)}</del></h5>
+                                <small>45% OFF</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        const searchQuery = getSearchQuery();
+        if (searchQuery) {
+            fetchProducts(searchQuery);
+        } else {
+            console.error('No search query found.');
+        }
+    });
+</script>
+
 <script src="assets/js/jquery.js"></script>
 <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="assets/vendor/swiper/swiper-bundle.min.js"></script><!-- Swiper -->
