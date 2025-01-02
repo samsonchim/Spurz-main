@@ -81,8 +81,33 @@
 						</a>
 						<a href="wishlist.html" class="icon">
 							<i class="icon feather icon-heart"></i>
-							<span class="badge badge-primary">3</span>
+							<span class="badge badge-primary" id="wishlistBadge">0</span>
 						</a>
+						
+						<script>
+							document.addEventListener('DOMContentLoaded', function() {
+								function updateWishlistCount() {
+									// Retrieve liked products from localStorage
+									const likedProducts = JSON.parse(localStorage.getItem('likedProducts')) || [];
+						
+									// Ensure likedProducts is an array and calculate the count
+									const count = Array.isArray(likedProducts) ? likedProducts.length : 0;
+						
+									// Update the badge count
+									const badgeElement = document.getElementById('wishlistBadge');
+									if (badgeElement) {
+										badgeElement.textContent = count;
+									}
+								}
+						
+								// Initial update
+								updateWishlistCount();
+						
+								// Optional: Add event listener to update count if products are liked/unliked dynamically
+								window.addEventListener('storage', updateWishlistCount);
+							});
+						</script>
+						
 					</div>
 				</div>
 			</div>
@@ -513,6 +538,8 @@ $(document).ready(function() {
     fetchProducts();
 });
 
+
+  
 
 </script>
 <script src="assets/js/jquery.js"></script>
