@@ -177,10 +177,115 @@ $conn->close();
         <p><?= isset($product['product_description']) ? $product['product_description'] : 'No description available.'; ?></p>
     </div>
 
-</div>
-<!---
+
 <div class="divider border"></div>
-  <div class="container mt-5 mb-5">
+<h6>Product Reviews</h6>
+<div id="reviews-container">
+    <?php
+    // Database connection
+    $servername = "localhost";
+    $username = "root";
+    $password = "";
+    $dbname = "spurz";
+
+    $conn = new mysqli($servername, $username, $password, $dbname);
+
+    // Check connection
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
+
+    // Fetch product ID from URL
+    $product_id = $_GET['id'] ?? '';
+
+    if (!empty($product_id)) {
+        // Fetch reviews for the product ID
+        $stmt = $conn->prepare("SELECT name, review, created_at FROM reviews WHERE product_id = ? ORDER BY created_at DESC");
+        $stmt->bind_param("i", $product_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows > 0) {
+            echo '<div class="review-header"><span class="review-verified">All reviews are from verified purchases</span></div>';
+            while ($row = $result->fetch_assoc()) {
+                echo '<div class="review">';
+                echo '<div class="review-body">';
+                echo '<div class="reviewer-info">';
+                echo '<span class="reviewer-name">' . htmlspecialchars($row['name']) . '</span>';
+                echo '<span class="review-date">' . date('F j, Y', strtotime($row['created_at'])) . '</span>';
+                echo '</div>';
+                echo '<div class="review-text">';
+                echo '<p>' . htmlspecialchars($row['review']) . '</p>';
+                echo '</div>';
+                echo '</div>';
+                echo '</div>';
+            }
+        } else {
+            echo '<p>No reviews yet.</p>';
+        }
+
+        $stmt->close();
+    } else {
+        echo '<p>Invalid product ID.</p>';
+    }
+
+    // Close connection
+    $conn->close();
+    ?>
+</div>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+    }
+
+    .review {
+        border: 1px solid #ddd;
+        padding: 15px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+    }
+
+    .review-header {
+        background-color: #e8f5e9;
+        padding: 10px;
+        border-radius: 5px 5px 0 0;
+        font-size: 14px;
+        color: #388e3c;
+    }
+
+    .review-body {
+        padding: 10px;
+    }
+
+    .reviewer-info {
+        display: flex;
+        justify-content: space-between;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .reviewer-name {
+        font-size: 16px;
+        color: #333;
+        margin: 1px;
+        padding: 1px;
+    }
+
+    .review-date {
+        font-size: 12px;
+        color: #666;
+    }
+
+    .review-text p {
+        font-size: 14px;
+        color: #333;
+        margin: 1px;
+    }
+</style>
+
+ <!--- <div class="container mt-5 mb-5">
     <div class="d-flex justify-content-center row">
         <div class="d-flex flex-column col-md-8">
 			 <h6 class="review"><i class="fa-solid fa-star me-1"></i>46 Likes <span>(5 review(s))</span></h6>
@@ -193,7 +298,6 @@ $conn->close();
             <div class="coment-bottom bg-white p-2 px-4">
                 <h4>Comments</h4><br>
                     <div id="comment-section">
-                        <?php include 'php/load_comments.php'; ?>
                         Comments will be dynamically added here -->
                     </div>
                 </div>
@@ -214,7 +318,7 @@ $conn->close();
 				<?= isset($product['price']) ? '₦' . $product['price'] : 'Invalid Price, Contact Vendor.'; ?>
 				<del>₦<?= isset($product['price']) ? ($product['price'] * 1.2) : 'Invalid'; ?></del>
 			</h3>
-			<a href="outlet.php?id=<?= $user_id; ?>">Open Vendors Outlets</a>
+			<a href="outlet.php?id=<?= $user_id; ?>">Open Vendor's Outlets</a>
             </div>
             <a href="https://api.whatsapp.com/send?phone=<?= urlencode($phone_no); ?>&text=Hello,I%20am%20interested%20in%20the%20<?= urlencode($product['product_name']); ?>%20listed%20on%20Spurz" class="btn btn-primary">Buy on WhatsApp</a>
         </div>
@@ -287,6 +391,7 @@ $conn->close();
         alert("Please enter a comment.");
     }
 });
+
 
 </script>
 <script src="assets/js/jquery.js"></script>

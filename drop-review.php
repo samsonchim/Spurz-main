@@ -72,7 +72,7 @@
 							<textarea id="review" name="review" class="form-control" placeholder="What do you think about this product?" required></textarea>
 						</div>
 				
-						<input type="hidden" name="product_id" value="<?php echo $_GET['product_id']; ?>">
+						<input type="hidden" name="product_id" value="<?php echo $_GET['id']; ?>">
 				
 						<button type="submit" class="btn mb-3 btn-primary w-100">Send</button>
 					</form>  
