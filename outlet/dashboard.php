@@ -213,7 +213,11 @@ mysqli_close($conn);
                   <li class="nav-item">
                     <a class="nav-link" href="product-list.php" >
                       <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/ghost -->
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 11a7 7 0 0 1 14 0v7a1.78 1.78 0 0 1 -3.1 1.4a1.65 1.65 0 0 0 -2.6 0a1.65 1.65 0 0 1 -2.6 0a1.65 1.65 0 0 0 -2.6 0a1.78 1.78 0 0 1 -3.1 -1.4v-7" /><path d="M10 10l.01 0" /><path d="M14 10l.01 0" /><path d="M10 14a3.5 3.5 0 0 0 4 0" /></svg>
+                        <svg width="24" height="24"class="icon" viewBox="0 0 20.00 20.00" xmlns="http://www.w3.org/2000/svg" fill="#929dab" stroke="#929dab" stroke-width="current-color">
+                        <g id="SVGRepo_bgCarrier" stroke-width="0"/>
+                        <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
+                        <g id="SVGRepo_iconCarrier"> <rect x="0" fill="none" width="20" height="20"/> <g> <path d="M17 8h1v11H2V8h1V6c0-2.76 2.24-5 5-5 .71 0 1.39.15 2 .42.61-.27 1.29-.42 2-.42 2.76 0 5 2.24 5 5v2zM5 6v2h2V6c0-1.13.39-2.16 1.02-3H8C6.35 3 5 4.35 5 6zm10 2V6c0-1.65-1.35-3-3-3h-.02c.63.84 1.02 1.87 1.02 3v2h2zm-5-4.22C9.39 4.33 9 5.12 9 6v2h2V6c0-.88-.39-1.67-1-2.22z"/> </g> </g>
+                        </svg>                
                       </span>
                       <span class="nav-link-title">
                         Products
@@ -433,9 +437,7 @@ fetchAndAppendProducts();
               <div class="col-12">
                 <div class="row row-cards">
                   <div class="col-sm-6 col-lg-3">
-                    <div class="card card-sm">
-                      <div class="card-body">
-                        <div class="row align-items-center">
+                   
                           <!--<div class="col-auto">
                             <span class="bg-primary text-white avatar">
                               <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M16.7 8a3 3 0 0 0 -2.7 -2h-4a3 3 0 0 0 0 6h4a3 3 0 0 1 0 6h-4a3 3 0 0 1 -2.7 -2" /><path d="M12 3v3m0 12v3" /></svg>
@@ -920,10 +922,19 @@ document.getElementById('productImages').addEventListener('change', function (ev
     const files = event.target.files;
     const currentImages = previewContainer.querySelectorAll('.preview-image');
 
-    // Check if the total number of images doesn't exceed 3
-    if (currentImages.length + files.length > 3) {
-        alert('You can only upload up to 3 images. Please remove an image before adding another.');
+    // Check if the total number of images will be exactly 3 after adding new ones
+    const totalImages = currentImages.length + files.length;
+    if (totalImages > 3) {
+        alert('You can only upload exactly 3 images. Please remove an image before adding another.');
         // Clear the file input to prevent adding more than 3 images
+        this.value = "";
+        return;
+    }
+
+    // Check if the number of selected files is less than 3
+    if (totalImages < 3) {
+        alert('Please upload exactly 3 images.');
+        // Clear the file input to encourage selecting the correct number of images
         this.value = "";
         return;
     }
@@ -934,34 +945,49 @@ document.getElementById('productImages').addEventListener('change', function (ev
         reader.onload = function (e) {
             const imgElement = document.createElement('img');
             imgElement.src = e.target.result;
-            imgElement.className = 'preview-image';
 
-            // Create an "X" button to remove the image
-            const closeButton = document.createElement('button');
-            closeButton.innerText = 'X';
-            closeButton.className = 'close-button';
+            imgElement.onload = function () {
+                const width = imgElement.naturalWidth;
+                const height = imgElement.naturalHeight;
 
-            // Set up a timer for double-tap behavior on mobile
-            let lastClickTime = 0;
-            imgElement.addEventListener('click', function () {
-                const currentTime = new Date().getTime();
-                const timeSinceLastClick = currentTime - lastClickTime;
+                // Check if the image dimensions are within the allowed range
+                if ((width >= 720 && width <= 810) && (height >= 1004 && height <= 1080)) {
+                    imgElement.className = 'preview-image';
 
-                if (timeSinceLastClick < 300) {
-                    previewContainer.removeChild(imgElement);
+                    // Create an "X" button to remove the image
+                    const closeButton = document.createElement('button');
+                    closeButton.innerText = 'X';
+                    closeButton.className = 'close-button';
+
+                    // Remove image on button click
+                    closeButton.addEventListener('click', function () {
+                        previewContainer.removeChild(imgElement);
+                        // Enable the file input if images are less than 3
+                        if (previewContainer.querySelectorAll('.preview-image').length < 3) {
+                            document.getElementById('productImages').disabled = false;
+                        }
+                    });
+
+                    // Append the image and close button to the preview container
+                    previewContainer.appendChild(imgElement);
+                    imgElement.appendChild(closeButton);
+
+                    // Disable the file input if 3 images are uploaded
+                    if (previewContainer.querySelectorAll('.preview-image').length === 3) {
+                        document.getElementById('productImages').disabled = true;
+                    }
+                } else {
+                    alert('Image dimensions must be between 720x1004px and 810x1080px.');
+                    // Clear the file input to prevent adding invalid images
+                    document.getElementById('productImages').value = "";
                 }
-
-                lastClickTime = currentTime;
-            });
-
-            // Append the image and close button to the preview container
-            previewContainer.appendChild(imgElement);
-            imgElement.appendChild(closeButton);
+            };
         };
 
         reader.readAsDataURL(file);
     }
 });
+
 
 
       // @formatter:off
