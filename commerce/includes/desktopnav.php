@@ -436,10 +436,6 @@
   </li>
 
   <li class="menu-category">
-    <a href="#" class="menu-title">Blog</a>
-  </li>
-
-  <li class="menu-category">
     <a href="#" class="menu-title">Hot Offers</a>
   </li>
 
@@ -451,48 +447,9 @@
 
     <li class="menu-category">
 
-      <button class="accordion-menu" data-accordion-btn>
-        <p class="menu-title">Language</p>
-
-        <ion-icon name="caret-back-outline" class="caret-back"></ion-icon>
-      </button>
-
-      <ul class="submenu-category-list" data-accordion>
-
-        <li class="submenu-category">
-          <a href="#" class="submenu-title">English</a>
-        </li>
-
-        <li class="submenu-category">
-          <a href="#" class="submenu-title">Espa&ntilde;ol</a>
-        </li>
-
-        <li class="submenu-category">
-          <a href="#" class="submenu-title">Fren&ccedil;h</a>
-        </li>
-
-      </ul>
-
     </li>
 
-    <li class="menu-category">
-      <button class="accordion-menu" data-accordion-btn>
-        <p class="menu-title">Currency</p>
-        <ion-icon name="caret-back-outline" class="caret-back"></ion-icon>
-      </button>
-
-      <ul class="submenu-category-list" data-accordion>
-        <li class="submenu-category">
-          <a href="#" class="submenu-title">USD &dollar;</a>
-        </li>
-
-        <li class="submenu-category">
-          <a href="#" class="submenu-title">EUR &euro;</a>
-        </li>
-      </ul>
-    </li>
-
-  </ul>
+   
 
   <ul class="menu-social-container">
 

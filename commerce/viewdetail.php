@@ -4,10 +4,6 @@
 <?php require_once './includes/topheadactions.php'; ?>
 <?php require_once './includes/mobilenav.php'; ?>
 
-
-
-
-
 <!-- get tables data from db -->
 
 <header>
@@ -66,22 +62,8 @@ $query->fetch();
 $query->close();
 
 // Encode message for WhatsApp URL (after product_name is set)
-$whatsapp_message = urlencode("Hello, $product_author, I am interested in the $product_name I found on Jaro.");
+$whatsapp_message = urlencode("Hello, $product_author, I am interested in the $product_name I found on Spurz.");
 ?>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 <!-- Adding to cart -->
 <div class="content">
@@ -117,7 +99,7 @@ $whatsapp_message = urlencode("Hello, $product_author, I am interested in the $p
                         </div>
                     </div>
                     <div class="product_description">
-                        <div class="product_title"><strong>Description:</strong></div>
+                       
                         <div class="product_detail">
                             <?php echo $description; ?>
                         </div>
@@ -156,10 +138,15 @@ $whatsapp_message = urlencode("Hello, $product_author, I am interested in the $p
                        
                     </div>
                 </div>
+                <h5>Reviews</h5>
+                <div id="reviewsContainer">
+                    <p>Loading reviews...</p>
+                </div>
 
             </div>
         </div>
     </form>
+  
 </div>
 
 
@@ -184,6 +171,46 @@ $whatsapp_message = urlencode("Hello, $product_author, I am interested in the $p
 <!--  -->
 
 
+<script>
+    // Utility to escape HTML special characters
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
 
+    // Fetch and display reviews on page load
+    document.addEventListener("DOMContentLoaded", function() {
+        const productId = <?php echo json_encode($row['product_id']); ?>;
+        fetchReviews(productId);
+    });
 
+    function fetchReviews(productId) {
+        fetch(`includes/productReviews.php?product_id=${productId}`)
+            .then(response => response.json())
+            .then(data => {
+                let reviewsContainer = document.getElementById("reviewsContainer");
+                reviewsContainer.innerHTML = "";
+
+                if (data.status === "success" && Array.isArray(data.reviews) && data.reviews.length > 0) {
+                    data.reviews.forEach(review => {
+                        let reviewItem = document.createElement("div");
+                        reviewItem.classList.add("review-item");
+                        reviewItem.innerHTML = `
+                            <p><strong>${escapeHtml(review.customer_name)}</strong></p>
+                            <p>${escapeHtml(review.review)}</p>
+                            <hr>
+                        `;
+                        reviewsContainer.appendChild(reviewItem);
+                    });
+                } else {
+                    reviewsContainer.innerHTML = `<p>No reviews available.</p>`;
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching reviews:", error);
+                document.getElementById("reviewsContainer").innerHTML = `<p>Error loading reviews.</p>`;
+            });
+    }
+</script>
 <?php require_once './includes/footer.php'; ?>

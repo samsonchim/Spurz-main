@@ -78,7 +78,7 @@
                             </tr>
                             <tr>
                               <td>
-                                <strong>You</strong> Joined <strong>Jaro</strong>
+                                <strong>You</strong> Joined <strong>Spurz</strong>
                               </td>
                             </tr>
                           </tbody>

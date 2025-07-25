@@ -15,8 +15,7 @@
 
             <h1 style="text-align: center;">
 
-            <img src="images/logo.png" alt="logo" width="40px">
-
+         
             </h1>
 
           </a>

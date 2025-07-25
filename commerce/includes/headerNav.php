@@ -22,7 +22,7 @@
 	<!-- Favicon -->
 	<link rel="shortcut icon" href="./images/flogo/logo.png" type="image/x-icon" />
 	
-    <title>Jaro - Buy Cheap</title>
+    <title>Spurz - Buy Cheap</title>
 
 	
 

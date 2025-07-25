@@ -65,7 +65,7 @@ if (isset($_SESSION['transaction_id'])) {
     <p><strong>Now screenshot this before closing!</strong><br> 
        Keep it safe, never share it with anyone—not even the vendor.<br>
        You will use the code for refunds, complaints, or confirming product delivery.<br>
-       No one from <strong>Jaro!</strong> will ever ask you for it.</p>
+       No one from <strong>Spurz!</strong> will ever ask you for it.</p>
     <button id="closePopup" onclick="closePopup()">Close</button>
 </div>
 

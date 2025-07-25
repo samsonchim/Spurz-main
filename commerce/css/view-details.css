@@ -38,7 +38,7 @@ input[type=number] {
     
 }
 .product_image_box{
-    width: 40%;
+    width: 30%;
     height: 450px;
     display: flex;
     background-repeat: no-repeat;
@@ -112,7 +112,7 @@ input[type=number] {
 .product_counter_btn_box{
     margin-top: 10px;
     border: 1px solid #7c7c7c;
-    width: 150px;
+    width: 300px;
     display: flex;
     justify-content: space-between;
 }
@@ -140,23 +140,17 @@ input[type=number] {
     /* border: 1px solid red; */
     
 }
-.product_description{
-    display: flex;
-    /* border: 1px solid red; */
-    margin-top: 10px;
-    margin-bottom: 10px;
-}
+
 .product_title{
     /* border: 1px solid black; */
     width: 20%;
-    font-size: 15px;
-    font-weight: 980;
+    font-size: 13px;
+    font-weight: 200;
 }
 .product_detail {
     /* border: 1px solid black; */
     width: 60%;
-    font-size: 18px;
-    text-align: justify;
+    font-size: 12px;
     line-height: normal;
 }
 
@@ -244,7 +238,7 @@ label h3{
            flex-direction: column;
            justify-content: center;
            align-items: center;
-           width: 100%;
+           width: 95%;
         }
     .product_image_box, .product_detail_box{
         width: 100%;

@@ -77,6 +77,8 @@ CREATE TABLE invoices (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+
+
 ALTER TABLE invoices 
 ADD COLUMN outlet_id INT NOT NULL,
 ADD COLUMN paid TINYINT(1) DEFAULT NULL,
@@ -477,19 +479,13 @@ INSERT INTO `products` (`product_id`, `product_catag`, `product_title`, `product
 
 CREATE TABLE `reviews` (
   `id` int(10) NOT NULL,
+  product_id INT NOT NULL,
   `name` varchar(30) NOT NULL,
   `review` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `reviews`
---
-
-INSERT INTO `reviews` (`id`, `name`, `review`) VALUES
-(1, 'Iqso Fhd', 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quidem ad\r\n            fugiat, itaque dolore culpa ipsa fuga, illum, maxime exercitationem\r\n            commodi nihil nobis nulla similique quibusdam sed expedita provident'),
-(2, 'IFAD', 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quidem ad\r\n            fugiat, itaque dolore culpa ipsa fuga, illum, maxime exercitationem\r\n            commodi nihil nobis nulla similique quibusdam sed expedita provident'),
-(3, 'Eva Silk', 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quidem ad\r\n            fugiat, itaque dolore culpa ipsa fuga, illum, maxime exercitationem\r\n            commodi nihil nobis nulla similique quibusdam sed expedita provident');
-
+ALTER TABLE reviews 
+ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 -- --------------------------------------------------------
 
 --
@@ -531,7 +527,7 @@ CREATE TABLE `settings` (
 --
 
 INSERT INTO `settings` (`website_name`, `website_logo`, `website_footer`) VALUES
-('Jaro Africa', 'logo.png', 'Jaro Africa');
+('Spurz Africa', 'logo.png', 'Spurz Africa');
 
 --
 -- Indexes for dumped tables
