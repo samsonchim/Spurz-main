@@ -1,7 +1,7 @@
 // API Configuration
 export const API_CONFIG = {
   // Change this when you deploy to production
-  BASE_URL: __DEV__ ? 'http://localhost:3000' : 'https://your-production-url.com',
+  BASE_URL: __DEV__ ? 'https://6f81e3710c41.ngrok-free.app' : 'https://6f81e3710c41.ngrok-free.app',
   API_VERSION: 'v1',
   TIMEOUT: 10000, // 10 seconds
 };

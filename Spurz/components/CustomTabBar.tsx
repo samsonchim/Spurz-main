@@ -14,8 +14,8 @@ export function CustomTabBar({ state, descriptors, navigation }: CustomTabBarPro
     switch (routeName) {
       case 'index':
         return { 
-          name: 'home-outline', 
-          activeName: 'home'
+          name: 'grid-outline', 
+          activeName: 'grid'
         };
       case 'chat':
         return { 
@@ -29,8 +29,8 @@ export function CustomTabBar({ state, descriptors, navigation }: CustomTabBarPro
         };
       case 'dashboard':
         return { 
-          name: 'grid-outline', 
-          activeName: 'grid'
+          name: 'stats-chart-outline', 
+          activeName: 'stats-chart'
         };
       case 'profile':
         return { 
@@ -39,8 +39,8 @@ export function CustomTabBar({ state, descriptors, navigation }: CustomTabBarPro
         };
       default:
         return { 
-          name: 'home-outline', 
-          activeName: 'home'
+          name: 'grid-outline', 
+          activeName: 'grid'
         };
     }
   };
@@ -70,14 +70,21 @@ export function CustomTabBar({ state, descriptors, navigation }: CustomTabBarPro
             <TouchableOpacity
               key={index}
               onPress={onPress}
-              style={styles.tabButton}
+              style={[
+                styles.tabButton,
+                isFocused && styles.activeTabButton
+              ]}
             >
-              <Ionicons
-                name={iconName as any}
-                size={24}
-                color={isFocused ? '#FFA500' : '#666666'}
-              />
-              {isFocused && <View style={styles.activeIndicator} />}
+              <View style={[
+                styles.iconContainer,
+                isFocused && styles.activeIconContainer
+              ]}>
+                <Ionicons
+                  name={iconName as any}
+                  size={22}
+                  color={isFocused ? '#FFFFFF' : '#8E8E93'}
+                />
+              </View>
             </TouchableOpacity>
           );
         })}
@@ -92,16 +99,26 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: '#ffffff',
+    backgroundColor: 'transparent',
   },
   tabBar: {
     flexDirection: 'row',
-    paddingTop: 15,
-    paddingBottom: 25,
+    paddingTop: 12,
+    paddingBottom: 28,
     paddingHorizontal: 20,
     alignItems: 'center',
     justifyContent: 'space-around',
-    backgroundColor: '#ffffff',
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: -2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 10,
   },
   tabButton: {
     alignItems: 'center',
@@ -109,11 +126,26 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     flex: 1,
   },
-  activeIndicator: {
-    width: 30,
-    height: 3,
+  activeTabButton: {
+    transform: [{ translateY: -2 }],
+  },
+  iconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'transparent',
+  },
+  activeIconContainer: {
     backgroundColor: '#FFA500',
-    borderRadius: 2,
-    marginTop: 8,
+    shadowColor: '#FFA500',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
   },
 });

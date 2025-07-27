@@ -1,6 +1,8 @@
+import { useToast } from '@/components/ToastProvider';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
+    ActivityIndicator,
     KeyboardAvoidingView,
     Platform,
     SafeAreaView,
@@ -14,11 +16,40 @@ import {
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const toast = useToast();
 
-  const handleLogin = () => {
-    // Add login logic here
-    // For now, just navigate to tabs
-    router.replace('/(tabs)');
+  const validateForm = () => {
+    if (!email.trim()) {
+      toast.showError('Please enter your email address', 'Validation Error');
+      return false;
+    }
+    if (!password) {
+      toast.showError('Please enter your password', 'Validation Error');
+      return false;
+    }
+    return true;
+  };
+
+  const handleLogin = async () => {
+    if (!validateForm()) return;
+
+    setIsLoading(true);
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // For demo purposes, show success and navigate
+      toast.showSuccess('Login successful! Welcome back.', 'Success');
+      
+      setTimeout(() => {
+        router.replace('/(tabs)');
+      }, 1000);
+    } catch (error) {
+      toast.showError('Login failed. Please check your credentials.', 'Login Error');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const navigateToSignup = () => {
@@ -48,6 +79,7 @@ export default function LoginScreen() {
                 placeholderTextColor="#999"
                 keyboardType="email-address"
                 autoCapitalize="none"
+                editable={!isLoading}
               />
             </View>
 
@@ -60,6 +92,7 @@ export default function LoginScreen() {
                 placeholder="Enter your password"
                 placeholderTextColor="#999"
                 secureTextEntry
+                editable={!isLoading}
               />
             </View>
 
@@ -67,8 +100,16 @@ export default function LoginScreen() {
               <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-              <Text style={styles.loginButtonText}>Sign In</Text>
+            <TouchableOpacity 
+              style={[styles.loginButton, isLoading && styles.loginButtonDisabled]} 
+              onPress={handleLogin}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <ActivityIndicator color="#FFFFFF" size="small" />
+              ) : (
+                <Text style={styles.loginButtonText}>Sign In</Text>
+              )}
             </TouchableOpacity>
 
             <View style={styles.signupLink}>
@@ -148,6 +189,10 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     alignItems: 'center',
     marginBottom: 20,
+  },
+  loginButtonDisabled: {
+    backgroundColor: '#FFD700',
+    opacity: 0.7,
   },
   loginButtonText: {
     color: '#ffffff',

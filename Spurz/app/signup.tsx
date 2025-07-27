@@ -1,9 +1,9 @@
+import { useToast } from '@/components/ToastProvider';
 import { API_ENDPOINTS, getApiUrl } from '@/constants/api';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
     ActivityIndicator,
-    Alert,
     KeyboardAvoidingView,
     Platform,
     SafeAreaView,
@@ -21,26 +21,27 @@ export default function SignupScreen() {
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const toast = useToast();
 
   const validateForm = () => {
     if (!fullName.trim()) {
-      Alert.alert('Error', 'Please enter your full name');
+      toast.showError('Please enter your full name', 'Validation Error');
       return false;
     }
     if (!email.trim()) {
-      Alert.alert('Error', 'Please enter your email address');
+      toast.showError('Please enter your email address', 'Validation Error');
       return false;
     }
     if (!password) {
-      Alert.alert('Error', 'Please enter a password');
+      toast.showError('Please enter a password', 'Validation Error');
       return false;
     }
     if (password.length < 6) {
-      Alert.alert('Error', 'Password must be at least 6 characters long');
+      toast.showError('Password must be at least 6 characters long', 'Validation Error');
       return false;
     }
     if (password !== confirmPassword) {
-      Alert.alert('Error', 'Passwords do not match');
+      toast.showError('Passwords do not match', 'Validation Error');
       return false;
     }
     return true;
@@ -67,6 +68,7 @@ export default function SignupScreen() {
       const data = await response.json();
 
       if (data.success) {
+        toast.showSuccess('Account created successfully! Please check your email for verification.', 'Success');
         // Navigate to email verification screen
         router.replace({
           pathname: '/email-verification',
@@ -76,14 +78,11 @@ export default function SignupScreen() {
           },
         });
       } else {
-        Alert.alert('Signup Failed', data.message || 'An error occurred during signup');
+        toast.showError(data.message || 'An error occurred during signup', 'Signup Failed');
       }
     } catch (error) {
       console.error('Signup error:', error);
-      Alert.alert(
-        'Network Error', 
-        'Please check your internet connection and try again.'
-      );
+      toast.showError('Please check your internet connection and try again.', 'Network Error');
     } finally {
       setIsLoading(false);
     }
