@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Image, Pressable, SafeAreaView, StatusBar, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, StatusBar, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFonts, Poppins_400Regular, Poppins_600SemiBold, Poppins_700Bold } from '@expo-google-fonts/poppins';
 import { colors } from '../../theme/colors';
 import { Button } from '../../components/Button';
@@ -10,19 +11,19 @@ const slides = [
     key: 'discover',
     title: 'Discover Trusted\nVendor Around You',
     subtitle: 'Find Great Deals From Verified\nSellers And Outlet',
-    image: require('../../../logo.png'),
+    image: require('../../../assets/onboarding_1.png'),
   },
   {
     key: 'escrow',
     title: 'Pay Safely With Escrow',
     subtitle: 'Your Money Is Protected Until\nYou Confirm Delivery',
-    image: require('../../../logo.png'),
+    image: require('../../../assets/onboarding_2.png'),
   },
   {
     key: 'simplify',
     title: 'Simplify Your  Transaction',
     subtitle: 'Chat Directly, Confirm Items, And\nReview Your Experience',
-    image: require('../../../logo.png'),
+    image: require('../../../assets/onboarding_3.png'),
   },
 ] as const;
 
@@ -31,7 +32,7 @@ type Props = { onDone?: () => void };
 export default function OnboardingScreen({ onDone }: Props) {
   const [index, setIndex] = useState(0);
   const [fontsLoaded] = useFonts({ Poppins_400Regular, Poppins_600SemiBold, Poppins_700Bold });
-  const slide = slides[index];
+  const slide = slides[index]!;
 
   const handleNext = () => {
     if (index < slides.length - 1) setIndex((i) => i + 1);

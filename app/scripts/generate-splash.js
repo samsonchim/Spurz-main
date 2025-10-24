@@ -19,8 +19,8 @@ const sharp = require('sharp');
     const WIDTH = 1080;
     const HEIGHT = 2340;
 
-    // Background color from app.json (approx of your mock): #FFFAF0
-    const background = { r: 255, g: 250, b: 240, alpha: 1 };
+  // Pure white background
+  const background = { r: 255, g: 255, b: 255, alpha: 1 };
 
     // Read logo and compute a target width keeping margins
     const logoImg = sharp(logoPath);
