@@ -5,6 +5,7 @@
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
     "baseUrl": ".",
+    "lib": ["esnext", "dom"],
     "paths": {
       "@components/*": ["src/components/*"],
       "@screens/*": ["src/screens/*"],
@@ -13,6 +14,6 @@
       "@lib/*": ["src/lib/*"]
     }
   },
-  "include": ["**/*.ts", "**/*.tsx"],
+  "include": ["**/*.ts", "**/*.tsx", "**/*.d.ts"],
   "exclude": ["node_modules"]
 }

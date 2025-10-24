@@ -1,5 +1,13 @@
 {
   "dependencies": {
-    "push.js": "^1.0.12"
+    "expo-file-system": "^19.0.17",
+    "expo-media-library": "^18.2.0",
+    "expo-sharing": "^14.0.7",
+    "push.js": "^1.0.12",
+    "react-native-view-shot": "^4.0.3"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.2",
+    "typescript": "^5.9.3"
   }
 }

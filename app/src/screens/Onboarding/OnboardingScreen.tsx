@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Image, Pressable, StatusBar, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useFonts, Poppins_400Regular, Poppins_600SemiBold, Poppins_700Bold } from '@expo-google-fonts/poppins';
 import { colors } from '../../theme/colors';
 import { Button } from '../../components/Button';
 import { PagerDots } from '../../components/PagerDots';
@@ -31,15 +30,12 @@ type Props = { onDone?: () => void };
 
 export default function OnboardingScreen({ onDone }: Props) {
   const [index, setIndex] = useState(0);
-  const [fontsLoaded] = useFonts({ Poppins_400Regular, Poppins_600SemiBold, Poppins_700Bold });
   const slide = slides[index]!;
 
   const handleNext = () => {
     if (index < slides.length - 1) setIndex((i) => i + 1);
     else onDone?.();
   };
-
-  if (!fontsLoaded) return null;
 
   return (
     <SafeAreaView style={styles.safe}>

@@ -4,7 +4,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../../theme/colors';
 import { Feather } from '@expo/vector-icons';
 import ErrorPopup from '../../components/ErrorPopup';
-import { useFonts, Poppins_400Regular, Poppins_600SemiBold, Poppins_700Bold } from '@expo-google-fonts/poppins';
 
 export default function SignUpScreen({ navigation }: any) {
   const [name, setName] = useState('');
@@ -13,8 +12,7 @@ export default function SignUpScreen({ navigation }: any) {
   const [show, setShow] = useState(false);
   const [errVisible, setErrVisible] = useState(false);
   const [errMsg, setErrMsg] = useState('');
-  const [fontsLoaded] = useFonts({ Poppins_400Regular, Poppins_600SemiBold, Poppins_700Bold });
-  if (!fontsLoaded) return null;
+  // Fonts are loaded globally in AppRoot via local assets.
 
   const canGoBack = navigation?.canGoBack?.() ?? false;
 

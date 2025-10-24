@@ -1,6 +1,5 @@
 import React, { useMemo, useState } from 'react';
 import { Image, ImageBackground, Pressable, SafeAreaView, StatusBar, StyleSheet, Text, View } from 'react-native';
-import { useFonts, Poppins_400Regular, Poppins_600SemiBold, Poppins_700Bold } from '@expo-google-fonts/poppins';
 
 const bg = '#FFFAF0';
 const accent = '#F89B1C';
@@ -30,11 +29,6 @@ const slides = [
 
 export default function OnboardingScreen({ onDone }) {
   const [index, setIndex] = useState(0);
-  const [fontsLoaded] = useFonts({
-    Poppins_400Regular,
-    Poppins_600SemiBold,
-    Poppins_700Bold,
-  });
 
   const slide = slides[index];
 
@@ -42,8 +36,6 @@ export default function OnboardingScreen({ onDone }) {
     if (index < slides.length - 1) setIndex((i) => i + 1);
     else onDone?.();
   };
-
-  if (!fontsLoaded) return null;
 
   return (
     <SafeAreaView style={styles.safe}>
