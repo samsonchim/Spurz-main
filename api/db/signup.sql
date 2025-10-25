@@ -15,7 +15,10 @@ CREATE TABLE IF NOT EXISTS public.users (
 
 -- Signup function
 -- Usage: SELECT * FROM public.signup_user('email@example.com', 'plaintext-password', 'Full Name');
-CREATE OR REPLACE FUNCTION public.signup_user(p_email TEXT, p_password TEXT, p_full_name TEXT DEFAULT NULL)
+-- If an older version of the function exists with a different parameter name/signature,
+-- drop it first so we can recreate with the desired parameter names.
+DROP FUNCTION IF EXISTS public.signup_user(text, text, text);
+CREATE OR REPLACE FUNCTION public.signup_user(p_email TEXT, p_password TEXT, p_user_name TEXT DEFAULT NULL)
 RETURNS TABLE(id UUID, email TEXT, created_at TIMESTAMPTZ) AS $$
 DECLARE
   v_id UUID;
@@ -25,15 +28,15 @@ BEGIN
   -- Normalize email to lower-case
   p_email := lower(trim(p_email));
 
-  -- Check for existing user
-  IF EXISTS (SELECT 1 FROM public.users WHERE email = p_email) THEN
+  -- Check for existing user (qualify column to avoid ambiguity with OUT param names)
+  IF EXISTS (SELECT 1 FROM public.users u WHERE lower(u.email) = p_email) THEN
     RAISE EXCEPTION 'email_exists' USING HINT = 'Email already registered';
   END IF;
 
   -- Hash password with bcrypt via pgcrypto
-  INSERT INTO public.users(email, password_hash, full_name)
-  VALUES (p_email, crypt(p_password, gen_salt('bf', 12)), p_full_name)
-  RETURNING id, email, created_at INTO v_id, v_email, v_created;
+  INSERT INTO public.users(email, password_hash, user_name)
+  VALUES (p_email, crypt(p_password, gen_salt('bf', 12)), p_user_name)
+  RETURNING public.users.id, public.users.email, public.users.created_at INTO v_id, v_email, v_created;
 
   -- Return the inserted row (id, email, created_at)
   id := v_id; email := v_email; created_at := v_created;
@@ -48,7 +51,7 @@ RETURNS BOOLEAN AS $$
 DECLARE
   stored_hash TEXT;
 BEGIN
-  SELECT password_hash INTO stored_hash FROM public.users WHERE email = lower(trim(p_email));
+  SELECT password_hash INTO stored_hash FROM public.users u WHERE lower(u.email) = lower(trim(p_email));
   IF stored_hash IS NULL THEN
     RETURN FALSE;
   END IF;

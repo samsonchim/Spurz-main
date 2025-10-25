@@ -33,11 +33,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    // Call the Postgres function signup_user(p_email, p_password, p_full_name)
+    // Call the Postgres function signup_user(p_email, p_password, p_user_name)
     const { data, error } = await supabaseAdmin.rpc('signup_user', {
       p_email: String(email).trim(),
       p_password: String(password),
-      p_full_name: String(name)
+      p_user_name: String(name)
     })
 
     if (error) {

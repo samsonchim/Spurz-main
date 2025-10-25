@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS public.users (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   email TEXT NOT NULL,
   password_hash TEXT NOT NULL,
-  full_name TEXT,
+  user_name TEXT,
   is_verified BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   last_login TIMESTAMPTZ,
@@ -20,12 +20,30 @@ CREATE TABLE IF NOT EXISTS public.users (
 -- 2a) Unique index on normalized (lowercase) email to avoid case-sensitivity collisions
 CREATE UNIQUE INDEX IF NOT EXISTS users_email_lower_idx ON public.users (lower(email));
 
+-- 2b) Outlets table (vendors)
+CREATE TABLE IF NOT EXISTS public.outlets (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  owner_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  locations TEXT,
+  category TEXT,
+  phone TEXT,
+  about TEXT,
+  logo_path TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ
+);
+
+CREATE INDEX IF NOT EXISTS outlets_owner_idx ON public.outlets(owner_id);
+
 -- 3) Signup function
 -- Usage example: SELECT * FROM public.signup_user('user@example.com', 'plaintext-password', 'Full Name');
+-- Drop older function with the same arg types if present (allows parameter renames)
+DROP FUNCTION IF EXISTS public.signup_user(text, text, text);
 CREATE OR REPLACE FUNCTION public.signup_user(
   p_email TEXT,
   p_password TEXT,
-  p_full_name TEXT DEFAULT NULL
+  p_user_name TEXT DEFAULT NULL
 )
 RETURNS TABLE(id UUID, email TEXT, created_at TIMESTAMPTZ) AS $$
 DECLARE
@@ -41,15 +59,15 @@ BEGIN
     RAISE EXCEPTION 'invalid_password' USING MESSAGE = 'Password must be provided';
   END IF;
 
-  -- Prevent duplicate registrations
-  IF EXISTS (SELECT 1 FROM public.users WHERE lower(email) = v_email) THEN
+  -- Prevent duplicate registrations (qualify column to avoid ambiguity with OUT param names)
+  IF EXISTS (SELECT 1 FROM public.users u WHERE lower(u.email) = v_email) THEN
     RAISE EXCEPTION 'email_exists' USING MESSAGE = 'Email is already registered';
   END IF;
 
   -- Hash password using bcrypt via pgcrypto (cost ~12)
-  INSERT INTO public.users(email, password_hash, full_name)
-  VALUES (v_email, crypt(p_password, gen_salt('bf', 12)), p_full_name)
-  RETURNING id, email, created_at INTO v_id, v_email, v_created;
+  INSERT INTO public.users(email, password_hash, user_name)
+  VALUES (v_email, crypt(p_password, gen_salt('bf', 12)), p_user_name)
+  RETURNING public.users.id, public.users.email, public.users.created_at INTO v_id, v_email, v_created;
 
   id := v_id; email := v_email; created_at := v_created;
   RETURN NEXT;
@@ -63,7 +81,7 @@ RETURNS BOOLEAN AS $$
 DECLARE
   stored_hash TEXT;
 BEGIN
-  SELECT password_hash INTO stored_hash FROM public.users WHERE lower(email) = lower(trim(p_email));
+  SELECT password_hash INTO stored_hash FROM public.users u WHERE lower(u.email) = lower(trim(p_email));
   IF stored_hash IS NULL THEN
     RETURN FALSE;
   END IF;
@@ -81,7 +99,7 @@ $$ LANGUAGE plpgsql VOLATILE;
 
 -- 6) Example read-safe view that excludes password hashes
 CREATE OR REPLACE VIEW public.users_public AS
-SELECT id, email, full_name, is_verified, created_at, last_login, metadata
+SELECT id, email, user_name, is_verified, created_at, last_login, metadata
 FROM public.users;
 
 -- 7) Example seed (commented out)
