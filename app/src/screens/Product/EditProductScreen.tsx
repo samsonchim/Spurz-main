@@ -30,7 +30,7 @@ export default function EditProductScreen() {
     try {
       const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (!perm.granted) { Alert.alert('Permission needed', 'Allow media access to pick images.'); return; }
-      const res = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ImagePicker.MediaTypeOptions.Images, quality: 0.9 });
+  const res = await ImagePicker.launchImageLibraryAsync({ quality: 0.9 });
       if (res.canceled) return;
       const uri = res.assets?.[0]?.uri; if (!uri) return;
       setPhotos((prev) => [...prev, uri]);

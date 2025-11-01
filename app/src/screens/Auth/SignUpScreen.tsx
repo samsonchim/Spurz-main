@@ -4,6 +4,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../../theme/colors';
 import { Feather } from '@expo/vector-icons';
 import ErrorPopup from '../../components/ErrorPopup';
+import { apiPost } from '../../services/api';
+import LoadingSpinner from '../../components/LoadingSpinner';
+import OverlayLoading from '../../components/OverlayLoading';
 
 export default function SignUpScreen({ navigation }: any) {
   const [name, setName] = useState('');
@@ -12,7 +15,32 @@ export default function SignUpScreen({ navigation }: any) {
   const [show, setShow] = useState(false);
   const [errVisible, setErrVisible] = useState(false);
   const [errMsg, setErrMsg] = useState('');
+  const [loading, setLoading] = useState(false);
   // Fonts are loaded globally in AppRoot via local assets.
+
+  const pwdMsgs = [
+    '🔒 Too short! Give it at least 8 characters so your secret stays a secret.',
+    '✨ Almost there — 8+ characters please. Make it quirky, not guessable!',
+    '🚀 Boost your password: minimum 8 characters required. Go wild (but safe)!',
+    '🧩 Not long enough — try 8 or more characters. Think of it like extra puzzle pieces.',
+    '🛡️ Whoops — passwords need 8+ characters. Add a few more to lock it down!',
+  ];
+  const emailUsedMsgs = [
+    '📧 That email’s already chilling with us — try logging in instead!',
+    '😅 Looks like you’ve been here before. Maybe try signing in?',
+    '🕵️ Email already taken! Are you secretly trying to make a twin account?',
+    '🔁 Déjà vu! This email’s already in our system — log in to continue.',
+    '🚨 Oops! Someone (maybe you?) already used that email.',
+  ];
+  const emailInvalidMsgs = [
+    '📮 Hmm… that doesn’t look like a real email. Double-check the @ and dot!”',
+    '🤔 That email’s looking a little suspicious — try again?',
+    '🧙 Magic can’t find that email! Maybe a typo in there?',
+    '🚫 Invalid email. Even our inbox is confused 😅',
+    '💌 Oops! That’s not a valid email format. Give it another shot.',
+  ];
+  const pick = (arr: string[]): string => (arr[Math.floor(Math.random() * arr.length)] ?? arr[0] ?? '');
+  const emailRx = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   const canGoBack = navigation?.canGoBack?.() ?? false;
 
@@ -32,11 +60,11 @@ export default function SignUpScreen({ navigation }: any) {
 
             <View style={{ height: 20 }} />
 
-            <Text style={styles.label}>Name</Text>
+            <Text style={styles.label}>Username</Text>
             <TextInput
               value={name}
               onChangeText={setName}
-              placeholder="Your Name"
+              placeholder="Username"
               placeholderTextColor="#B0B0B0"
               style={styles.input}
               autoCapitalize="words"
@@ -75,18 +103,53 @@ export default function SignUpScreen({ navigation }: any) {
 
             <Pressable
               style={styles.registerBtn}
-              onPress={() => {
+              onPress={async () => {
+                if (loading) return; // Prevent multiple clicks
                 if (!name || !email || !password) {
                   setErrMsg('Please fill in all fields');
                   setErrVisible(true);
                   return;
                 }
-                // TODO: submit to API; for now navigate Home
-                navigation.navigate('Home');
+                if (!emailRx.test(email.trim())) {
+                  setErrMsg(pick(emailInvalidMsgs));
+                  setErrVisible(true);
+                  return;
+                }
+                if (password.length < 8) {
+                  setErrMsg(pick(pwdMsgs));
+                  setErrVisible(true);
+                  return;
+                }
+                setLoading(true);
+                try {
+                  // include `name` in the request body so the server receives all required fields
+                  const res = await apiPost<{ ok: boolean; userId?: string; error?: string }>('/auth/signup', { name: name.trim(), email: email.trim(), password: password });
+                  if (!res.ok) {
+                    // If 409, use email used messages; else show backend message
+                    if (res.status === 409) {
+                      setErrMsg(pick(emailUsedMsgs));
+                    } else {
+                      setErrMsg(res.error || 'Signup failed');
+                    }
+                    setErrVisible(true);
+                    return;
+                  }
+                  navigation.navigate('VendorOnboarding', { email, userId: (res.data as any)?.userId });
+                } catch (e) {
+                  setErrMsg('Network error. Please try again.');
+                  setErrVisible(true);
+                } finally {
+                  setLoading(false);
+                }
               }}
               android_ripple={{ color: '#ffffff55' }}
+              disabled={loading}
             >
-              <Text style={styles.registerText}>Register</Text>
+              {loading ? (
+                <LoadingSpinner message="Signing up..." size="small" />
+              ) : (
+                <Text style={styles.registerText}>Register</Text>
+              )}
             </Pressable>
 
             <View style={styles.rowCenter}>
@@ -111,6 +174,8 @@ export default function SignUpScreen({ navigation }: any) {
               </Pressable>
             </View>
             <ErrorPopup visible={errVisible} message={errMsg} onDismiss={() => setErrVisible(false)} />
+            {/* Overlay loading covers the entire screen while loading is true */}
+            <OverlayLoading visible={loading} message="Signing up..." />
           </View>
         </ScrollView>
       </KeyboardAvoidingView>

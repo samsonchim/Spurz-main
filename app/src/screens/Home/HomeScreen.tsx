@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { StyleSheet, Text, View, Pressable, ImageSourcePropType, ScrollView, Image, FlatList, TextInput, Modal } from 'react-native';
 import ImageViewing from 'react-native-image-viewing';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../navigation/RootNavigator';
 import { colors } from '../../theme/colors';
@@ -32,6 +32,7 @@ type Chat = {
 
 export default function HomeScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const route = useRoute<any>();
   const [errVisible, setErrVisible] = useState(false);
   const [tab, setTab] = useState<'home'|'dashboard'|'feed'|'chats'|'profile'>('home');
   const [activeFilter, setActiveFilter] = useState('All');
@@ -98,6 +99,14 @@ export default function HomeScreen() {
       return true;
     });
   }, [chats, chatFilter, chatSearch]);
+
+  // Respond to navigation param to switch tabs when navigated from other screens
+  React.useEffect(() => {
+    const rtab = (route?.params as any)?.tab as 'home'|'dashboard'|'feed'|'chats'|'profile' | undefined;
+    if (rtab && rtab !== tab) {
+      setTab(rtab);
+    }
+  }, [route?.params?.tab]);
 
   const renderChat = (item: Chat) => (
     <Pressable
@@ -355,45 +364,6 @@ export default function HomeScreen() {
             </View>
           )}
         />
-      ) : tab === 'dashboard' ? (
-        <ScrollView contentContainerStyle={styles.dashboardContent} showsVerticalScrollIndicator={false}>
-          {/* Outlet Cover + Logo */}
-          <View style={styles.coverWrap}>
-            <View style={styles.coverPhoto}><Text style={styles.coverEmoji}>{outlet.coverEmoji}</Text></View>
-            <View style={styles.logoWrap}>
-              <View style={styles.logoCircle}><Text style={styles.logoEmoji}>{outlet.logoEmoji}</Text></View>
-              <View style={styles.brandFace}><Text style={styles.brandFaceEmoji}>{outlet.brandFace}</Text></View>
-            </View>
-          </View>
-
-          {/* Stats */}
-          <View style={styles.statsRow}>
-            <Pressable style={styles.statBox} onPress={() => setShowFollowers(true)}>
-              <Text style={styles.statNum}>{outlet.followers}</Text>
-              <Text style={styles.statLabel}>Followers</Text>
-            </Pressable>
-            <Pressable style={styles.statBox} onPress={() => setShowFollowing(true)}>
-              <Text style={styles.statNum}>{outlet.following}</Text>
-              <Text style={styles.statLabel}>Following</Text>
-            </Pressable>
-            <View style={styles.statBox}><Text style={styles.statNum}>{outlet.likes}</Text><Text style={styles.statLabel}>Likes</Text></View>
-          </View>
-
-          {/* Products */}
-          <View style={{ paddingHorizontal: 16 }}>
-            <Text style={styles.sectionTitle}>Your Products</Text>
-          </View>
-          <FlatList
-            data={products}
-            keyExtractor={(it) => it.id}
-            renderItem={({ item }) => renderProduct(item)}
-            numColumns={2}
-            scrollEnabled={false}
-            columnWrapperStyle={styles.gridWrapper}
-            contentContainerStyle={[styles.gridContent, styles.dashboardGridContent]}
-          />
-
-        </ScrollView>
       ) : tab === 'feed' ? (
         <FlatList
           data={posts}
@@ -512,7 +482,18 @@ export default function HomeScreen() {
         </ScrollView>
       )}
 
-      <BottomNav items={navItems} activeKey={tab} onChange={(k) => setTab(k as any)} />
+      <BottomNav
+        items={navItems}
+        activeKey={tab}
+        onChange={(k) => {
+          if (k === 'dashboard') {
+            // Route to the single source-of-truth Vendor Dashboard screen
+            navigation.navigate('VendorDashboard');
+            return;
+          }
+          setTab(k as any);
+        }}
+      />
       <ErrorPopup visible={errVisible} onDismiss={() => setErrVisible(false)} message="Something went wrong" />
 
       {/* Dashboard top-right menu */}
