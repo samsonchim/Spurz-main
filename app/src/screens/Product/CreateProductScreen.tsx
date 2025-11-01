@@ -36,10 +36,11 @@ export default function CreateProductScreen() {
     try {
       const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (!perm.granted) { Alert.alert('Permission needed', 'Allow media access to pick images.'); return; }
-      const res = await ImagePicker.launchImageLibraryAsync({ quality: 0.9, base64: true });
+  const res = await ImagePicker.launchImageLibraryAsync({ quality: 0.9, base64: true });
       if (res.canceled) return;
-      const asset = res.assets?.[0]; if (!asset || !asset.base64) return;
-      setPhotos((prev) => [...prev, `data:${asset.type};base64,${asset.base64}`]);
+  const asset = res.assets?.[0]; if (!asset || !asset.base64) return;
+  const mime = 'image/jpeg'; // default to jpeg for data URI
+  setPhotos((prev) => [...prev, `data:${mime};base64,${asset.base64}`]);
     } catch (e) { /* noop */ }
   };
 

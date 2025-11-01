@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Pressable, ScrollView, Image, Modal, FlatList, ViewStyle, TextStyle, ImageStyle } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -7,6 +7,7 @@ import type { RouteProp } from '@react-navigation/native';
 import { colors } from '../../theme/colors';
 import ErrorPopup from '../../components/ErrorPopup';
 import { FontAwesome5 } from '@expo/vector-icons';
+import { apiGet, API_BASE } from '../../services/api';
 
 type RootStackParamList = {
   ProductDetail: { productId: string; productName: string };
@@ -32,6 +33,10 @@ export default function ProductDetailScreen() {
   const [errMessage, setErrMessage] = useState('');
   const [activeImageIdx, setActiveImageIdx] = useState(0);
   const [showReviewsModal, setShowReviewsModal] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [product, setProduct] = useState<any | null>(null);
+  const [outlet, setOutlet] = useState<any | null>(null);
+  const [images, setImages] = useState<string[]>([]);
 
   // Mock reviews data
   const reviews: Review[] = [
@@ -69,26 +74,39 @@ export default function ProductDetailScreen() {
     },
   ];
 
-  // Mock product data
-  const product = {
-    id: route.params?.productId || '1',
-    name: route.params?.productName || 'iPhone 12 Pro',
-    price: 999,
-    oldPrice: 1299,
-    rating: 4.5,
-    reviews: 328,
-    images: ['📱', '📱', '📱'],
-    description:
-      'Experience the power of innovation with the iPhone 12 Pro. Featuring a stunning 6.1-inch Liquid Retina display, 5G connectivity, and an advanced triple-camera system with Night mode and ProRaw support.',
-    colors: ['Silver', 'Gold', 'Space Gray'],
-    storage: ['64GB', '128GB', '256GB'],
-    inStock: true,
-    badge: 'Sale',
-    outlet: 'TechHub Electronics Store',
-  };
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const id = route.params?.productId;
+        if (!id) return;
+        setLoading(true);
+        const res = await apiGet(`/products/detail?id=${encodeURIComponent(id)}`);
+        if (res.ok && mounted) {
+          const data = (res.data as any) || {};
+          const prod = data.product || null;
+          const out = data.outlet || null;
+          setProduct(prod);
+          setOutlet(out);
+          const imgs: string[] = Array.isArray(prod?.images) ? prod.images : [];
+          const norm = imgs.map((u) => {
+            if (!u) return '';
+            if (u.startsWith('http') || u.startsWith('data:') || u.startsWith('file:')) return u;
+            return `${API_BASE}${u.startsWith('/') ? u : `/${u}`}`;
+          }).filter(Boolean) as string[];
+          setImages(norm.length ? norm : ['https://via.placeholder.com/800']);
+          setActiveImageIdx(0);
+        }
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    })();
+    return () => { mounted = false; };
+  }, [route.params?.productId]);
 
   const handleAddToCart = () => {
-    setErrMessage(`Added ${quantity}x ${product.name} to cart!`);
+    const name = product?.name || route.params?.productName || 'item';
+    setErrMessage(`Added ${quantity}x ${name} to cart!`);
     setErrVisible(true);
   };
 
@@ -134,14 +152,9 @@ export default function ProductDetailScreen() {
         {/* Image Carousel */}
         <View style={styles.imageCarousel}>
           <View style={styles.mainImage}>
-            <Text style={styles.imageEmoji}>{product.images[activeImageIdx]}</Text>
-            {product.badge && (
-              <View style={styles.badgePosition}>
-                <View style={styles.badge}>
-                  <Text style={styles.badgeText}>{product.badge}</Text>
-                </View>
-              </View>
-            )}
+            {images[activeImageIdx] ? (
+              <Image source={{ uri: images[activeImageIdx] }} style={styles.mainImagePhoto} resizeMode="cover" />
+            ) : null}
           </View>
           <ScrollView
             horizontal
@@ -149,13 +162,13 @@ export default function ProductDetailScreen() {
             contentContainerStyle={styles.thumbnailContainer}
             scrollEventThrottle={16}
           >
-            {product.images.map((img, idx) => (
+            {images.map((u, idx) => (
               <Pressable
                 key={idx}
                 style={[styles.thumbnail, activeImageIdx === idx && styles.thumbnailActive]}
                 onPress={() => setActiveImageIdx(idx)}
               >
-                <Text style={styles.thumbnailEmoji}>{img}</Text>
+                <Image source={{ uri: u }} style={styles.thumbnailImg} resizeMode="cover" />
               </Pressable>
             ))}
           </ScrollView>
@@ -164,67 +177,40 @@ export default function ProductDetailScreen() {
         {/* Product Info */}
         <View style={styles.infoContainer}>
           {/* Outlet Name */}
-          <Text style={styles.outletName}>📍 {product.outlet}</Text>
+          <Text style={styles.outletName}>📍 {outlet?.name || 'Outlet'}</Text>
 
           {/* Title & Rating */}
           <View style={styles.titleRow}>
             <View style={{ flex: 1 }}>
-              <Text style={styles.productName}>{product.name}</Text>
+              <Text style={styles.productName}>{product?.name || route.params?.productName}</Text>
               <View style={styles.ratingRow}>
-                <Text style={styles.rating}>★★★★★ {product.rating}</Text>
-                <Pressable onPress={() => setShowReviewsModal(true)}>
-                  <Text style={styles.reviewsLink}>({product.reviews} reviews)</Text>
-                </Pressable>
+                <Text style={styles.rating}>★★★★★ 4.5</Text>
               </View>
             </View>
           </View>
 
           {/* Pricing */}
           <View style={styles.priceContainer}>
-            <Text style={styles.price}>NGN {product.price}</Text>
-            {product.oldPrice && (
-              <Text style={styles.oldPrice}>NGN {product.oldPrice}</Text>
-            )}
-            <Text style={styles.discount}>25% OFF</Text>
+            <Text style={styles.price}>NGN {product?.price ?? 0}</Text>
+            {product?.old_price ? (
+              <Text style={styles.oldPrice}>NGN {product.old_price}</Text>
+            ) : null}
           </View>
 
           {/* Stock Status */}
           <View style={styles.stockRow}>
-            <View style={[styles.stockIndicator, product.inStock && styles.stockAvailable]} />
-            <Text style={[styles.stockText, product.inStock && styles.stockAvailableText]}>
-              {product.inStock ? 'In Stock' : 'Out of Stock'}
+            <View style={[styles.stockIndicator, (product?.stock_quantity ?? 0) > 0 && styles.stockAvailable]} />
+            <Text style={[styles.stockText, (product?.stock_quantity ?? 0) > 0 && styles.stockAvailableText]}>
+              {(product?.stock_quantity ?? 0) > 0 ? 'In Stock' : 'Out of Stock'}
             </Text>
           </View>
 
-          {/* Color Selection */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Color</Text>
-            <View style={styles.optionRow}>
-              {product.colors.map((color) => (
-                <Pressable key={color} style={styles.colorOption} onPress={() => {}}>
-                  <View style={[styles.colorCircle, { backgroundColor: color === 'Gold' ? '#FFD700' : color === 'Space Gray' ? '#505050' : '#C0C0C0' }]} />
-                  <Text style={styles.optionLabel}>{color}</Text>
-                </Pressable>
-              ))}
-            </View>
-          </View>
-
-          {/* Storage Selection */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Storage</Text>
-            <View style={styles.optionRow}>
-              {product.storage.map((storage) => (
-                <Pressable key={storage} style={styles.storageOption} onPress={() => {}}>
-                  <Text style={styles.storageText}>{storage}</Text>
-                </Pressable>
-              ))}
-            </View>
-          </View>
+          {/* Optional configurable options could go here */}
 
           {/* Description */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Description</Text>
-            <Text style={styles.descriptionText}>{product.description}</Text>
+            <Text style={styles.descriptionText}>{product?.description || 'No description provided.'}</Text>
           </View>
 
           {/* Quantity Selector */}
@@ -349,7 +335,7 @@ const styles = StyleSheet.create({
     position: 'relative',
     overflow: 'hidden',
   },
-  imageEmoji: { fontSize: 80 },
+  mainImagePhoto: { width: '100%', height: '100%' },
   badgePosition: { position: 'absolute', top: 12, right: 12 },
   badge: {
     backgroundColor: colors.accent,
@@ -370,7 +356,7 @@ const styles = StyleSheet.create({
     borderColor: '#E0E0E0',
   },
   thumbnailActive: { borderColor: colors.accent, borderWidth: 2 },
-  thumbnailEmoji: { fontSize: 32 },
+  thumbnailImg: { width: '100%', height: '100%', borderRadius: 10 },
 
   // Info Container
   infoContainer: { paddingHorizontal: 16 },

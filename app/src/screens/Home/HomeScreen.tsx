@@ -1,21 +1,24 @@
-import React, { useMemo, useState } from 'react';
-import { StyleSheet, Text, View, Pressable, ImageSourcePropType, ScrollView, Image, FlatList, TextInput, Modal } from 'react-native';
+import React, { useEffect, useMemo, useState } from 'react';
+import { StyleSheet, Text, View, Pressable, ImageSourcePropType, ScrollView, Image, FlatList, TextInput, Modal, RefreshControl } from 'react-native';
 import ImageViewing from 'react-native-image-viewing';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../navigation/RootNavigator';
 import { colors } from '../../theme/colors';
+import { apiGet, API_BASE } from '../../services/api';
+import { PROMO_IMAGE_URL } from '../../config/marketing';
 import ErrorPopup from '../../components/ErrorPopup';
 import BottomNav from '../../components/BottomNav';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type Product = {
   id: string;
   name: string;
   price: number;
-  oldPrice?: number;
-  image: string;
-  badge?: string;
+  old_price?: number | null;
+  images?: string[] | null;
+  category?: string | null;
   rating?: number;
 };
 
@@ -38,6 +41,7 @@ export default function HomeScreen() {
   const [activeFilter, setActiveFilter] = useState('All');
   const [chatFilter, setChatFilter] = useState<'All' | 'Unread' | 'Paid' | 'Delivered' | 'Enroute'>('All');
   const [chatSearch, setChatSearch] = useState('');
+  const [homeSearch, setHomeSearch] = useState('');
   const [dashMenuOpen, setDashMenuOpen] = useState(false);
   const [showInvoices, setShowInvoices] = useState(false);
   const [showTheme, setShowTheme] = useState(false);
@@ -60,12 +64,53 @@ export default function HomeScreen() {
 
   const filters = ['All', 'Electronics', 'Fashion', 'Properties', 'Furniture', 'Books', 'Sports', 'Jewelry'];
 
-  const products: Product[] = [
-    { id: '1', name: 'iPhone 12 Pro', price: 999, oldPrice: 1299, image: '📱', badge: 'Sale', rating: 4.5, views: 1450, likes: 210 } as any,
-    { id: '2', name: 'MacBook Pro M2', price: 1999, image: '💻', rating: 4.8, views: 820, likes: 130 } as any,
-    { id: '3', name: 'Wireless Earbuds', price: 199, oldPrice: 299, image: '🎧', badge: 'Hot', rating: 4.3, views: 560, likes: 88 } as any,
-    { id: '4', name: 'Smart Watch', price: 299, image: '⌚', rating: 4.6, views: 390, likes: 65 } as any,
-  ];
+  const [products, setProducts] = useState<Product[]>([]);
+  const [homeLoading, setHomeLoading] = useState<boolean>(false);
+  const [homeRefreshing, setHomeRefreshing] = useState<boolean>(false);
+  const [imageVersion, setImageVersion] = useState<number>(Date.now());
+
+  useEffect(() => {
+    // Fetch newest products for Home
+    (async () => {
+      try {
+        setHomeLoading(true);
+        // Cache-first load for 'All' category
+        await loadProductsCached('All');
+      } finally {
+        setHomeLoading(false);
+      }
+    })();
+  }, []);
+
+  const HOME_CACHE_KEY = (cat: string) => `home_products_cache_v1_${cat || 'All'}`;
+
+  const fetchProducts = async (category?: string) => {
+    const q = category && category !== 'All' ? `/products/list?limit=20&category=${encodeURIComponent(category)}` : '/products/list?limit=20';
+    const res = await apiGet(q);
+    if (res.ok) {
+      const list = (res.data as any)?.products ?? [];
+      setProducts(list);
+      await AsyncStorage.setItem(HOME_CACHE_KEY(category || 'All'), JSON.stringify(list));
+      setImageVersion(Date.now());
+    }
+  };
+
+  const loadProductsCached = async (category?: string) => {
+    const key = HOME_CACHE_KEY(category || 'All');
+    const raw = await AsyncStorage.getItem(key);
+    const cache = raw ? (JSON.parse(raw) as Product[]) : null;
+    if (cache) setProducts(cache);
+    if (!cache) await fetchProducts(category);
+  };
+
+  const onRefreshHome = async () => {
+    try {
+      setHomeRefreshing(true);
+      await fetchProducts(activeFilter);
+    } finally {
+      setHomeRefreshing(false);
+    }
+  };
 
   const outlet = {
     name: 'TechHub Electronics',
@@ -138,56 +183,27 @@ export default function HomeScreen() {
   );
 
   const renderProduct = (item: Product) => {
-    if (tab === 'dashboard') {
-      return (
-        <View style={styles.productCard}>
-          <View style={styles.productImage}>
-            <Text style={styles.emoji}>{item.image}</Text>
-            {/* Hide sale badges on Dashboard */}
-            {item.badge && tab !== 'dashboard' && (
-              <View style={styles.badge}><Text style={styles.badgeText}>{item.badge}</Text></View>
-            )}
-            <Pressable
-              ref={(r) => { productRefs.current[item.id] = r as any; }}
-              style={styles.dotBtn}
-              onPress={() => {
-                const ref = productRefs.current[item.id];
-                if (!ref) return;
-                (ref as any).measureInWindow((x: number, y: number, w: number, h: number) => {
-                  setProductMenu({ id: item.id, x: x + w - 160, y: y + 8, visible: true });
-                });
-              }}
-            >
-              <Text style={{ fontSize: 16, color: '#6B7280' }}>⋮</Text>
-            </Pressable>
-          </View>
-          <Text style={styles.productName} numberOfLines={2}>{item.name}</Text>
-          <View style={styles.priceRow}>
-            <Text style={styles.price}>NGN {item.price}</Text>
-            {item.oldPrice && <Text style={styles.oldPrice}>NGN {item.oldPrice}</Text>}
-          </View>
-          {item.rating && <Text style={styles.rating}>★ {item.rating}</Text>}
-          {/* Metrics row */}
-          <View style={styles.metricsRow}>
-            <Text style={styles.metric}>👁️ { (item as any).views ?? 0 }</Text>
-            <Text style={styles.metric}>❤️ { (item as any).likes ?? 0 }</Text>
-          </View>
-        </View>
-      );
-    }
     // Home and other tabs: tap opens Product Detail
     return (
       <Pressable style={styles.productCard} onPress={() => navigation.navigate('ProductDetail', { productId: item.id, productName: item.name })}>
-        <View style={styles.productImage}>
-          <Text style={styles.emoji}>{item.image}</Text>
-          {item.badge && (
-            <View style={styles.badge}><Text style={styles.badgeText}>{item.badge}</Text></View>
-          )}
+        <View style={styles.productImageBox}>
+          <Image
+            source={{
+              uri: (() => {
+                const first = item.images?.[0];
+                if (!first) return 'https://via.placeholder.com/300';
+                if (first.startsWith('http') || first.startsWith('data:') || first.startsWith('file:')) return `${first}?v=${imageVersion}`;
+                return `${API_BASE}${first.startsWith('/') ? first : `/${first}`}?v=${imageVersion}`;
+              })(),
+            }}
+            style={styles.productImagePhoto}
+            resizeMode="cover"
+          />
         </View>
         <Text style={styles.productName} numberOfLines={2}>{item.name}</Text>
         <View style={styles.priceRow}>
           <Text style={styles.price}>NGN {item.price}</Text>
-          {item.oldPrice && <Text style={styles.oldPrice}>NGN {item.oldPrice}</Text>}
+          {item.old_price ? <Text style={styles.oldPrice}>NGN {item.old_price}</Text> : null}
         </View>
         {item.rating && <Text style={styles.rating}>★ {item.rating}</Text>}
       </Pressable>
@@ -430,12 +446,20 @@ export default function HomeScreen() {
           scrollEventThrottle={16}
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
+          refreshControl={<RefreshControl refreshing={homeRefreshing} onRefresh={onRefreshHome} />}
         >
           {/* Search Bar */}
           <View style={styles.searchContainer}>
             <View style={styles.searchBar}>
               <Image source={require('../../../assets/icons/search.png')} style={styles.searchIconImg} resizeMode="contain" />
-              <Text style={styles.searchPlaceholder}>Search products...</Text>
+              <TextInput
+                style={[styles.searchPlaceholder, { fontFamily: 'Poppins_400Regular' }]}
+                placeholder="Search products..."
+                placeholderTextColor={colors.muted}
+                value={homeSearch}
+                onChangeText={setHomeSearch}
+                returnKeyType="search"
+              />
             </View>
           </View>
 
@@ -450,7 +474,10 @@ export default function HomeScreen() {
               <Pressable
                 key={filter}
                 style={[styles.filterTab, activeFilter === filter && styles.filterTabActive]}
-                onPress={() => setActiveFilter(filter)}
+                onPress={async () => {
+                  setActiveFilter(filter);
+                  await loadProductsCached(filter);
+                }}
               >
                 <Text style={[styles.filterText, activeFilter === filter && styles.filterTextActive]}>
                   {filter}
@@ -459,19 +486,20 @@ export default function HomeScreen() {
             ))}
           </ScrollView>
 
-          {/* Promotional Banner */}
-          <Pressable style={styles.promoBanner}>
-            <View style={styles.promoContent}>
-              <Text style={styles.promoDiscount}>UPTO 50%</Text>
-              <Text style={styles.promoText}>Mega Sale</Text>
-            </View>
-            <Text style={styles.promoEmoji}>👨‍💼</Text>
-          </Pressable>
+          {/* Promotional Banner - replaced with image */}
+          <View style={styles.promoBannerImgWrap}>
+            <Image source={{ uri: PROMO_IMAGE_URL }} style={styles.promoBannerImg} resizeMode="cover" />
+          </View>
 
           {/* Products Grid */}
           <Text style={styles.sectionTitle}>Featured Products</Text>
           <FlatList
-            data={products}
+            data={products.filter((p) => {
+              const t = homeSearch.trim().toLowerCase();
+              if (!t) return true;
+              const hay = `${p.name} ${p.category ?? ''}`.toLowerCase();
+              return hay.includes(t);
+            })}
             renderItem={({ item }) => renderProduct(item)}
             keyExtractor={(item) => item.id}
             numColumns={2}
@@ -801,7 +829,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#F0F0F0',
   },
   greeting: { fontSize: 12, color: colors.muted, fontFamily: 'Poppins_400Regular' },
-  userName: { fontSize: 16, fontWeight: '700', color: colors.text, marginTop: 2 },
+  userName: { fontSize: 16, fontWeight: '700', color: colors.text, marginTop: 2, fontFamily: 'Poppins_700Bold' },
   notificationIcon: { padding: 8 },
   headerIconImg: { width: 24, height: 24, tintColor: colors.text },
   iconText: { fontSize: 20 },
@@ -848,9 +876,16 @@ const styles = StyleSheet.create({
   promoDiscount: { fontSize: 24, fontWeight: '800', color: 'white' },
   promoText: { fontSize: 14, color: 'white', opacity: 0.9, marginTop: 4 },
   promoEmoji: { fontSize: 48 },
+  promoBannerImgWrap: {
+    height: 140,
+    borderRadius: 16,
+    overflow: 'hidden',
+    marginBottom: 20,
+  },
+  promoBannerImg: { width: '100%', height: '100%' },
 
   // Section Title
-  sectionTitle: { fontSize: 16, fontWeight: '700', color: colors.text, marginBottom: 12 },
+  sectionTitle: { fontSize: 16, fontWeight: '700', color: colors.text, marginBottom: 12, fontFamily: 'Poppins_700Bold' },
 
   // Grid
   gridWrapper: { gap: 12 },
@@ -867,6 +902,15 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#F0F0F0',
   },
+  productImageBox: {
+    width: '100%',
+    height: 120,
+    backgroundColor: '#F8F8F8',
+    borderRadius: 10,
+    overflow: 'hidden',
+    marginBottom: 8,
+  },
+  productImagePhoto: { width: '100%', height: '100%' },
   productImage: {
     width: '100%',
     height: 120,

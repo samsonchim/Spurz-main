@@ -34,7 +34,11 @@ interface Product {
   price: number;
   description?: string;
   images?: string[];
-  is_active?: boolean;
+  status?: string;
+  is_active?: boolean; // derived from status
+  stock_quantity?: number;
+  category?: string;
+  tags?: string[];
   created_at: string;
 }
 
@@ -139,7 +143,11 @@ export default function Dashboard({ navigation }: any) {
     try {
       const response = await apiGet(`/products/my-products?userId=${userId}`, token);
       if (response.ok) {
-        const list = (response.data as any)?.products || [];
+        const raw = (response.data as any)?.products || [];
+        const list: Product[] = raw.map((p: any) => ({
+          ...p,
+          is_active: typeof p.status === 'string' ? p.status.toLowerCase() === 'active' : true,
+        }));
         setProducts(list);
         if (writeCache) {
           await AsyncStorage.setItem(PRODUCTS_CACHE_KEY, JSON.stringify(list));
@@ -157,10 +165,16 @@ export default function Dashboard({ navigation }: any) {
     
     switch (action) {
       case 'hide':
-        Alert.alert('Hide Product', 'Are you sure you want to hide this product?', [
+        {
+          const p = products.find((x) => x.id === productId);
+          const active = p ? (p.is_active ?? (p.status === 'active')) : false;
+          const title = active ? 'Hide Product' : 'Unhide Product';
+          const message = active ? 'Are you sure you want to hide this product?' : 'Make this product visible again?';
+          Alert.alert(title, message, [
           { text: 'Cancel', style: 'cancel' },
-          { text: 'Hide', onPress: () => hideProduct(productId) }
-        ]);
+            { text: active ? 'Hide' : 'Unhide', onPress: () => hideProduct(productId) }
+          ]);
+        }
         break;
       case 'delete':
         Alert.alert('Delete Product', 'Are you sure you want to delete this product? This action cannot be undone.', [
@@ -169,19 +183,62 @@ export default function Dashboard({ navigation }: any) {
         ]);
         break;
       case 'edit':
-        navigation.navigate('EditProduct', { productId });
-        break;
+        {
+          const p = products.find((x) => x.id === productId);
+          navigation.navigate('EditProduct', {
+            productId,
+            name: p?.name,
+            price: p?.price,
+            description: p?.description,
+            images: p?.images ?? [],
+            category: (p as any)?.category,
+            stockQuantity: (p as any)?.stock_quantity ?? 0,
+            tags: (p as any)?.tags ?? [],
+          });
+    }
+    break;
+    }
+  };
+  const hideProduct = async (productId: string) => {
+    try {
+      if (!user || !token) return;
+      const current = products.find((p) => p.id === productId);
+      const nextStatus = current?.is_active ? 'hidden' : 'active';
+      const res = await apiPost('/products/update', { productId, status: nextStatus }, token);
+      if (res.ok) {
+        const updated = products.map((p) => p.id === productId ? { ...p, status: nextStatus, is_active: nextStatus === 'active' } : p);
+        setProducts(updated);
+        await AsyncStorage.setItem(PRODUCTS_CACHE_KEY, JSON.stringify(updated));
+        if (Platform.OS === 'android') {
+          ToastAndroid.show(nextStatus === 'active' ? 'Product unhidden' : 'Product hidden', ToastAndroid.SHORT);
+        }
+      } else {
+        Alert.alert('Update failed', res.error || 'Could not update product');
+      }
+    } catch (e) {
+      Alert.alert('Error', 'Could not update product');
     }
   };
 
-  const hideProduct = async (productId: string) => {
-    // TODO: Implement hide product API call
-    console.log('Hide product:', productId);
-  };
-
   const deleteProduct = async (productId: string) => {
-    // TODO: Implement delete product API call
-    console.log('Delete product:', productId);
+    try {
+      const user = await userSession.getCurrentUser();
+      const token = await userSession.getToken();
+      if (!user || !token) return;
+      const res = await apiPost('/products/delete', { productId }, token);
+      if (res.ok) {
+        const updated = products.filter((p) => p.id !== productId);
+        setProducts(updated);
+        await AsyncStorage.setItem(PRODUCTS_CACHE_KEY, JSON.stringify(updated));
+        if (Platform.OS === 'android') {
+          ToastAndroid.show('Product deleted', ToastAndroid.SHORT);
+        }
+      } else {
+        Alert.alert('Delete failed', res.error || 'Could not delete product');
+      }
+    } catch (e) {
+      Alert.alert('Error', 'Could not delete product');
+    }
   };
 
   const getLogoUrl = (outlet: Outlet) => {
@@ -226,8 +283,10 @@ export default function Dashboard({ navigation }: any) {
           source={{ uri: (() => {
             const first = product.images?.[0];
             if (!first) return 'https://via.placeholder.com/150';
+            // Use as-is for absolute http(s) or data URIs
+            if (first.startsWith('http') || first.startsWith('data:') || first.startsWith('file:')) return first;
             // Prefix API_BASE for relative paths like "/products/<file>.png"
-            return first.startsWith('http') ? first : `${API_BASE}${first.startsWith('/') ? first : `/${first}`}`;
+            return `${API_BASE}${first.startsWith('/') ? first : `/${first}`}`;
           })() }} 
           style={styles.productImage}
           resizeMode="cover"
@@ -242,12 +301,14 @@ export default function Dashboard({ navigation }: any) {
       
       <View style={styles.productInfo}>
         <Text style={styles.productName} numberOfLines={2}>{product.name}</Text>
-        <Text style={styles.productPrice}>NGN {product.price.toLocaleString()}</Text>
-        <View style={styles.productStatus}>
-          <View style={[styles.statusDot, { backgroundColor: product.is_active ? '#4CAF50' : '#FF9800' }]} />
-          <Text style={styles.statusText}>
-            {product.is_active ? 'Active' : 'Hidden'}
-          </Text>
+        <View style={styles.priceStatusRow}>
+          <Text style={styles.productPrice}>NGN {product.price.toLocaleString()}</Text>
+          <View style={styles.productStatus}>
+            <View style={[styles.statusDot, { backgroundColor: (product.is_active ?? (product.status === 'active')) ? '#4CAF50' : '#FF9800' }]} />
+            <Text style={styles.statusText}>
+              {(product.is_active ?? (product.status === 'active')) ? 'Active' : 'Hidden'}
+            </Text>
+          </View>
         </View>
       </View>
     </View>
@@ -391,7 +452,7 @@ export default function Dashboard({ navigation }: any) {
               <Text style={styles.outletCategory}>{outlet.category}</Text>
               <Text style={styles.outletLocation}>📍 {outlet.locations || 'Location not set'}</Text>
               {Boolean(outlet.about) && (
-                <Text style={styles.outletAbout} numberOfLines={3}>{outlet.about}</Text>
+                <Text style={styles.outletAbout}>{outlet.about}</Text>
               )}
             </View>
           </View>
@@ -513,7 +574,12 @@ export default function Dashboard({ navigation }: any) {
               onPress={() => handleProductAction(productMenu.id!, 'hide')}
             >
               <Feather name="eye-off" size={16} color={colors.text} />
-              <Text style={styles.menuItemText}>Hide</Text>
+              <Text style={styles.menuItemText}>
+                {(() => {
+                  const pr = products.find((p) => p.id === productMenu.id);
+                  return pr?.is_active ? 'Hide' : 'Unhide';
+                })()}
+              </Text>
             </Pressable>
             <Pressable 
               style={[styles.menuItem, styles.deleteMenuItem]}
@@ -823,16 +889,21 @@ const styles = StyleSheet.create({
     padding: 12
   },
   productName: {
-    fontFamily: 'Poppins_600SemiBold',
+    fontFamily: 'Poppins_700Bold',
     fontSize: 14,
     color: colors.text,
-    marginBottom: 4
+    marginBottom: 2
+  },
+  priceStatusRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 2,
   },
   productPrice: {
     fontFamily: 'Poppins_700Bold',
-    fontSize: 16,
-    color: colors.accent,
-    marginBottom: 8
+    fontSize: 15,
+    color: colors.accent
   },
   productStatus: {
     flexDirection: 'row',
@@ -845,8 +916,8 @@ const styles = StyleSheet.create({
     marginRight: 6
   },
   statusText: {
-    fontFamily: 'Poppins_400Regular',
-    fontSize: 12,
+    fontFamily: 'Poppins_600SemiBold',
+    fontSize: 11.5,
     color: colors.muted
   },
 

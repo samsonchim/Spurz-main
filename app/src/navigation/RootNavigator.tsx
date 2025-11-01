@@ -21,7 +21,16 @@ export type RootStackParamList = {
   Login: undefined;
   Home: undefined;
   ProductDetail: { productId: string; productName: string };
-  EditProduct: { productId: string; name?: string; price?: number; description?: string; images?: string[] };
+  EditProduct: { 
+    productId: string; 
+    name?: string; 
+    price?: number; 
+    description?: string; 
+    images?: string[];
+    category?: string;
+    stockQuantity?: number;
+    tags?: string[];
+  };
   CreateProduct: undefined;
   ChatDetail: { chatId: string; name: string; role?: 'buyer' | 'vendor' };
   VendorOnboarding: { email?: string; userId?: string } | undefined;
