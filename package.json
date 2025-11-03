@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@supabase/supabase-js": "^2.78.0",
     "expo-file-system": "^19.0.17",
     "expo-media-library": "^18.2.0",
     "expo-sharing": "^14.0.7",

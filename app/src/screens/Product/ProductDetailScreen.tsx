@@ -7,7 +7,8 @@ import type { RouteProp } from '@react-navigation/native';
 import { colors } from '../../theme/colors';
 import ErrorPopup from '../../components/ErrorPopup';
 import { FontAwesome5 } from '@expo/vector-icons';
-import { apiGet, API_BASE } from '../../services/api';
+import { apiGet, apiPost, API_BASE } from '../../services/api';
+import { userSession } from '../../services/userSession';
 
 type RootStackParamList = {
   ProductDetail: { productId: string; productName: string };
@@ -28,7 +29,7 @@ type Review = {
 export default function ProductDetailScreen() {
   const navigation = useNavigation<ProductDetailNavigationProp>();
   const route = useRoute<ProductDetailRouteProp>();
-  const [quantity, setQuantity] = useState(1);
+  // Removed quantity selector per requirements
   const [errVisible, setErrVisible] = useState(false);
   const [errMessage, setErrMessage] = useState('');
   const [activeImageIdx, setActiveImageIdx] = useState(0);
@@ -37,6 +38,7 @@ export default function ProductDetailScreen() {
   const [product, setProduct] = useState<any | null>(null);
   const [outlet, setOutlet] = useState<any | null>(null);
   const [images, setImages] = useState<string[]>([]);
+  const [viewerOpen, setViewerOpen] = useState(false);
 
   // Mock reviews data
   const reviews: Review[] = [
@@ -76,6 +78,7 @@ export default function ProductDetailScreen() {
 
   useEffect(() => {
     let mounted = true;
+    let timer: any;
     (async () => {
       try {
         const id = route.params?.productId;
@@ -96,23 +99,59 @@ export default function ProductDetailScreen() {
           }).filter(Boolean) as string[];
           setImages(norm.length ? norm : ['https://via.placeholder.com/800']);
           setActiveImageIdx(0);
+
+          // Auto-slide every 5s if multiple images
+          if ((norm.length ? norm : ['https://via.placeholder.com/800']).length > 1) {
+            timer = setInterval(() => {
+              setActiveImageIdx((idx) => {
+                const total = (norm.length ? norm : ['https://via.placeholder.com/800']).length;
+                return (idx + 1) % total;
+              });
+            }, 5000);
+          }
         }
       } finally {
         if (mounted) setLoading(false);
       }
     })();
-    return () => { mounted = false; };
+    return () => { mounted = false; if (timer) clearInterval(timer); };
   }, [route.params?.productId]);
 
   const handleAddToCart = () => {
     const name = product?.name || route.params?.productName || 'item';
-    setErrMessage(`Added ${quantity}x ${name} to cart!`);
+    setErrMessage(`${name} added to cart`);
     setErrVisible(true);
   };
 
-  const handleBuyNow = () => {
-    // TODO: Navigate to checkout
-    navigation.goBack();
+  const handleBuyNow = async () => {
+    try {
+      const user = await userSession.getCurrentUser();
+      if (!user) {
+        setErrMessage('Please log in to start a chat');
+        setErrVisible(true);
+        return;
+      }
+      const pid = route.params?.productId;
+      const resp = await apiPost('/chats/start', { buyerId: user.id, productId: pid });
+      if (!resp.ok || !resp.data) {
+        setErrMessage(resp.error || 'Unable to start chat');
+        setErrVisible(true);
+        return;
+      }
+      const { chatId, vendorName, productName } = resp.data as any;
+      navigation.navigate('ChatDetail', {
+        chatId,
+        name: vendorName || 'Vendor',
+        role: 'buyer',
+        productName: product?.name || productName || route.params?.productName,
+        productId: route.params?.productId,
+        initialText: `Hi! I'm interested in ${product?.name || productName || 'your product'}.`,
+        initialSend: true as any,
+      });
+    } catch (e) {
+      setErrMessage('Network error. Please try again.');
+      setErrVisible(true);
+    }
   };
 
   const renderReview = (item: Review) => (
@@ -151,11 +190,11 @@ export default function ProductDetailScreen() {
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {/* Image Carousel */}
         <View style={styles.imageCarousel}>
-          <View style={styles.mainImage}>
+          <Pressable style={styles.mainImage} onPress={() => setViewerOpen(true)}>
             {images[activeImageIdx] ? (
               <Image source={{ uri: images[activeImageIdx] }} style={styles.mainImagePhoto} resizeMode="cover" />
             ) : null}
-          </View>
+          </Pressable>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -213,41 +252,13 @@ export default function ProductDetailScreen() {
             <Text style={styles.descriptionText}>{product?.description || 'No description provided.'}</Text>
           </View>
 
-          {/* Quantity Selector */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Quantity</Text>
-            <View style={styles.quantitySelector}>
-              <Pressable
-                style={styles.quantityBtn}
-                onPress={() => setQuantity(Math.max(1, quantity - 1))}
-              >
-                <Text style={styles.quantityBtnText}>−</Text>
-              </Pressable>
-              <Text style={styles.quantityValue}>{quantity}</Text>
-              <Pressable
-                style={styles.quantityBtn}
-                onPress={() => setQuantity(quantity + 1)}
-              >
-                <Text style={styles.quantityBtnText}>+</Text>
-              </Pressable>
+          {/* Outlet delivery locations */}
+          {outlet?.locations ? (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Delivery Locations</Text>
+              <Text style={styles.descriptionText}>{outlet.locations}</Text>
             </View>
-          </View>
-
-          {/* Specs */}
-          <View style={styles.specsContainer}>
-            <View style={styles.specRow}>
-              <Text style={styles.specLabel}>Warranty</Text>
-              <Text style={styles.specValue}>1 Year International</Text>
-            </View>
-            <View style={styles.specRow}>
-              <Text style={styles.specLabel}>Delivery</Text>
-              <Text style={styles.specValue}>Free Shipping</Text>
-            </View>
-            <View style={styles.specRow}>
-              <Text style={styles.specLabel}>Return</Text>
-              <Text style={styles.specValue}>30 Days Return</Text>
-            </View>
-          </View>
+          ) : null}
 
           {/* Reviews Button */}
           <View style={styles.section}>
@@ -271,7 +282,7 @@ export default function ProductDetailScreen() {
         </Pressable>
       </View>
 
-      {/* Reviews Modal */}
+  {/* Reviews Modal */}
       <Modal visible={showReviewsModal} animationType="slide" transparent onRequestClose={() => setShowReviewsModal(false)}>
         <SafeAreaView style={styles.modalSafe}>
           <View style={styles.modalHeader}>
@@ -287,6 +298,42 @@ export default function ProductDetailScreen() {
             keyExtractor={(item) => item.id}
             contentContainerStyle={styles.reviewsList}
             scrollEventThrottle={16}
+          />
+        </SafeAreaView>
+      </Modal>
+
+      {/* Image Viewer Modal (expand and swipe) */}
+      <Modal visible={viewerOpen} animationType="fade" transparent onRequestClose={() => setViewerOpen(false)}>
+        <SafeAreaView style={styles.modalSafe}>
+          <View style={styles.modalHeader}>
+            <Pressable onPress={() => setViewerOpen(false)}>
+              <Text style={styles.modalCloseBtn}>✕</Text>
+            </Pressable>
+            <Text style={styles.modalTitle}>{`${activeImageIdx + 1} / ${images.length}`}</Text>
+            <View style={{ width: 30 }} />
+          </View>
+          <FlatList
+            data={images}
+            horizontal
+            pagingEnabled
+            onMomentumScrollEnd={(e) => {
+              const idx = Math.round(e.nativeEvent.contentOffset.x / e.nativeEvent.layoutMeasurement.width);
+              if (!isNaN(idx)) setActiveImageIdx(idx);
+            }}
+            renderItem={({ item }) => (
+              <ScrollView
+                style={{ width: '100%', backgroundColor: 'black' }}
+                contentContainerStyle={{ alignItems: 'center', justifyContent: 'center' }}
+                maximumZoomScale={3}
+                minimumZoomScale={1}
+                showsVerticalScrollIndicator={false}
+                showsHorizontalScrollIndicator={false}
+                centerContent
+              >
+                <Image source={{ uri: item }} style={{ width: '100%', height: 500 }} resizeMode="contain" />
+              </ScrollView>
+            )}
+            keyExtractor={(u, i) => u + String(i)}
           />
         </SafeAreaView>
       </Modal>

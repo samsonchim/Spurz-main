@@ -36,12 +36,57 @@ export default function CreateProductScreen() {
     try {
       const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (!perm.granted) { Alert.alert('Permission needed', 'Allow media access to pick images.'); return; }
-  const res = await ImagePicker.launchImageLibraryAsync({ quality: 0.9, base64: true });
-      if (res.canceled) return;
-  const asset = res.assets?.[0]; if (!asset || !asset.base64) return;
-  const mime = 'image/jpeg'; // default to jpeg for data URI
-  setPhotos((prev) => [...prev, `data:${mime};base64,${asset.base64}`]);
-    } catch (e) { /* noop */ }
+
+      const remaining = Math.max(0, 10 - photos.length);
+      if (remaining === 0) return;
+
+      const baseOptions: any = {
+        quality: 0.9,
+        base64: true,
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      };
+
+      let res: ImagePicker.ImagePickerResult | null = null;
+
+      // Try multi-select first (supported on newer SDKs / iOS)
+      try {
+        res = await ImagePicker.launchImageLibraryAsync({
+          ...baseOptions,
+          allowsMultipleSelection: true,
+          selectionLimit: remaining,
+        } as any);
+      } catch {
+        // Fall back to single-select if the above options are not supported
+        res = await ImagePicker.launchImageLibraryAsync(baseOptions);
+      }
+
+      if (!res || (res as any).canceled) return;
+
+      const assets = (res as any).assets || [];
+      const toAdd: string[] = [];
+      for (const asset of assets) {
+        if (asset?.base64) {
+          const mime = 'image/jpeg';
+          toAdd.push(`data:${mime};base64,${asset.base64}`);
+        }
+      }
+
+      // In some single-select flows, assets may be empty; handle that too
+      if (toAdd.length === 0 && (res as any).assets?.[0]?.base64) {
+        toAdd.push(`data:image/jpeg;base64,${(res as any).assets[0].base64}`);
+      }
+
+      if (toAdd.length > 0) setPhotos((prev) => [...prev, ...toAdd].slice(0, 10));
+    } catch (e) {
+      // If anything goes wrong, attempt a final minimal single-select fallback
+      try {
+        const single = await ImagePicker.launchImageLibraryAsync({ quality: 0.9, base64: true });
+        if (!single.canceled) {
+          const asset = single.assets?.[0];
+          if (asset?.base64) setPhotos((prev) => [...prev, `data:image/jpeg;base64,${asset.base64}`].slice(0, 10));
+        }
+      } catch {}
+    }
   };
 
   // camera capture removed — gallery-only image picker

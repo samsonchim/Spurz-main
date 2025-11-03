@@ -23,14 +23,27 @@ The dev server runs on port 3001 (see `package.json` scripts). Example endpoints
   - Body (JSON): { "email": "you@example.com", "password": "secret" }
   - Response: 200 { token, user }
 
-Notes and next steps:
-- The auth endpoints are illustrative only (no DB or real security). Replace with real persistence (MySQL/Postgres/Supabase) and proper password hashing (bcrypt) and token generation (JWT).
-- Add `@types/cors` and any DB client types if you plan to use TypeScript type-checking.
-- If you want the API to run on a different port, change the `dev`/`start` scripts in `package.json`.
-- To connect from the mobile app (Expo/React Native), call the API URL `http://<your-dev-host>:3001/api/...` (or tunnel/Ngrok, or use device+PC network).
+Environment setup (required for DB-backed endpoints):
 
-If you'd like, I can:
-- Add Supabase integration matching the app's current usage.
-- Add a basic DB schema, migrations, and an example using SQLite/Postgres.
-- Add unit tests for the API endpoints.
+1) Copy `.env.example` to `.env.local` in this `api` folder.
+
+```powershell
+Copy-Item .env.example .env.local
+```
+
+2) Fill in your Supabase details:
+
+- SUPABASE_URL: https://<your-project-ref>.supabase.co
+- SUPABASE_SERVICE_ROLE_KEY: service role key from Supabase Dashboard > Settings > API
+
+These are used by `api/services/supabase.ts`. Without them, endpoints like `/api/outlets/my-outlet` will return 500 due to missing DB configuration.
+
+Static assets:
+
+- Files in `api/public` are served from the root of the API host (not under `/public`).
+- Example: `api/public/hallowenn.png` is available at `${API_BASE}/hallowenn.png`.
+
+Notes:
+- To connect from the mobile app (Expo/React Native), call the API URL `http://<your-dev-host>:3001/api/...` (or use a tunnel like Ngrok).
+- You can change the dev port in `package.json` scripts.
 

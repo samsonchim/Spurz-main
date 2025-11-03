@@ -1,5 +1,5 @@
-import React from 'react';
-import { NavigationContainer, DefaultTheme, Theme } from '@react-navigation/native';
+import React, { useCallback } from 'react';
+import { NavigationContainer, DefaultTheme, Theme, createNavigationContainerRef } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from '../screens/Home/HomeScreen';
 import SignUpScreen from '../screens/Auth/SignUpScreen';
@@ -8,6 +8,7 @@ import ProductDetailScreen from '../screens/Product/ProductDetailScreen';
 import EditProductScreen from '../screens/Product/EditProductScreen';
 import CreateProductScreen from '../screens/Product/CreateProductScreen';
 import ChatDetailScreen from '../screens/Chats/ChatDetailScreen';
+import ConversationsListScreen from '../screens/Chats/ConversationsListScreen';
 import VendorOnboardingScreen from '../screens/Onboarding/VendorOnboardingScreen';
 import FollowingListScreen from '../screens/Profile/FollowingListScreen';
 import CartScreen from '../screens/Profile/CartScreen';
@@ -15,6 +16,7 @@ import InvoicesListScreen from '../screens/Profile/InvoicesListScreen';
 import LikedProductsScreen from '../screens/Profile/LikedProductsScreen';
 import SettingsScreen from '../screens/Profile/SettingsScreen';
 import VendorDashboardScreen from '../screens/Vendor/VendorDashboardScreen';
+import { userSession } from '../services/userSession';
 
 export type RootStackParamList = {
   SignUp: undefined;
@@ -32,7 +34,8 @@ export type RootStackParamList = {
     tags?: string[];
   };
   CreateProduct: undefined;
-  ChatDetail: { chatId: string; name: string; role?: 'buyer' | 'vendor' };
+  ChatDetail: { chatId: string; name: string; role?: 'buyer' | 'vendor'; productName?: string; productId?: string; initialText?: string; initialSend?: boolean };
+  Conversations: undefined;
   VendorOnboarding: { email?: string; userId?: string } | undefined;
   FollowingList: undefined;
   Cart: undefined;
@@ -50,8 +53,29 @@ const navTheme: Theme = {
 };
 
 export default function RootNavigator() {
+  const navRef = createNavigationContainerRef<RootStackParamList>();
+  const authScreens = new Set<keyof RootStackParamList>(['Login','SignUp']);
+
+  const ensureAuthGuard = useCallback(async () => {
+    try {
+      const user = await userSession.getCurrentUser();
+      if (!user && navRef.isReady()) {
+        const route = navRef.getCurrentRoute();
+        const name = route?.name as keyof RootStackParamList | undefined;
+        if (!name || !authScreens.has(name)) {
+          navRef.navigate('Login');
+        }
+      }
+    } catch {}
+  }, [navRef]);
+
   return (
-    <NavigationContainer theme={navTheme}>
+    <NavigationContainer
+      ref={navRef}
+      theme={navTheme}
+      onReady={ensureAuthGuard}
+      onStateChange={ensureAuthGuard}
+    >
       <Stack.Navigator initialRouteName="Home" screenOptions={{ headerShown: false }}>
         <Stack.Screen name="SignUp" component={SignUpScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
@@ -61,6 +85,7 @@ export default function RootNavigator() {
   <Stack.Screen name="EditProduct" component={EditProductScreen} />
     <Stack.Screen name="CreateProduct" component={CreateProductScreen} />
         <Stack.Screen name="ChatDetail" component={ChatDetailScreen} />
+  <Stack.Screen name="Conversations" component={ConversationsListScreen} />
         <Stack.Screen name="FollowingList" component={FollowingListScreen} />
         <Stack.Screen name="Cart" component={CartScreen} />
         <Stack.Screen name="InvoicesList" component={InvoicesListScreen} />

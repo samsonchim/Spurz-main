@@ -1,16 +1,18 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { StyleSheet, Text, View, Pressable, ImageSourcePropType, ScrollView, Image, FlatList, TextInput, Modal, RefreshControl } from 'react-native';
 import ImageViewing from 'react-native-image-viewing';
+import { FontAwesome5 } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../navigation/RootNavigator';
 import { colors } from '../../theme/colors';
 import { apiGet, API_BASE } from '../../services/api';
-import { PROMO_IMAGE_URL } from '../../config/marketing';
+import { PROMO_IMAGE_URL, PROMO_FALLBACK_URL } from '../../config/marketing';
 import ErrorPopup from '../../components/ErrorPopup';
 import BottomNav from '../../components/BottomNav';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { userSession } from '../../services/userSession';
 
 type Product = {
   id: string;
@@ -22,16 +24,20 @@ type Product = {
   rating?: number;
 };
 
-type Chat = {
-  id: string;
-  name: string;
-  lastMessage: string;
-  time: string;
-  status?: 'Delivered' | 'Enroute' | 'Paid';
-  unread?: boolean;
-  avatar?: string; 
-  role?: 'buyer' | 'vendor';
-};
+  type ConversationRow = {
+    id: string;
+    buyerId: string;
+    vendorId: string;
+    outletId: string;
+    productId: string;
+    lastMessageAt: string | null;
+    productName: string | null;
+    outletName: string | null;
+    otherPartyId: string;
+    otherPartyName: string;
+    status?: 'unpaid' | 'paid' | 'enroute' | 'delivered' | null;
+    lastMessage?: { id: string; body: string; senderId: string; senderRole: 'buyer' | 'vendor' | 'bot'; createdAt: string } | null;
+  };
 
 export default function HomeScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -43,6 +49,7 @@ export default function HomeScreen() {
   const [chatSearch, setChatSearch] = useState('');
   const [homeSearch, setHomeSearch] = useState('');
   const [dashMenuOpen, setDashMenuOpen] = useState(false);
+  const [displayName, setDisplayName] = useState<string>('');
   const [showInvoices, setShowInvoices] = useState(false);
   const [showTheme, setShowTheme] = useState(false);
   const [showKYC, setShowKYC] = useState(false);
@@ -70,43 +77,67 @@ export default function HomeScreen() {
   const [imageVersion, setImageVersion] = useState<number>(Date.now());
 
   useEffect(() => {
-    // Fetch newest products for Home
+    // Redirect to Login if no session, then fetch newest products for Home
     (async () => {
       try {
+        const user = await userSession.getCurrentUser();
+        if (!user) {
+          navigation.navigate('Login');
+          return;
+        }
+        setDisplayName(user?.name || user?.email || 'User');
         setHomeLoading(true);
         // Cache-first load for 'All' category
         await loadProductsCached('All');
+        // Prime chats list when landing
+        meRef.current = { id: user.id };
+        await loadConversations();
       } finally {
         setHomeLoading(false);
       }
     })();
   }, []);
 
-  const HOME_CACHE_KEY = (cat: string) => `home_products_cache_v1_${cat || 'All'}`;
+  const getGreeting = () => {
+    const h = new Date().getHours();
+    if (h < 12) return 'Good morning';
+    if (h < 17) return 'Good afternoon';
+    return 'Good evening';
+  };
 
-  const fetchProducts = async (category?: string) => {
-    const q = category && category !== 'All' ? `/products/list?limit=20&category=${encodeURIComponent(category)}` : '/products/list?limit=20';
+  const sanitizeTerm = (s?: string) => (s || '').trim().toLowerCase();
+  const HOME_CACHE_KEY = (cat: string, term?: string) => {
+    const keyTerm = sanitizeTerm(term);
+    return `home_products_cache_v1_${cat || 'All'}_${encodeURIComponent(keyTerm)}`;
+  };
+
+  const fetchProducts = async (category?: string, term?: string) => {
+    const params: string[] = ['limit=20'];
+    if (category && category !== 'All') params.push(`category=${encodeURIComponent(category)}`);
+    const t = sanitizeTerm(term);
+    if (t) params.push(`search=${encodeURIComponent(t)}`);
+    const q = `/products/list?${params.join('&')}`;
     const res = await apiGet(q);
     if (res.ok) {
       const list = (res.data as any)?.products ?? [];
       setProducts(list);
-      await AsyncStorage.setItem(HOME_CACHE_KEY(category || 'All'), JSON.stringify(list));
+      await AsyncStorage.setItem(HOME_CACHE_KEY(category || 'All', term), JSON.stringify(list));
       setImageVersion(Date.now());
     }
   };
 
-  const loadProductsCached = async (category?: string) => {
-    const key = HOME_CACHE_KEY(category || 'All');
+  const loadProductsCached = async (category?: string, term?: string) => {
+    const key = HOME_CACHE_KEY(category || 'All', term);
     const raw = await AsyncStorage.getItem(key);
     const cache = raw ? (JSON.parse(raw) as Product[]) : null;
     if (cache) setProducts(cache);
-    if (!cache) await fetchProducts(category);
+    if (!cache) await fetchProducts(category, term);
   };
 
   const onRefreshHome = async () => {
     try {
       setHomeRefreshing(true);
-      await fetchProducts(activeFilter);
+      await fetchProducts(activeFilter, homeSearch);
     } finally {
       setHomeRefreshing(false);
     }
@@ -122,28 +153,21 @@ export default function HomeScreen() {
     likes: 987,
   };
 
-  const chats: Chat[] = [
-    { id: 'c1', name: 'TechHub Electronics', lastMessage: 'Your order is on the way 🚚', time: '09:12', status: 'Enroute', unread: true, avatar: '📦', role: 'vendor' },
-    { id: 'c2', name: 'Style & Co.', lastMessage: 'Payment received. Thanks! 🧾', time: 'Yesterday', status: 'Paid', unread: false, avatar: '👜' },
-    { id: 'c3', name: 'BookWorld Store', lastMessage: 'Package delivered. Enjoy reading! 📚', time: 'Mon', status: 'Delivered', unread: false, avatar: '📚' },
-    { id: 'c4', name: 'FurnishIt', lastMessage: 'We have a discount on sofas.', time: 'Sun', unread: true, avatar: '🛋️' },
-    { id: 'c5', name: 'Gadget Arena', lastMessage: 'Can we confirm your address?', time: 'Sat', unread: false, avatar: '🔌' },
-  ];
+  const [conversations, setConversations] = useState<ConversationRow[]>([]);
+  const meRef = React.useRef<{ id: string } | null>(null);
 
   const filteredChats = useMemo(() => {
     const term = chatSearch.trim().toLowerCase();
-    return chats.filter((c) => {
-      if (chatFilter === 'Unread' && !c.unread) return false;
-      if (chatFilter === 'Paid' && c.status !== 'Paid') return false;
-      if (chatFilter === 'Delivered' && c.status !== 'Delivered') return false;
-      if (chatFilter === 'Enroute' && c.status !== 'Enroute') return false;
+    const list = conversations.filter((c) => {
       if (term) {
-        const hay = `${c.name} ${c.lastMessage}`.toLowerCase();
+        const preview = c.lastMessage?.body || '';
+        const hay = `${c.otherPartyName} ${preview} ${c.productName || ''} ${c.outletName || ''}`.toLowerCase();
         if (!hay.includes(term)) return false;
       }
       return true;
     });
-  }, [chats, chatFilter, chatSearch]);
+    return list;
+  }, [conversations, chatSearch]);
 
   // Respond to navigation param to switch tabs when navigated from other screens
   React.useEffect(() => {
@@ -153,34 +177,123 @@ export default function HomeScreen() {
     }
   }, [route?.params?.tab]);
 
-  const renderChat = (item: Chat) => (
+  // Load conversations when switching to chats tab
+  useEffect(() => {
+    (async () => {
+      if (tab !== 'chats') return;
+      const me = await userSession.getCurrentUser();
+      if (!me) return;
+      meRef.current = { id: me.id };
+      await loadConversations();
+    })();
+  }, [tab]);
+
+  const loadConversations = async () => {
+    try {
+      const me = await userSession.getCurrentUser();
+      if (!me) return;
+      const resp = await apiGet(`/chats/list?userId=${encodeURIComponent(me.id)}&limit=50`);
+      if (resp.ok && resp.data) {
+        const convs = (resp.data as any).conversations as ConversationRow[];
+        setConversations(convs || []);
+      }
+    } catch {}
+  };
+
+  // Realtime updates for chats tab
+  useEffect(() => {
+    const { getSupabase } = require('../../services/realtime');
+    const sb = getSupabase();
+    if (!sb) return;
+    const channel = sb.channel('home-conversations')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, (payload: any) => {
+        const m = payload?.new; if (!m) return;
+        setConversations((prev: ConversationRow[]) => {
+          const idx = prev.findIndex((r) => r.id === m.conversation_id);
+          if (idx === -1) return prev;
+          const copy = [...prev];
+          const row: ConversationRow = { ...copy[idx] } as ConversationRow;
+          row.lastMessageAt = m.created_at;
+          row.lastMessage = { id: m.id, body: m.body || '', senderId: m.sender_id, senderRole: m.sender_role, createdAt: m.created_at } as any;
+          copy.splice(idx, 1);
+          return [row, ...copy];
+        });
+      })
+      .subscribe();
+    return () => { try { sb.removeChannel(channel); } catch {} };
+  }, []);
+
+  const renderChat = (item: ConversationRow) => (
     <Pressable
       key={item.id}
-      style={[styles.chatItem, item.unread && styles.chatItemUnread]}
-      onPress={() => navigation.navigate('ChatDetail', { chatId: item.id, name: item.name, role: item.role ?? 'buyer' })}
+      style={[styles.chatItem]}
+      onPress={async () => {
+        const me = meRef.current; if (!me) return;
+        const role: 'buyer' | 'vendor' = item.vendorId === me.id ? 'vendor' : 'buyer';
+        navigation.navigate('ChatDetail', { chatId: item.id, name: item.otherPartyName, role, productName: item.productName || undefined, productId: item.productId });
+      }}
     >
       <View style={styles.chatLeft}>
-        <View style={styles.chatAvatar}><Text style={styles.chatAvatarText}>{item.avatar || item.name.charAt(0)}</Text></View>
+        <View style={styles.chatAvatar}><Text style={styles.chatAvatarText}>{item.otherPartyName?.charAt(0) || '💬'}</Text></View>
         <View style={styles.chatBody}>
           <View style={styles.chatTitleRow}>
-            <Text style={[styles.chatTitle, item.unread && styles.chatTitleUnread]} numberOfLines={1}>{item.name}</Text>
-            <Text style={styles.chatTime}>{item.time}</Text>
+            <Text style={styles.chatTitle} numberOfLines={1}>{item.otherPartyName}</Text>
+            <Text style={styles.chatTime}>{formatWhen(item.lastMessageAt)}</Text>
           </View>
           <View style={styles.chatMetaRow}>
-            <Text style={[styles.chatSnippet, item.unread && styles.chatSnippetUnread]} numberOfLines={1}>{item.lastMessage}</Text>
-            {item.status && (
-              <View style={[styles.statusBadge,
-                item.status === 'Delivered' ? styles.statusDelivered : item.status === 'Enroute' ? styles.statusEnroute : styles.statusPaid,
-              ]}>
-                <Text style={styles.statusText}>{item.status}</Text>
+            {item.status ? (
+              <View style={[styles.chatStatusBadge, statusStyle(item.status)]}>
+                <Text style={styles.chatStatusText}>{statusLabel(item.status)}</Text>
               </View>
-            )}
-            {item.unread && <View style={styles.unreadDot} />}
+            ) : null}
+            <Text style={[styles.chatSnippet]} numberOfLines={1}>{renderPreview(item)}</Text>
           </View>
         </View>
       </View>
     </Pressable>
   );
+
+  const formatWhen = (iso?: string | null) => {
+    if (!iso) return '';
+    const d = new Date(iso);
+    const now = new Date();
+    const diffMs = now.getTime() - d.getTime();
+    const diffMin = Math.floor(diffMs / 60000);
+    if (diffMin < 1) return 'now';
+    if (diffMin < 60) return `${diffMin}m`;
+    const diffH = Math.floor(diffMin / 60);
+    if (diffH < 24) return `${diffH}h`;
+    const diffD = Math.floor(diffH / 24);
+    if (diffD < 7) return `${diffD}d`;
+    try {
+      return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+    } catch {
+      return d.toDateString();
+    }
+  };
+
+  const renderPreview = (c: ConversationRow) => {
+    const me = meRef.current; if (!me) return c.lastMessage?.body || '';
+    const meRole: 'buyer' | 'vendor' = c.vendorId === me.id ? 'vendor' : 'buyer';
+    if (!c.lastMessage) return '';
+    const prefix = c.lastMessage.senderRole === meRole ? 'You: ' : '';
+    return `${prefix}${c.lastMessage.body || ''}`;
+  };
+
+  const statusLabel = (s?: string | null) => {
+    if (!s) return '';
+    const map: any = { unpaid: 'Not paid', paid: 'Paid', enroute: 'Enroute', delivered: 'Delivered' };
+    return map[s] || s;
+  };
+
+  const statusStyle = (s?: string | null) => {
+    switch (s) {
+      case 'paid': return styles.statusPaid;
+      case 'enroute': return styles.statusEnroute;
+      case 'delivered': return styles.statusDelivered;
+      default: return styles.statusUnpaid;
+    }
+  };
 
   const renderProduct = (item: Product) => {
     // Home and other tabs: tap opens Product Detail
@@ -192,12 +305,21 @@ export default function HomeScreen() {
               uri: (() => {
                 const first = item.images?.[0];
                 if (!first) return 'https://via.placeholder.com/300';
-                if (first.startsWith('http') || first.startsWith('data:') || first.startsWith('file:')) return `${first}?v=${imageVersion}`;
+                // Do NOT append cache-busting to data: or file: URIs
+                if (first.startsWith('data:') || first.startsWith('file:')) return first;
+                if (first.startsWith('http')) return `${first}?v=${imageVersion}`;
                 return `${API_BASE}${first.startsWith('/') ? first : `/${first}`}?v=${imageVersion}`;
               })(),
             }}
             style={styles.productImagePhoto}
             resizeMode="cover"
+            onError={() => {
+              // Fallback if URI is invalid
+              try {
+                // @ts-ignore
+                (global as any).requestAnimationFrame?.(() => {});
+              } catch {}
+            }}
           />
         </View>
         <Text style={styles.productName} numberOfLines={2}>{item.name}</Text>
@@ -333,11 +455,11 @@ export default function HomeScreen() {
         ) : (
           <>
             <View>
-              <Text style={styles.greeting}>Good morning</Text>
-              <Text style={styles.userName}>Jimmy Samson</Text>
+              <Text style={styles.greeting}>{getGreeting()}</Text>
+              <Text style={styles.userName}>{displayName}</Text>
             </View>
             <Pressable style={styles.notificationIcon}>
-              <Image source={require('../../../assets/icons/notification.png')} style={styles.headerIconImg} resizeMode="contain" />
+              <FontAwesome5 name="bell" size={20} color="#FFA500" />
             </Pressable>
           </>
         )}
@@ -364,19 +486,6 @@ export default function HomeScreen() {
                   returnKeyType="search"
                 />
               </View>
-
-              {/* Chats Filters */}
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.chatFilterRow}
-              >
-                {(['All','Unread','Paid','Delivered','Enroute'] as const).map((f) => (
-                  <Pressable key={f} style={[styles.chatFilterChip, chatFilter === f && styles.chatFilterChipActive]} onPress={() => setChatFilter(f)}>
-                    <Text style={[styles.chatFilterText, chatFilter === f && styles.chatFilterTextActive]}>{f}</Text>
-                  </Pressable>
-                ))}
-              </ScrollView>
             </View>
           )}
         />
@@ -421,13 +530,16 @@ export default function HomeScreen() {
           {/* Profile Header */}
           <View style={styles.profHeader}>
             <View style={styles.profAvatar}><Text style={{ fontSize: 28 }}>👤</Text></View>
-            <Text style={styles.profName}>Jimmy Samson</Text>
-            <Text style={styles.profHandle}>@jimmy</Text>
+            <Text style={styles.profName}>{displayName || 'User'}</Text>
+            <Text style={styles.profHandle}>
+              @{(String(displayName || 'user').split(/[\s@]/)[0] || '').toLowerCase()}
+            </Text>
           </View>
 
           {/* Profile Menu */}
           <View style={{ paddingHorizontal: 16 }}>
             {[
+              { key: 'Conversations', label: 'Conversations' },
               { key: 'FollowingList', label: 'Following' },
               { key: 'Cart', label: 'Cart' },
               { key: 'InvoicesList', label: 'Invoices' },
@@ -439,6 +551,20 @@ export default function HomeScreen() {
                 <Text style={{ color: colors.muted }}>›</Text>
               </Pressable>
             ))}
+
+            {/* Logout Button */}
+            <Pressable
+              style={[styles.profRow, { borderColor: '#FFE4E6', backgroundColor: '#FFF1F2' }]}
+              onPress={async () => {
+                try { await userSession.clearSession(); } catch {}
+                // Navigate to Login; global guard will keep unauthenticated users on auth screens
+                // @ts-ignore
+                navigation.navigate('Login');
+              }}
+            >
+              <Text style={[styles.profRowText, { color: '#B91C1C' }]}>Logout</Text>
+              <Text style={{ color: '#B91C1C' }}>›</Text>
+            </Pressable>
           </View>
         </ScrollView>
       ) : (
@@ -459,6 +585,14 @@ export default function HomeScreen() {
                 value={homeSearch}
                 onChangeText={setHomeSearch}
                 returnKeyType="search"
+                onSubmitEditing={async () => {
+                  setHomeLoading(true);
+                  try {
+                    await loadProductsCached(activeFilter, homeSearch);
+                  } finally {
+                    setHomeLoading(false);
+                  }
+                }}
               />
             </View>
           </View>
@@ -476,7 +610,7 @@ export default function HomeScreen() {
                 style={[styles.filterTab, activeFilter === filter && styles.filterTabActive]}
                 onPress={async () => {
                   setActiveFilter(filter);
-                  await loadProductsCached(filter);
+                  await loadProductsCached(filter, homeSearch);
                 }}
               >
                 <Text style={[styles.filterText, activeFilter === filter && styles.filterTextActive]}>
@@ -488,18 +622,24 @@ export default function HomeScreen() {
 
           {/* Promotional Banner - replaced with image */}
           <View style={styles.promoBannerImgWrap}>
-            <Image source={{ uri: PROMO_IMAGE_URL }} style={styles.promoBannerImg} resizeMode="cover" />
+            <Image
+              source={{ uri: PROMO_IMAGE_URL }}
+              style={styles.promoBannerImg}
+              resizeMode="cover"
+              onError={(e) => {
+                // Fallback to a reliable remote image if local asset fails (e.g., dev server not serving public correctly)
+                try {
+                  // @ts-ignore - change the source to the fallback URI on error
+                  e?.currentTarget?.setNativeProps?.({ src: [{ uri: PROMO_FALLBACK_URL }] });
+                } catch {}
+              }}
+            />
           </View>
 
           {/* Products Grid */}
           <Text style={styles.sectionTitle}>Featured Products</Text>
           <FlatList
-            data={products.filter((p) => {
-              const t = homeSearch.trim().toLowerCase();
-              if (!t) return true;
-              const hay = `${p.name} ${p.category ?? ''}`.toLowerCase();
-              return hay.includes(t);
-            })}
+            data={products}
             renderItem={({ item }) => renderProduct(item)}
             keyExtractor={(item) => item.id}
             numColumns={2}
@@ -858,8 +998,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#F0F0F0',
   },
   filterTabActive: { backgroundColor: colors.accent },
-  filterText: { fontSize: 12, fontWeight: '600', color: colors.muted },
-  filterTextActive: { color: 'white' },
+  filterText: { fontSize: 12, color: colors.muted, fontFamily: 'Poppins_600SemiBold' },
+  filterTextActive: { color: 'white', fontFamily: 'Poppins_600SemiBold' },
 
   // Promo Banner
   promoBanner: {
@@ -885,7 +1025,7 @@ const styles = StyleSheet.create({
   promoBannerImg: { width: '100%', height: '100%' },
 
   // Section Title
-  sectionTitle: { fontSize: 16, fontWeight: '700', color: colors.text, marginBottom: 12, fontFamily: 'Poppins_700Bold' },
+  sectionTitle: { fontSize: 16, fontWeight: '700', color: colors.text, marginBottom: 12, fontFamily: 'Poppins_900Black' },
 
   // Grid
   gridWrapper: { gap: 12 },
@@ -933,11 +1073,11 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   badgeText: { fontSize: 10, fontWeight: '700', color: 'white' },
-  productName: { fontSize: 12, fontWeight: '600', color: colors.text, marginBottom: 4 },
+  productName: { fontSize: 12, color: colors.text, marginBottom: 4, fontFamily: 'Poppins_600SemiBold' },
   priceRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 },
-  price: { fontSize: 13, fontWeight: '700', color: colors.accent },
-  oldPrice: { fontSize: 11, color: colors.muted, textDecorationLine: 'line-through' },
-  rating: { fontSize: 11, color: '#FFA500' },
+  price: { fontSize: 13, color: colors.accent, fontFamily: 'Poppins_700Bold' },
+  oldPrice: { fontSize: 11, color: colors.muted, textDecorationLine: 'line-through', fontFamily: 'Poppins_400Regular' },
+  rating: { fontSize: 11, color: '#FFA500', fontFamily: 'Poppins_400Regular' },
   metricsRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 },
   metric: { fontSize: 11, color: colors.muted, fontWeight: '600' },
 
@@ -979,11 +1119,13 @@ const styles = StyleSheet.create({
   chatMetaRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   chatSnippet: { fontSize: 12, color: colors.muted, flex: 1 },
   chatSnippetUnread: { color: colors.text, fontWeight: '600' },
-  statusBadge: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8 },
-  statusDelivered: { backgroundColor: '#51CF66' },
-  statusEnroute: { backgroundColor: '#F89B1C' },
+  chatStatusBadge: { borderRadius: 999, paddingHorizontal: 8, paddingVertical: 2, marginRight: 8 },
+  chatStatusText: { fontSize: 10, fontWeight: '700', color: 'white' },
+  statusUnpaid: { backgroundColor: '#EF4444' },
   statusPaid: { backgroundColor: '#3B82F6' },
-  statusText: { fontSize: 10, color: 'white', fontWeight: '700' },
+  statusEnroute: { backgroundColor: '#F59E0B' },
+  statusDelivered: { backgroundColor: '#10B981' },
+  
   unreadDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.accent },
 
   // Dashboard
@@ -1098,8 +1240,8 @@ const styles = StyleSheet.create({
   profileContent: { paddingBottom: 120, paddingTop: 12 },
   profHeader: { alignItems: 'center', marginBottom: 16 },
   profAvatar: { width: 72, height: 72, borderRadius: 36, backgroundColor: '#F5F5F5', alignItems: 'center', justifyContent: 'center', alignSelf: 'center' },
-  profName: { marginTop: 10, fontSize: 16, color: colors.text, fontWeight: '800' },
-  profHandle: { fontSize: 12, color: colors.muted, marginTop: 2 },
+  profName: { marginTop: 10, fontSize: 16, color: colors.text, fontFamily: 'Poppins_700Bold' },
+  profHandle: { fontSize: 12, color: colors.muted, marginTop: 2, fontFamily: 'Poppins_700Bold' },
   profRow: { backgroundColor: 'white', borderRadius: 12, borderWidth: 1, borderColor: '#EFEFEF', padding: 14, marginBottom: 12, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  profRowText: { fontSize: 13, color: colors.text, fontWeight: '700' },
+  profRowText: { fontSize: 13, color: colors.text, fontFamily: 'Poppins_700Bold' },
 });

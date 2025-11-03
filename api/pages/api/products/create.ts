@@ -16,11 +16,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     price,
     oldPrice,
     category,
-    brand,
-    sku,
     stockQuantity,
-    color,
-    size,
     condition,
     status,
     isFeatured,
@@ -59,17 +55,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       price: parseFloat(price),
       old_price: oldPrice ? parseFloat(oldPrice) : null,
       category: category || null,
-      brand: brand?.trim() || null,
-      sku: sku?.trim() || null,
       stock_quantity: stockQuantity || 0,
-      color: color?.trim() || null,
-      size: size?.trim() || null,
       condition: condition || 'new',
       status: status || 'active',
       is_featured: isFeatured || false,
-      tags: tags || [],
-      images: images || [],
-      published_at: new Date().toISOString()
+      tags: Array.isArray(tags) ? tags : [],
+      images: Array.isArray(images) ? images : []
     }
 
     const { data: product, error: insertError } = await supabaseAdmin

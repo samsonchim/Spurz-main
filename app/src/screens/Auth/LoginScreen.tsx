@@ -4,10 +4,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../../theme/colors';
 import { Feather } from '@expo/vector-icons';
 import ErrorPopup from '../../components/ErrorPopup';
-import OverlayLoading from '../../components/OverlayLoading';
-import LoadingSpinner from '../../components/LoadingSpinner';
-import { apiPost } from '../../services/api';
 import { userSession } from '../../services/userSession';
+import { apiPost } from '../../services/api';
 import { useFonts, Poppins_400Regular, Poppins_600SemiBold, Poppins_700Bold } from '@expo-google-fonts/poppins';
 
 export default function LoginScreen({ navigation }: any) {
@@ -16,7 +14,7 @@ export default function LoginScreen({ navigation }: any) {
   const [show, setShow] = useState(false);
   const [errVisible, setErrVisible] = useState(false);
   const [errMsg, setErrMsg] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [fontsLoaded] = useFonts({ Poppins_400Regular, Poppins_600SemiBold, Poppins_700Bold });
   if (!fontsLoaded) return null;
 
@@ -67,52 +65,37 @@ export default function LoginScreen({ navigation }: any) {
             </View>
 
             <Pressable
-              style={[styles.loginBtn, loading && styles.loginBtnDisabled]}
+              style={[styles.loginBtn, submitting && { opacity: 0.7 }]}
+              disabled={submitting}
               onPress={async () => {
                 if (!email || !password) {
                   setErrMsg('Please fill in all fields');
                   setErrVisible(true);
                   return;
                 }
-                setLoading(true);
+                setSubmitting(true);
                 try {
-                  const response = await apiPost('/auth/login', {
-                    email: email.trim(),
-                    password,
-                  });
-                  
-                  if (!response.ok) {
-                    setErrMsg(response.error || 'Login failed');
-                    setErrVisible(true);
+                  // Call API login; requires the API server to be configured with Supabase
+                  const resp = await apiPost('/auth/login', { email, password });
+                  if (resp.ok && resp.data) {
+                    const { user, token } = resp.data as any;
+                    await userSession.setSession({ user, token });
+                    navigation.navigate('Home');
                     return;
                   }
-                  
-                  // Store user session data
-                  if (response.data?.user && response.data?.token) {
-                    await userSession.setSession({
-                      user: response.data.user,
-                      token: response.data.token
-                    });
-                    console.log('Login successful:', response.data);
-                  }
-                  
-                  // Success - navigate to home
-                  navigation.navigate('Home');
+                  // Surface server-provided error, else generic
+                  setErrMsg(resp.error || 'Invalid credentials');
+                  setErrVisible(true);
                 } catch (e) {
-                  setErrMsg('Network error. Please try again.');
+                  setErrMsg('Login failed. Please try again.');
                   setErrVisible(true);
                 } finally {
-                  setLoading(false);
+                  setSubmitting(false);
                 }
               }}
               android_ripple={{ color: '#ffffff55' }}
-              disabled={loading}
             >
-              {loading ? (
-                <LoadingSpinner message="Signing in..." size="small" />
-              ) : (
-                <Text style={styles.loginText}>Login</Text>
-              )}
+              <Text style={styles.loginText}>{submitting ? 'Signing in…' : 'Login'}</Text>
             </Pressable>
 
             <View style={styles.rowCenter}>
@@ -123,7 +106,6 @@ export default function LoginScreen({ navigation }: any) {
             </View>
 
             <ErrorPopup visible={errVisible} message={errMsg} onDismiss={() => setErrVisible(false)} />
-            <OverlayLoading visible={loading} message="Signing in..." />
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -156,9 +138,6 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  loginBtnDisabled: {
-    opacity: 0.6,
   },
   loginText: { color: '#fff', fontFamily: 'Poppins_600SemiBold', fontSize: 18 },
   rowCenter: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 18 },
