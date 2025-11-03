@@ -39,7 +39,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const ownerIds = Array.from(new Set(userIds));
     const [{ data: products }, { data: outlets }, { data: users }, lastMessages, { data: outletsByOwner }] = await Promise.all([
       productIds.length ? supabaseAdmin.from('products').select('id, name').in('id', productIds) : Promise.resolve({ data: [] as any[] } as any),
-      outletIds.length ? supabaseAdmin.from('outlets').select('id, name, owner_id').in('id', outletIds) : Promise.resolve({ data: [] as any[] } as any),
+      outletIds.length ? supabaseAdmin.from('outlets').select('id, name, owner_id, face_of_brand_path').in('id', outletIds) : Promise.resolve({ data: [] as any[] } as any),
       userIds.length ? supabaseAdmin.from('users').select('id, user_name, email').in('id', userIds) : Promise.resolve({ data: [] as any[] } as any),
       (async () => {
         if (!convIds.length) return new Map();
@@ -56,7 +56,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
         return map;
       })(),
-      ownerIds.length ? supabaseAdmin.from('outlets').select('id, name, owner_id').in('owner_id', ownerIds) : Promise.resolve({ data: [] as any[] } as any),
+      ownerIds.length ? supabaseAdmin.from('outlets').select('id, name, owner_id, face_of_brand_path').in('owner_id', ownerIds) : Promise.resolve({ data: [] as any[] } as any),
     ])
 
   const productMap: Map<string, any> = new Map((products || []).map((p: any) => [p.id, p]))
@@ -68,13 +68,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const otherId = c.buyer_id === userId ? c.vendor_id : c.buyer_id
   const other: any = userMap.get(otherId) || null
       let name = other?.user_name || (other?.email ? String(other.email).split('@')[0] : 'User')
+      let avatar: string | null = null
       // Prefer outlet name for vendor; for buyer, use their outlet if any
       if (otherId === c.vendor_id) {
         const out = outletMap.get(c.outlet_id)
         if (out?.name) name = out.name
+        if (out?.face_of_brand_path) avatar = out.face_of_brand_path
       } else {
         const ob = outletByOwner.get(otherId)
         if (ob?.name) name = ob.name
+        if (ob?.face_of_brand_path) avatar = ob.face_of_brand_path
       }
   const product: any = productMap.get(c.product_id) || null
   const outlet: any = outletMap.get(c.outlet_id) || null
@@ -91,6 +94,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         outletName: outlet?.name || null,
         otherPartyId: otherId,
         otherPartyName: name,
+  otherPartyAvatar: avatar || null,
         lastMessage: lm
           ? {
               id: lm.id,

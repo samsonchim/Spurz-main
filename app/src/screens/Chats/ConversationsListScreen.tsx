@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { StyleSheet, Text, View, Pressable, FlatList, RefreshControl } from 'react-native';
+import { StyleSheet, Text, View, Pressable, FlatList, RefreshControl, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../navigation/RootNavigator';
 import { colors } from '../../theme/colors';
-import { apiGet } from '../../services/api';
+import { apiGet, API_BASE } from '../../services/api';
 import { userSession } from '../../services/userSession';
 import { getSupabase } from '../../services/realtime';
 
@@ -20,6 +20,7 @@ type ConversationRow = {
   outletName: string | null;
   otherPartyId: string;
   otherPartyName: string;
+  otherPartyAvatar?: string | null;
   status?: 'unpaid' | 'paid' | 'enroute' | 'delivered' | null;
   lastMessage?: { id: string; body: string; senderId: string; senderRole: 'buyer' | 'vendor' | 'bot'; createdAt: string } | null;
 };
@@ -27,6 +28,7 @@ type ConversationRow = {
 export default function ConversationsListScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [rows, setRows] = useState<ConversationRow[]>([]);
+  const [readSet, setReadSet] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const userIdRef = useRef<string | null>(null);
@@ -42,8 +44,10 @@ export default function ConversationsListScreen() {
       userIdRef.current = me.id;
       const resp = await apiGet(`/chats/list?userId=${encodeURIComponent(me.id)}&limit=50`);
       if (resp.ok && resp.data) {
-        const convs = (resp.data as any).conversations as ConversationRow[];
-        setRows(convs || []);
+        const convs = ((resp.data as any).conversations as ConversationRow[]) || [];
+        // newest first
+        convs.sort((a, b) => new Date(b.lastMessageAt || 0).getTime() - new Date(a.lastMessageAt || 0).getTime());
+        setRows(convs);
       }
     } finally {
       setLoading(false);
@@ -104,6 +108,13 @@ export default function ConversationsListScreen() {
     const meId = userIdRef.current;
     const meRole: 'buyer' | 'vendor' = meId && item.vendorId === meId ? 'vendor' : 'buyer';
     const preview = item.lastMessage ? `${item.lastMessage.senderRole === meRole ? 'You: ' : ''}${item.lastMessage.body || ''}` : '';
+    const isUnread = !!item.lastMessage && item.lastMessage.senderRole !== meRole && !readSet.has(item.id);
+    const avatarUri = (() => {
+      const p = item.otherPartyAvatar || '';
+      if (!p) return null;
+      if (p.startsWith('http') || p.startsWith('data:') || p.startsWith('file:')) return p;
+      return `${API_BASE}${p.startsWith('/') ? p : `/${p}`}`;
+    })();
     const statusLabel = (s?: string | null) => {
       if (!s) return null;
       const map: any = { unpaid: 'Not paid', paid: 'Paid', enroute: 'Enroute', delivered: 'Delivered' };
@@ -123,6 +134,7 @@ export default function ConversationsListScreen() {
           const me = await userSession.getCurrentUser();
           if (!me) return;
           const role: 'buyer' | 'vendor' = item.vendorId === me.id ? 'vendor' : 'buyer';
+          setReadSet((prev) => new Set([...Array.from(prev), item.id]));
           navigation.navigate('ChatDetail', {
             chatId: item.id,
             name: item.otherPartyName || 'Chat',
@@ -131,9 +143,15 @@ export default function ConversationsListScreen() {
             productId: item.productId,
           });
         }}
-        style={styles.row}
+        style={[styles.row, isUnread && styles.rowUnread]}
       >
-        <View style={styles.avatar}><Text style={styles.avatarText}>💬</Text></View>
+        <View style={styles.avatar}>
+          {avatarUri ? (
+            <Image source={{ uri: avatarUri }} style={styles.avatarImg} />
+          ) : (
+            <Text style={styles.avatarText}>{(item.otherPartyName || 'U').charAt(0).toUpperCase()}</Text>
+          )}
+        </View>
         <View style={{ flex: 1 }}>
           <View style={styles.titleRow}>
             <Text style={styles.title} numberOfLines={1}>{item.otherPartyName}</Text>
@@ -188,8 +206,10 @@ const styles = StyleSheet.create({
   headerTitle: { flex: 1, textAlign: 'center', fontSize: 15, fontWeight: '700', color: colors.text },
   list: { padding: 16, paddingBottom: 80, gap: 10 },
   row: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'white', borderRadius: 12, padding: 12, borderWidth: 1, borderColor: '#EFEFEF', marginBottom: 10 },
-  avatar: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#F5F5F5', alignItems: 'center', justifyContent: 'center', marginRight: 12 },
-  avatarText: { fontSize: 22 },
+  rowUnread: { borderColor: '#F59E0B' },
+  avatar: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#F5F5F5', alignItems: 'center', justifyContent: 'center', marginRight: 12, overflow: 'hidden' },
+  avatarImg: { width: 44, height: 44 },
+  avatarText: { fontSize: 18, fontWeight: '800', color: colors.text },
   titleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 },
   title: { fontSize: 14, fontWeight: '700', color: colors.text, flex: 1, marginRight: 8 },
   when: { fontSize: 11, color: colors.muted },

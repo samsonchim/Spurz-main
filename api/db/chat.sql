@@ -100,8 +100,8 @@ BEGIN
     RETURNING id INTO v_conversation_id;
     v_created := TRUE;
   EXCEPTION WHEN unique_violation THEN
-    SELECT id INTO v_conversation_id FROM public.conversations
-    WHERE buyer_id = p_buyer_id AND vendor_id = v_vendor_id AND product_id = p_product_id;
+    SELECT c.id INTO v_conversation_id FROM public.conversations c
+    WHERE c.buyer_id = p_buyer_id AND c.vendor_id = v_vendor_id AND c.product_id = p_product_id;
   END;
 
   -- If new, add a system message referencing the product
@@ -211,6 +211,26 @@ BEGIN
   -- bump conversation status to unpaid
   UPDATE public.conversations SET status = 'unpaid', updated_at = now() WHERE id = p_conversation_id;
   RETURN v_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Device tokens for push notifications
+CREATE TABLE IF NOT EXISTS public.device_tokens (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
+  expo_token TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE(user_id, expo_token)
+);
+
+-- Helper to upsert a token
+DROP FUNCTION IF EXISTS public.upsert_device_token(uuid, text);
+CREATE OR REPLACE FUNCTION public.upsert_device_token(p_user_id UUID, p_expo_token TEXT)
+RETURNS VOID AS $$
+BEGIN
+  INSERT INTO public.device_tokens(user_id, expo_token)
+  VALUES (p_user_id, p_expo_token)
+  ON CONFLICT (user_id, expo_token) DO NOTHING;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 

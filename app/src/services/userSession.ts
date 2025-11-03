@@ -44,6 +44,15 @@ export const userSession = {
     }
   },
 
+  // Clear session and all cached app data (use on logout)
+  async clearAll(): Promise<void> {
+    try {
+      await AsyncStorage.clear();
+    } catch (error) {
+      console.error('Failed to clear app storage:', error);
+    }
+  },
+
   // Get current user
   async getCurrentUser(): Promise<User | null> {
     const session = await this.getSession();

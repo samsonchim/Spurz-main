@@ -146,9 +146,9 @@ import { getSupabase } from '../../services/realtime';
   const [invExpectedDate, setInvExpectedDate] = useState<Date | null>(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showInvoiceForm, setShowInvoiceForm] = useState(false);
-  const [invProduct, setInvProduct] = useState('iPhone 12 Pro');
-  const [invPrice, setInvPrice] = useState('999');
-   const [invDeliveryFee, setInvDeliveryFee] = useState('20');
+  const [invProduct, setInvProduct] = useState('');
+  const [invPrice, setInvPrice] = useState('');
+   const [invDeliveryFee, setInvDeliveryFee] = useState('');
    const [invAddress, setInvAddress] = useState('');
   const [composerHeight, setComposerHeight] = useState(0);
   const invoiceRefs = useRef<Record<string, View | null>>({});
@@ -485,7 +485,7 @@ import { getSupabase } from '../../services/realtime';
           onLayout={() => listRef.current?.scrollToEnd({ animated: false })}
           ListHeaderComponent={(
             <>
-              {shouldSeed && prodCard ? (
+              {prodCard ? (
                 <View style={[styles.bubbleRow, styles.rowLeft]}>
                   <View style={styles.avatarCircle}><Text style={styles.avatarEmoji}>🏪</Text></View>
                   <View style={[styles.bubble, styles.bubbleOther]}>
@@ -626,7 +626,7 @@ import { getSupabase } from '../../services/realtime';
 
  const styles = StyleSheet.create({
    safe: { flex: 1, backgroundColor: colors.background },
-  productSummary: { marginHorizontal: 12, marginTop: 12, backgroundColor: 'white', borderRadius: 12, padding: 10, borderWidth: 1, borderColor: '#EFEFEF' },
+  productSummary: { marginHorizontal: 12, marginTop: 12, backgroundColor: '#FFF7ED', borderRadius: 12, padding: 10, borderWidth: 1, borderColor: '#FDBA74' },
   productThumb: { width: 44, height: 44, borderRadius: 8 },
   prodName: { fontSize: 13, color: colors.text, fontWeight: '700' },
   prodPrice: { fontSize: 12, color: colors.accent, fontWeight: '700' },

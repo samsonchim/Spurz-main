@@ -35,6 +35,7 @@ type Product = {
     outletName: string | null;
     otherPartyId: string;
     otherPartyName: string;
+    otherPartyAvatar?: string | null;
     status?: 'unpaid' | 'paid' | 'enroute' | 'delivered' | null;
     lastMessage?: { id: string; body: string; senderId: string; senderRole: 'buyer' | 'vendor' | 'bot'; createdAt: string } | null;
   };
@@ -154,6 +155,7 @@ export default function HomeScreen() {
   };
 
   const [conversations, setConversations] = useState<ConversationRow[]>([]);
+  const [readSet, setReadSet] = useState<Set<string>>(new Set());
   const meRef = React.useRef<{ id: string } | null>(null);
 
   const filteredChats = useMemo(() => {
@@ -194,8 +196,9 @@ export default function HomeScreen() {
       if (!me) return;
       const resp = await apiGet(`/chats/list?userId=${encodeURIComponent(me.id)}&limit=50`);
       if (resp.ok && resp.data) {
-        const convs = (resp.data as any).conversations as ConversationRow[];
-        setConversations(convs || []);
+        const convs = ((resp.data as any).conversations as ConversationRow[]) || [];
+        convs.sort((a, b) => new Date(b.lastMessageAt || 0).getTime() - new Date(a.lastMessageAt || 0).getTime());
+        setConversations(convs);
       }
     } catch {}
   };
@@ -226,15 +229,30 @@ export default function HomeScreen() {
   const renderChat = (item: ConversationRow) => (
     <Pressable
       key={item.id}
-      style={[styles.chatItem]}
+      style={[styles.chatItem, (() => {
+        const me = meRef.current; if (!me) return null;
+        const meRole: 'buyer' | 'vendor' = item.vendorId === me.id ? 'vendor' : 'buyer';
+        const unread = !!item.lastMessage && item.lastMessage.senderRole !== meRole && !readSet.has(item.id);
+        return unread ? styles.chatItemUnread : null;
+      })()]}
       onPress={async () => {
         const me = meRef.current; if (!me) return;
         const role: 'buyer' | 'vendor' = item.vendorId === me.id ? 'vendor' : 'buyer';
+        setReadSet((prev) => new Set([...Array.from(prev), item.id]));
         navigation.navigate('ChatDetail', { chatId: item.id, name: item.otherPartyName, role, productName: item.productName || undefined, productId: item.productId });
       }}
     >
       <View style={styles.chatLeft}>
-        <View style={styles.chatAvatar}><Text style={styles.chatAvatarText}>{item.otherPartyName?.charAt(0) || '💬'}</Text></View>
+        <View style={styles.chatAvatar}>
+          {(() => {
+            const p = item.otherPartyAvatar || '';
+            if (p) {
+              const uri = p.startsWith('http') || p.startsWith('data:') || p.startsWith('file:') ? p : `${API_BASE}${p.startsWith('/') ? p : `/${p}`}`;
+              return <Image source={{ uri }} style={{ width: 44, height: 44 }} />
+            }
+            return <Text style={styles.chatAvatarText}>{(item.otherPartyName || 'U').charAt(0).toUpperCase()}</Text>
+          })()}
+        </View>
         <View style={styles.chatBody}>
           <View style={styles.chatTitleRow}>
             <Text style={styles.chatTitle} numberOfLines={1}>{item.otherPartyName}</Text>
@@ -556,7 +574,7 @@ export default function HomeScreen() {
             <Pressable
               style={[styles.profRow, { borderColor: '#FFE4E6', backgroundColor: '#FFF1F2' }]}
               onPress={async () => {
-                try { await userSession.clearSession(); } catch {}
+                try { await userSession.clearAll(); } catch {}
                 // Navigate to Login; global guard will keep unauthenticated users on auth screens
                 // @ts-ignore
                 navigation.navigate('Login');
@@ -1107,9 +1125,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#EFEFEF',
   },
-  chatItemUnread: { borderColor: colors.accent, shadowColor: '#000', shadowOpacity: 0.04, shadowRadius: 4, elevation: 1 },
+  // unread state highlighted with orange border
   chatLeft: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  chatAvatar: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#F5F5F5', alignItems: 'center', justifyContent: 'center' },
+  chatAvatar: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#F5F5F5', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
   chatAvatarText: { fontSize: 22 },
   chatBody: { flex: 1 },
   chatTitleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 },
@@ -1119,6 +1137,7 @@ const styles = StyleSheet.create({
   chatMetaRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   chatSnippet: { fontSize: 12, color: colors.muted, flex: 1 },
   chatSnippetUnread: { color: colors.text, fontWeight: '600' },
+  chatItemUnread: { borderColor: '#F59E0B' },
   chatStatusBadge: { borderRadius: 999, paddingHorizontal: 8, paddingVertical: 2, marginRight: 8 },
   chatStatusText: { fontSize: 10, fontWeight: '700', color: 'white' },
   statusUnpaid: { backgroundColor: '#EF4444' },
