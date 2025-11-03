@@ -20,10 +20,19 @@ import { getSupabase } from '../../services/realtime';
  type Message = {
    id: string;
    sender: 'buyer' | 'vendor' | 'bot';
+   senderId?: string;
+   senderAvatar?: string;
    text?: string;
    createdAt: number;
    invoice?: Invoice;
   deleted?: boolean;
+  isSystem?: boolean;
+  productAttachment?: {
+    id: string;
+    name: string;
+    price: number;
+    image?: string;
+  };
  };
 
  type Invoice = {
@@ -54,6 +63,7 @@ import { getSupabase } from '../../services/realtime';
 
   const [messages, setMessages] = useState<Message[]>(initialIntent ? [initialIntent] : []);
   const [loading, setLoading] = useState(false);
+  const [otherPartyAvatar, setOtherPartyAvatar] = useState<string | null>(null);
   const sentInitial = useRef<boolean>(false);
 
   // Load messages and optionally send initial intent
@@ -63,16 +73,29 @@ import { getSupabase } from '../../services/realtime';
       if (!chatId) return;
       setLoading(true);
       try {
+        // Fetch conversation details for avatar
+        const me = await userSession.getCurrentUser();
+        if (me) {
+          const convResp = await apiGet(`/chats/list?userId=${encodeURIComponent(me.id)}&limit=100`);
+          if (convResp.ok && convResp.data) {
+            const convs = (convResp.data as any).conversations as any[];
+            const thisConv = convs.find((c: any) => c.id === chatId);
+            if (thisConv?.otherPartyAvatar) {
+              setOtherPartyAvatar(thisConv.otherPartyAvatar);
+            }
+          }
+        }
+
         // Persist initial intent exactly once, only for buyer Buy flow
         if (shouldSeed && initialIntent && !sentInitial.current) {
           try {
-            const me = await userSession.getCurrentUser();
             if (me) {
               await apiPost('/chats/messages', {
                 conversationId: chatId,
                 senderId: me.id,
                 senderRole: role,
                 body: initialIntent.text,
+                productId: productId || null,
               });
               sentInitial.current = true;
             }
@@ -81,12 +104,63 @@ import { getSupabase } from '../../services/realtime';
         const resp = await apiGet(`/chats/messages?conversationId=${encodeURIComponent(chatId)}&limit=200`);
         if (mounted && resp.ok && resp.data) {
           const rows = (resp.data as any).messages as any[];
+          
+          // Collect unique product IDs and sender IDs to fetch
+          const productIds = Array.from(new Set(rows.map((r: any) => r.product_id).filter(Boolean)));
+          const senderIds = Array.from(new Set(rows.map((r: any) => r.sender_id).filter(Boolean)));
+          const productMap = new Map();
+          const avatarMap = new Map();
+          
+          // Fetch all product details
+          if (productIds.length > 0) {
+            await Promise.all(
+              productIds.map(async (pid: string) => {
+                try {
+                  const pResp = await apiGet(`/products/detail?id=${encodeURIComponent(pid)}`);
+                  if (pResp.ok && pResp.data) {
+                    const p = (pResp.data as any)?.product;
+                    if (p) {
+                      const img = Array.isArray(p.images) && p.images[0]
+                        ? (p.images[0].startsWith('http') || p.images[0].startsWith('data:') || p.images[0].startsWith('file:')
+                            ? p.images[0]
+                            : `${API_BASE}${p.images[0].startsWith('/') ? p.images[0] : `/${p.images[0]}`}`)
+                        : undefined;
+                      productMap.set(pid, { id: p.id, name: p.name, price: (typeof p.price === 'number' ? p.price : 0), image: img });
+                    }
+                  }
+                } catch {}
+              })
+            );
+          }
+
+          // Fetch sender outlet info for avatars
+          if (senderIds.length > 0) {
+            try {
+              const outletResp = await apiGet(`/outlets/list?limit=100`);
+              if (outletResp.ok && outletResp.data) {
+                const outlets = (outletResp.data as any).outlets || [];
+                outlets.forEach((outlet: any) => {
+                  if (outlet.owner_id && outlet.face_of_brand_path) {
+                    const avatar = outlet.face_of_brand_path.startsWith('http') || outlet.face_of_brand_path.startsWith('data:') || outlet.face_of_brand_path.startsWith('file:')
+                      ? outlet.face_of_brand_path
+                      : `${API_BASE}${outlet.face_of_brand_path}`;
+                    avatarMap.set(outlet.owner_id, avatar);
+                  }
+                });
+              }
+            } catch {}
+          }
+
           const mapped: Message[] = (rows || []).map((r) => ({
             id: r.id,
             sender: (r.sender_role === 'buyer' || r.sender_role === 'vendor' || r.sender_role === 'bot') ? r.sender_role : 'buyer',
+            senderId: r.sender_id,
+            senderAvatar: avatarMap.has(r.sender_id) ? avatarMap.get(r.sender_id) : undefined,
             text: r.body || '',
             createdAt: r.created_at ? new Date(r.created_at).getTime() : Date.now(),
             deleted: !!r.deleted,
+            isSystem: r.kind === 'system',
+            productAttachment: r.product_id && productMap.has(r.product_id) ? productMap.get(r.product_id) : undefined,
           }));
           setMessages(mapped);
           requestAnimationFrame(() => listRef.current?.scrollToEnd({ animated: false }));
@@ -112,10 +186,12 @@ import { getSupabase } from '../../services/realtime';
             ? p.images[0]
             : `${API_BASE}${p.images[0].startsWith('/') ? p.images[0] : `/${p.images[0]}`}`)
         : undefined;
-      setProdCard({ id: p.id, name: p.name, price: p.price, image: img });
+  setProdCard({ id: p.id, name: p.name, price: (typeof p.price === 'number' ? p.price : 0), image: img });
     })();
     return () => { active = false; };
   }, [productId]);
+
+  
 
   // Realtime: listen for new messages
   useEffect(() => {
@@ -127,22 +203,57 @@ import { getSupabase } from '../../services/realtime';
         if (!m) return;
         setMessages((prev) => {
           if (prev.find((x) => x.id === m.id)) return prev;
-          return [...prev, {
+          const msg: Message = {
             id: m.id,
             sender: (m.sender_role === 'buyer' || m.sender_role === 'vendor' || m.sender_role === 'bot') ? m.sender_role : 'buyer',
+            senderId: m.sender_id,
+            senderAvatar: (m.sender_role !== role && otherPartyAvatar) ? otherPartyAvatar : undefined,
             text: m.body || '',
             createdAt: m.created_at ? new Date(m.created_at).getTime() : Date.now(),
             deleted: !!m.deleted,
-          }];
+          };
+          return [...prev, msg];
         });
         requestAnimationFrame(() => listRef.current?.scrollToEnd({ animated: true }));
+        // If product attached, fetch details and enrich message
+        if (m.product_id) {
+          (async () => {
+            try {
+              const pResp = await apiGet(`/products/detail?id=${encodeURIComponent(m.product_id)}`);
+              if (pResp.ok && pResp.data) {
+                const p = (pResp.data as any)?.product;
+                if (p) {
+                  const img = Array.isArray(p.images) && p.images[0]
+                    ? (p.images[0].startsWith('http') || p.images[0].startsWith('data:') || p.images[0].startsWith('file:')
+                        ? p.images[0]
+                        : `${API_BASE}${p.images[0].startsWith('/') ? p.images[0] : `/${p.images[0]}`}`)
+                    : undefined;
+                  const attach = { id: p.id, name: p.name, price: p.price, image: img };
+                  setMessages((prev) => prev.map((mm) => mm.id === m.id ? { ...mm, productAttachment: attach } : mm));
+                }
+              }
+            } catch {}
+          })();
+        }
       })
       .subscribe();
     return () => { try { sb.removeChannel(channel); } catch {} };
   }, [chatId]);
 
   const [composer, setComposer] = useState('');
-  const [prodCard, setProdCard] = useState<{ id: string; name: string; price?: number; image?: string } | null>(null);
+  const [attachedProduct, setAttachedProduct] = useState<{ id: string; name: string; price: number; image?: string } | null>(null);
+  const [prodCard, setProdCard] = useState<{ id: string; name: string; price: number; image?: string } | null>(null);
+
+  // If we optimistically seeded an initial message but without productAttachment, add it once product loads
+  useEffect(() => {
+    if (!prodCard) return;
+    setMessages((prev) => prev.map((m) => {
+      if (m.id.startsWith('m-intent-') && !m.productAttachment) {
+        return { ...m, productAttachment: { id: prodCard.id, name: prodCard.name, price: prodCard.price, image: prodCard.image } } as Message;
+      }
+      return m;
+    }));
+  }, [prodCard]);
   const [invExpectedDate, setInvExpectedDate] = useState<Date | null>(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showInvoiceForm, setShowInvoiceForm] = useState(false);
@@ -162,21 +273,31 @@ import { getSupabase } from '../../services/realtime';
   }, [invPrice, invDeliveryFee]);
 
    const sendText = async () => {
-     const trimmed = composer.trim();
+     const base = composer.trim();
+     const trimmed = base.length ? base : (attachedProduct ? 'Interested in this product' : '');
      if (!trimmed || !chatId) return;
+     const productToAttach = attachedProduct;
      setComposer('');
+     setAttachedProduct(null);
      try {
        const me = await userSession.getCurrentUser();
        if (!me) return;
        // Optimistic update
        const tempId = `m-${Date.now()}`;
-       setMessages((prev) => [...prev, { id: tempId, sender: role, text: trimmed, createdAt: Date.now() }]);
+       setMessages((prev) => [...prev, { 
+         id: tempId, 
+         sender: role, 
+         text: trimmed, 
+         createdAt: Date.now(),
+         productAttachment: productToAttach || undefined,
+       }]);
        requestAnimationFrame(() => listRef.current?.scrollToEnd({ animated: true }));
        const resp = await apiPost('/chats/messages', {
          conversationId: chatId,
          senderId: me.id,
          senderRole: role,
          body: trimmed,
+         productId: productToAttach?.id || null,
        });
        if (!resp.ok) {
          // Revert optimistic message on failure
@@ -399,6 +520,17 @@ import { getSupabase } from '../../services/realtime';
    );
 
   const renderItem = ({ item }: { item: Message }) => {
+    // System messages render differently - centered and gray
+    if (item.isSystem) {
+      return (
+        <View style={styles.systemMessageContainer}>
+          <View style={styles.systemMessageBubble}>
+            <Text style={styles.systemMessageText}>{item.text}</Text>
+          </View>
+        </View>
+      );
+    }
+
     const isMe = item.sender === role;
     const onLongPress = () => {
       if (!isMe || item.deleted) return;
@@ -420,7 +552,11 @@ import { getSupabase } from '../../services/realtime';
       <Pressable ref={(r) => { messageRefs.current[item.id] = r; }} style={[styles.bubbleRow, isMe ? styles.rowRight : styles.rowLeft]} onLongPress={onLongPress} delayLongPress={300}>
          {!isMe && (
            <View style={styles.avatarCircle}>
-             {item.sender === 'vendor' ? <Text style={styles.avatarEmoji}>🏪</Text> : item.sender === 'bot' ? <Text style={styles.avatarEmoji}>🤖</Text> : <Text style={styles.avatarEmoji}>🧑</Text>}
+             {item.senderAvatar ? (
+               <Image source={{ uri: item.senderAvatar }} style={styles.avatarImage} />
+             ) : (
+               item.sender === 'vendor' ? <Text style={styles.avatarEmoji}>🏪</Text> : item.sender === 'bot' ? <Text style={styles.avatarEmoji}>🤖</Text> : <Text style={styles.avatarEmoji}>🧑</Text>
+             )}
            </View>
          )}
          <View style={[styles.bubble, isMe ? styles.bubbleMe : styles.bubbleOther]}>
@@ -428,6 +564,30 @@ import { getSupabase } from '../../services/realtime';
             <Text style={styles.deletedText}>This message has been deleted</Text>
           ) : (
             <>
+              {item.productAttachment ? (
+                <Pressable 
+                  style={styles.messageProductCard}
+                  onPress={() => navigation.navigate('ProductDetail', { 
+                    productId: item.productAttachment!.id, 
+                    productName: item.productAttachment!.name 
+                  })}
+                >
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                    {item.productAttachment.image ? (
+                      <Image source={{ uri: item.productAttachment.image }} style={styles.messageProductThumb} resizeMode="cover" />
+                    ) : (
+                      <View style={[styles.messageProductThumb, { alignItems: 'center', justifyContent: 'center', backgroundColor: '#F5F5F5' }]}>
+                        <Text>🛍️</Text>
+                      </View>
+                    )}
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.messageProductName}>{item.productAttachment.name}</Text>
+                      <Text style={styles.messageProductPrice}>NGN {item.productAttachment.price?.toLocaleString() || 0}</Text>
+                    </View>
+                    <FontAwesome5 name="chevron-right" size={12} color={colors.muted} />
+                  </View>
+                </Pressable>
+              ) : null}
               {item.text ? <Text style={styles.bubbleText}>{item.text}</Text> : null}
               {item.invoice ? renderInvoice(item.invoice) : null}
             </>
@@ -468,12 +628,115 @@ import { getSupabase } from '../../services/realtime';
         <Pressable onPress={() => navigation.goBack()} style={{ padding: 8 }}>
           <FontAwesome5 name="chevron-left" size={18} color={colors.text} />
         </Pressable>
-        <Text style={styles.headerTitle}>{route.params?.name || 'Chat'}</Text>
+        <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+          {otherPartyAvatar ? (
+            <Image 
+              source={{ uri: otherPartyAvatar.startsWith('http') || otherPartyAvatar.startsWith('data:') || otherPartyAvatar.startsWith('file:') ? otherPartyAvatar : `${API_BASE}${otherPartyAvatar}` }} 
+              style={styles.headerAvatar} 
+            />
+          ) : (
+            <View style={styles.headerAvatarPlaceholder}>
+              <Text style={{ fontSize: 14 }}>👤</Text>
+            </View>
+          )}
+          <Text style={styles.headerTitle}>{route.params?.name || 'Chat'}</Text>
+        </View>
         <View style={{ width: 40 }} />
       </View>
 
       {/* Content + Composer inside KAV for WhatsApp-like behavior */}
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.select({ ios: 'padding', android: 'height' })} keyboardVerticalOffset={80}>
+        {/* Optional invoice composer header */}
+        {role === 'vendor' && showInvoiceForm ? (
+          <View style={styles.invoiceComposer}>
+            <Text style={styles.invTitle}>Create Invoice</Text>
+            <View style={styles.invFieldRow}>
+              <Text style={styles.invLabel}>Product</Text>
+              <TextInput
+                style={styles.invInput}
+                placeholder="Product name"
+                placeholderTextColor={colors.muted}
+                value={invProduct}
+                onChangeText={setInvProduct}
+              />
+            </View>
+            <View style={styles.invFieldRow}>
+              <Text style={styles.invLabel}>Price</Text>
+              <TextInput
+                style={styles.invInput}
+                placeholder="0"
+                keyboardType="decimal-pad"
+                placeholderTextColor={colors.muted}
+                value={invPrice}
+                onChangeText={setInvPrice}
+              />
+            </View>
+            <View style={styles.invFieldRow}>
+              <Text style={styles.invLabel}>Delivery Fee</Text>
+              <TextInput
+                style={styles.invInput}
+                placeholder="0"
+                keyboardType="decimal-pad"
+                placeholderTextColor={colors.muted}
+                value={invDeliveryFee}
+                onChangeText={setInvDeliveryFee}
+              />
+            </View>
+            <View style={styles.invFieldRow}>
+              <Text style={styles.invLabel}>Expected Delivery Date</Text>
+              <Pressable style={styles.invInput} onPress={() => setShowDatePicker(true)}>
+                <Text style={{ color: invExpectedDate ? colors.text : colors.muted }}>
+                  {invExpectedDate ? invExpectedDate.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : 'Select date'}
+                </Text>
+              </Pressable>
+              {showDatePicker && Platform.OS !== 'web' ? (() => {
+                const Picker = require('@react-native-community/datetimepicker').default;
+                return (
+                  <Picker
+                    value={invExpectedDate || new Date()}
+                    mode="date"
+                    display={Platform.OS === 'ios' ? 'inline' : 'default'}
+                    onChange={(event: any, date?: Date) => {
+                      if (Platform.OS !== 'ios') setShowDatePicker(false);
+                      if (!date) return;
+                      if (isPastDate(date)) {
+                        Alert.alert('Wow You cant go back in time in our world, the date is bbehind');
+                        return;
+                      }
+                      setInvExpectedDate(date);
+                      if (Platform.OS === 'ios') setShowDatePicker(false);
+                    }}
+                  />
+                );
+              })() : null}
+            </View>
+            <View style={styles.invFieldRow}>
+              <Text style={styles.invLabel}>Buyer Delivery Address</Text>
+              <TextInput
+                style={styles.invInput}
+                placeholder="Street, City, State"
+                placeholderTextColor={colors.muted}
+                value={invAddress}
+                onChangeText={setInvAddress}
+                multiline
+              />
+            </View>
+            <View style={styles.invTotalRow}>
+              <Text style={styles.invTotalLabel}>Total</Text>
+              <Text style={styles.invTotalValue}>NGN {invTotal}</Text>
+            </View>
+            <View style={styles.invActions}>
+              <Pressable style={[styles.invBtn, styles.invCancel]} onPress={() => setShowInvoiceForm(false)}>
+                <Text style={styles.invBtnText}>Cancel</Text>
+              </Pressable>
+              <Pressable style={[styles.invBtn, styles.invSend]} onPress={sendInvoice}>
+                <FontAwesome5 name="file-invoice-dollar" color={'white'} size={12} />
+                <Text style={[styles.invBtnText, { color: 'white' }]}>Send Invoice</Text>
+              </Pressable>
+            </View>
+          </View>
+        ) : null}
+
         {/* Messages */}
         <FlatList
           ref={listRef}
@@ -483,141 +746,55 @@ import { getSupabase } from '../../services/realtime';
           contentContainerStyle={[styles.listContent, { paddingBottom: composerHeight + 8 }]}
           onContentSizeChange={() => listRef.current?.scrollToEnd({ animated: true })}
           onLayout={() => listRef.current?.scrollToEnd({ animated: false })}
-          ListHeaderComponent={(
-            <>
-              {prodCard ? (
-                <View style={[styles.bubbleRow, styles.rowLeft]}>
-                  <View style={styles.avatarCircle}><Text style={styles.avatarEmoji}>🏪</Text></View>
-                  <View style={[styles.bubble, styles.bubbleOther]}>
-                    <View style={styles.productSummary}>
-                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-                        {prodCard.image ? (
-                          <Image source={{ uri: prodCard.image }} style={styles.productThumb} resizeMode="cover" />
-                        ) : (
-                          <View style={[styles.productThumb, { alignItems: 'center', justifyContent: 'center', backgroundColor: '#F5F5F5' }]}><Text>🛍️</Text></View>
-                        )}
-                        <View style={{ flex: 1 }}>
-                          <Text style={styles.prodName} numberOfLines={1}>{prodCard.name}</Text>
-                          {typeof prodCard.price === 'number' ? <Text style={styles.prodPrice}>NGN {prodCard.price}</Text> : null}
-                        </View>
-                        <Pressable style={styles.viewBtn} onPress={() => navigation.navigate('ProductDetail', { productId: prodCard.id, productName: prodCard.name })}>
-                          <Text style={styles.viewBtnText}>View product</Text>
-                        </Pressable>
-                      </View>
-                    </View>
-                  </View>
-                </View>
-              ) : null}
-              {role === 'vendor' && showInvoiceForm ? (
-                <View style={styles.invoiceComposer}>
-                <Text style={styles.invTitle}>Create Invoice</Text>
-                <View style={styles.invFieldRow}>
-                  <Text style={styles.invLabel}>Product</Text>
-                  <TextInput
-                    style={styles.invInput}
-                    placeholder="Product name"
-                    placeholderTextColor={colors.muted}
-                    value={invProduct}
-                    onChangeText={setInvProduct}
-                  />
-                </View>
-                <View style={styles.invFieldRow}>
-                  <Text style={styles.invLabel}>Price</Text>
-                  <TextInput
-                    style={styles.invInput}
-                    placeholder="0"
-                    keyboardType="decimal-pad"
-                    placeholderTextColor={colors.muted}
-                    value={invPrice}
-                    onChangeText={setInvPrice}
-                  />
-                </View>
-                <View style={styles.invFieldRow}>
-                  <Text style={styles.invLabel}>Delivery Fee</Text>
-                  <TextInput
-                    style={styles.invInput}
-                    placeholder="0"
-                    keyboardType="decimal-pad"
-                    placeholderTextColor={colors.muted}
-                    value={invDeliveryFee}
-                    onChangeText={setInvDeliveryFee}
-                  />
-                </View>
-                <View style={styles.invFieldRow}>
-                  <Text style={styles.invLabel}>Expected Delivery Date</Text>
-                  <Pressable style={styles.invInput} onPress={() => setShowDatePicker(true)}>
-                    <Text style={{ color: invExpectedDate ? colors.text : colors.muted }}>
-                      {invExpectedDate ? invExpectedDate.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : 'Select date'}
-                    </Text>
-                  </Pressable>
-                  {showDatePicker && Platform.OS !== 'web' ? (() => {
-                    const Picker = require('@react-native-community/datetimepicker').default;
-                    return (
-                      <Picker
-                        value={invExpectedDate || new Date()}
-                        mode="date"
-                        display={Platform.OS === 'ios' ? 'inline' : 'default'}
-                        onChange={(event: any, date?: Date) => {
-                          if (Platform.OS !== 'ios') setShowDatePicker(false);
-                          if (!date) return;
-                          if (isPastDate(date)) {
-                            Alert.alert('Wow You cant go back in time in our world, the date is bbehind');
-                            return;
-                          }
-                          setInvExpectedDate(date);
-                          if (Platform.OS === 'ios') setShowDatePicker(false);
-                        }}
-                      />
-                    );
-                  })() : null}
-                </View>
-                <View style={styles.invFieldRow}>
-                  <Text style={styles.invLabel}>Buyer Delivery Address</Text>
-                  <TextInput
-                    style={styles.invInput}
-                    placeholder="Street, City, State"
-                    placeholderTextColor={colors.muted}
-                    value={invAddress}
-                    onChangeText={setInvAddress}
-                    multiline
-                  />
-                </View>
-                <View style={styles.invTotalRow}>
-                  <Text style={styles.invTotalLabel}>Total</Text>
-                  <Text style={styles.invTotalValue}>NGN {invTotal}</Text>
-                </View>
-                <View style={styles.invActions}>
-                  <Pressable style={[styles.invBtn, styles.invCancel]} onPress={() => setShowInvoiceForm(false)}>
-                    <Text style={styles.invBtnText}>Cancel</Text>
-                  </Pressable>
-                  <Pressable style={[styles.invBtn, styles.invSend]} onPress={sendInvoice}>
-                    <FontAwesome5 name="file-invoice-dollar" color={'white'} size={12} />
-                    <Text style={[styles.invBtnText, { color: 'white' }]}>Send Invoice</Text>
-                  </Pressable>
-                </View>
-                </View>
-              ) : null}
-            </>
-          )}
         />
 
         {/* Composer */}
-        <View style={styles.composerBar} onLayout={(e) => setComposerHeight(e.nativeEvent.layout.height)}>
-          {role === 'vendor' && (
-            <Pressable style={styles.iconBtn} onPress={() => setShowInvoiceForm((s) => !s)}>
-              <FontAwesome5 name="file-invoice-dollar" size={16} color={colors.accent} />
+        <View style={{ backgroundColor: colors.background }}>
+          {/* Product attachment preview */}
+          {attachedProduct ? (
+            <Pressable style={styles.attachmentPreview} onPress={sendText}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 }}>
+                {attachedProduct.image ? (
+                  <Image source={{ uri: attachedProduct.image }} style={styles.attachmentThumb} />
+                ) : (
+                  <View style={[styles.attachmentThumb, { backgroundColor: '#F5F5F5', alignItems: 'center', justifyContent: 'center' }]}>
+                    <Text>🛍️</Text>
+                  </View>
+                )}
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.attachmentName} numberOfLines={1}>{attachedProduct.name}</Text>
+                  <Text style={styles.attachmentPrice}>NGN {attachedProduct.price.toLocaleString()}</Text>
+                </View>
+              </View>
+              <Pressable onPress={() => setAttachedProduct(null)} style={{ padding: 4 }}>
+                <FontAwesome5 name="times" size={14} color={colors.muted} />
+              </Pressable>
             </Pressable>
-          )}
-          <TextInput
-            style={styles.input}
-            placeholder="Type a message"
-            placeholderTextColor={colors.muted}
-            value={composer}
-            onChangeText={setComposer}
-          />
-          <Pressable style={styles.sendBtn} onPress={sendText}>
-            <FontAwesome5 name="paper-plane" color={'white'} size={14} />
-          </Pressable>
+          ) : null}
+          
+          <View style={styles.composerBar} onLayout={(e) => setComposerHeight(e.nativeEvent.layout.height)}>
+            {role === 'vendor' && (
+              <Pressable style={styles.iconBtn} onPress={() => setShowInvoiceForm((s) => !s)}>
+                <FontAwesome5 name="file-invoice-dollar" size={16} color={colors.accent} />
+              </Pressable>
+            )}
+            {/* Attach product button */}
+            {prodCard && !attachedProduct ? (
+              <Pressable style={styles.iconBtn} onPress={() => setAttachedProduct(prodCard as any)}>
+                <FontAwesome5 name="paperclip" size={16} color={colors.accent} />
+              </Pressable>
+            ) : null}
+            <TextInput
+              style={styles.input}
+              placeholder="Type a message"
+              placeholderTextColor={colors.muted}
+              value={composer}
+              onChangeText={setComposer}
+            />
+            <Pressable style={styles.sendBtn} onPress={sendText}>
+              <FontAwesome5 name="paper-plane" color={'white'} size={14} />
+            </Pressable>
+          </View>
         </View>
       </KeyboardAvoidingView>
      </SafeAreaView>
@@ -633,7 +810,9 @@ import { getSupabase } from '../../services/realtime';
   viewBtn: { backgroundColor: '#F0F0F0', paddingHorizontal: 10, paddingVertical: 8, borderRadius: 8 },
   viewBtnText: { fontSize: 12, fontWeight: '700', color: colors.text },
    header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#F0F0F0' },
-   headerTitle: { flex: 1, textAlign: 'center', fontSize: 15, fontWeight: '700', color: colors.text },
+   headerTitle: { fontSize: 15, fontWeight: '700', color: colors.text },
+   headerAvatar: { width: 32, height: 32, borderRadius: 16, overflow: 'hidden' },
+   headerAvatarPlaceholder: { width: 32, height: 32, borderRadius: 16, backgroundColor: '#F5F5F5', alignItems: 'center', justifyContent: 'center' },
 
    listContent: { padding: 16, paddingBottom: 100 },
   invoiceComposer: { backgroundColor: 'white', borderRadius: 12, padding: 12, borderWidth: 1, borderColor: '#EFEFEF', margin: 16 },
@@ -652,12 +831,19 @@ import { getSupabase } from '../../services/realtime';
    bubbleRow: { flexDirection: 'row', marginBottom: 10, alignItems: 'flex-end' },
    rowLeft: { justifyContent: 'flex-start' },
    rowRight: { justifyContent: 'flex-end' },
-   avatarCircle: { width: 32, height: 32, borderRadius: 16, backgroundColor: '#F5F5F5', alignItems: 'center', justifyContent: 'center', marginRight: 8 },
+   avatarCircle: { width: 32, height: 32, borderRadius: 16, backgroundColor: '#F5F5F5', alignItems: 'center', justifyContent: 'center', marginRight: 8, overflow: 'hidden' },
+   avatarImage: { width: 32, height: 32, borderRadius: 16 },
    avatarEmoji: { fontSize: 16 },
    bubble: { maxWidth: '78%', paddingHorizontal: 12, paddingVertical: 10, borderRadius: 12 },
    bubbleMe: { backgroundColor: '#F0F7FF', borderTopRightRadius: 4, borderWidth: 1, borderColor: '#E3F2FF' },
    bubbleOther: { backgroundColor: '#F8F8F8', borderTopLeftRadius: 4, borderWidth: 1, borderColor: '#EFEFEF' },
    bubbleText: { fontSize: 13, color: colors.text },
+
+   // Product attachment in messages
+   messageProductCard: { backgroundColor: '#FFF7ED', borderRadius: 10, padding: 10, borderWidth: 1, borderColor: '#FDBA74', marginBottom: 6 },
+   messageProductThumb: { width: 50, height: 50, borderRadius: 8 },
+   messageProductName: { fontSize: 13, fontWeight: '600', color: colors.text },
+   messageProductPrice: { fontSize: 12, color: colors.accent, fontWeight: '700', marginTop: 2 },
 
    // Invoice
    invoiceCard: { backgroundColor: 'white', borderRadius: 12, padding: 12, borderWidth: 1, borderColor: '#EFEFEF', marginTop: 6 },
@@ -683,8 +869,21 @@ import { getSupabase } from '../../services/realtime';
   iconBtn: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
    input: { flex: 1, backgroundColor: '#F5F5F5', borderRadius: 12, paddingHorizontal: 12, paddingVertical: 10, fontSize: 14, color: colors.text },
    sendBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: colors.accent, alignItems: 'center', justifyContent: 'center' },
+  
+  // Attachment preview
+  attachmentPreview: { flexDirection: 'row', alignItems: 'center', padding: 12, backgroundColor: '#FFF7ED', borderTopWidth: 1, borderTopColor: '#FDBA74', gap: 8 },
+  attachmentThumb: { width: 40, height: 40, borderRadius: 8 },
+  attachmentName: { fontSize: 13, fontWeight: '600', color: colors.text },
+  attachmentPrice: { fontSize: 11, color: colors.accent, fontWeight: '700', marginTop: 2 },
+
   // Deleted message and context menu
   deletedText: { fontSize: 12, color: '#9CA3AF', fontStyle: 'italic' },
+  
+  // System messages
+  systemMessageContainer: { alignItems: 'center', marginVertical: 8 },
+  systemMessageBubble: { backgroundColor: '#E5E7EB', borderRadius: 10, paddingHorizontal: 14, paddingVertical: 8, maxWidth: '70%' },
+  systemMessageText: { fontSize: 12, color: '#6B7280', textAlign: 'center' },
+
   menuOverlay: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 20 },
   contextMenu: { position: 'absolute', width: 120, backgroundColor: 'white', borderRadius: 8, borderWidth: 1, borderColor: '#E5E7EB', shadowColor: '#000', shadowOpacity: 0.15, shadowRadius: 6, elevation: 6 },
   menuItem: { paddingVertical: 8, paddingHorizontal: 12 },

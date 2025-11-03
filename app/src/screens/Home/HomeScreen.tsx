@@ -575,9 +575,12 @@ export default function HomeScreen() {
               style={[styles.profRow, { borderColor: '#FFE4E6', backgroundColor: '#FFF1F2' }]}
               onPress={async () => {
                 try { await userSession.clearAll(); } catch {}
-                // Navigate to Login; global guard will keep unauthenticated users on auth screens
+                // Reset navigation stack to Login to clear all state
                 // @ts-ignore
-                navigation.navigate('Login');
+                navigation.reset({
+                  index: 0,
+                  routes: [{ name: 'Login' }],
+                });
               }}
             >
               <Text style={[styles.profRowText, { color: '#B91C1C' }]}>Logout</Text>

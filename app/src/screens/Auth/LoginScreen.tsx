@@ -80,7 +80,11 @@ export default function LoginScreen({ navigation }: any) {
                   if (resp.ok && resp.data) {
                     const { user, token } = resp.data as any;
                     await userSession.setSession({ user, token });
-                    navigation.navigate('Home');
+                    // Reset navigation to Home to clear all previous state
+                    navigation.reset({
+                      index: 0,
+                      routes: [{ name: 'Home' }],
+                    });
                     return;
                   }
                   // Surface server-provided error, else generic
