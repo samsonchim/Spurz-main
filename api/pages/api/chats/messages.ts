@@ -30,7 +30,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (req.method === 'POST') {
     try {
-      const { conversationId, senderId, senderRole, body } = req.body || {}
+      const { conversationId, senderId, senderRole, body, productId } = req.body || {}
       if (!conversationId || !senderId || !senderRole || !body) {
         return res.status(400).json({ ok: false, error: 'conversationId, senderId, senderRole, body are required' })
       }
@@ -42,6 +42,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         p_sender_id: senderId,
         p_sender_role: senderRole,
         p_body: String(body),
+        p_product_id: productId || null,
       })
       if (error) return res.status(500).json({ ok: false, error: 'Failed to send message' })
       return res.status(200).json({ ok: true, messageId: data })

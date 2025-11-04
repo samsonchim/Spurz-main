@@ -7,6 +7,8 @@ import {
   useFonts,
   Poppins_900Black,
 } from '@expo-google-fonts/poppins';
+import { GlobalLoadingProvider } from './store/globalLoading';
+import { GlobalPopupProvider } from './store/globalPopup';
 
 export default function AppRoot() {
   // Always declare hooks in the same order before any returns
@@ -39,6 +41,18 @@ export default function AppRoot() {
   }, [fontsLoaded]);
 
   if (!fontsLoaded) return null;
-  if (!done) return <OnboardingScreen onDone={() => setDone(true)} />;
-  return <RootNavigator />;
+  if (!done) return (
+    <GlobalPopupProvider>
+      <GlobalLoadingProvider>
+        <OnboardingScreen onDone={() => setDone(true)} />
+      </GlobalLoadingProvider>
+    </GlobalPopupProvider>
+  );
+  return (
+    <GlobalPopupProvider>
+      <GlobalLoadingProvider>
+        <RootNavigator />
+      </GlobalLoadingProvider>
+    </GlobalPopupProvider>
+  );
 }

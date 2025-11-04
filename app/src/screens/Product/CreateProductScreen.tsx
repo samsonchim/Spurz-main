@@ -11,12 +11,13 @@ import { apiGet, apiPost } from '../../services/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { userSession } from '../../services/userSession';
 import LoadingSpinner from '../../components/LoadingSpinner';
-import ErrorPopup from '../../components/ErrorPopup';
+import { useGlobalPopup } from '../../store/globalPopup';
 
 type Nav = NativeStackNavigationProp<RootStackParamList, 'CreateProduct'>;
 
 export default function CreateProductScreen() {
   const navigation = useNavigation<Nav>();
+  const popup = useGlobalPopup();
   const [title, setTitle] = useState('');
   const [desc, setDesc] = useState('');
   const [priceStr, setPriceStr] = useState('');
@@ -29,13 +30,11 @@ export default function CreateProductScreen() {
   const [quantity, setQuantity] = useState('');
   // color and size removed; stock quantity will be placed in their area
   const [condition, setCondition] = useState<string>('new');
-  const [errVisible, setErrVisible] = useState(false);
-  const [errMsg, setErrMsg] = useState('');
 
   const addPhoto = async () => {
     try {
       const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (!perm.granted) { Alert.alert('Permission needed', 'Allow media access to pick images.'); return; }
+  if (!perm.granted) { popup.info('Allow media access to pick images.', 'Permission needed'); return; }
 
       const remaining = Math.max(0, 10 - photos.length);
       if (remaining === 0) return;
@@ -102,8 +101,7 @@ export default function CreateProductScreen() {
 
   const handleCreate = async () => {
     if (!canSave) { 
-      setErrMsg('Please fill in the product title and valid price');
-      setErrVisible(true);
+      popup.info('Please fill in the product title and valid price');
       return; 
     }
     
@@ -113,16 +111,14 @@ export default function CreateProductScreen() {
       const token = await userSession.getToken();
       
       if (!user || !token) {
-        setErrMsg('Please log in to create products');
-        setErrVisible(true);
+        popup.info('Please log in to create products');
         return;
       }
 
       // Get outlet ID for the user
       const outletResponse = await apiGet(`/outlets/my-outlet?userId=${user.id}`, token);
       if (!outletResponse.ok || !outletResponse.data?.outlet) {
-        setErrMsg('You need to create an outlet first');
-        setErrVisible(true);
+        popup.info('You need to create an outlet first');
         return;
       }
 
@@ -144,19 +140,16 @@ export default function CreateProductScreen() {
       const response = await apiPost('/products/create', productData, token);
       
       if (!response.ok) {
-        setErrMsg(response.error || 'Failed to create product');
-        setErrVisible(true);
+        popup.error(response.error || 'Failed to create product');
         return;
       }
 
       // flag dashboard to refresh once when user returns
       try { await AsyncStorage.setItem('dashboard_needs_refresh', '1'); } catch {}
-      Alert.alert('Success', 'Product created successfully!', [
-        { text: 'OK', onPress: () => navigation.goBack() }
-      ]);
+      popup.success('Product created successfully!', 'Success');
+      navigation.goBack();
     } catch (e) {
-      setErrMsg('Network error. Please try again.');
-      setErrVisible(true);
+      popup.error('Network error. Please try again.');
     } finally {
       setSaving(false);
     }
@@ -382,11 +375,6 @@ export default function CreateProductScreen() {
           </View>
         </ScrollView>
 
-        <ErrorPopup 
-          visible={errVisible} 
-          message={errMsg} 
-          onDismiss={() => setErrVisible(false)} 
-        />
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

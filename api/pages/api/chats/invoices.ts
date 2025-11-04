@@ -8,6 +8,33 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (!supabaseAdmin) return res.status(500).json({ ok: false, error: 'DB not configured' })
 
   try {
+    if (req.method === 'GET') {
+      // fetch invoice details by id
+      const { invoiceId } = req.query as { invoiceId?: string };
+      if (!invoiceId) return res.status(400).json({ ok: false, error: 'invoiceId required' });
+      const invRes = await supabaseAdmin.from('invoices').select('*').eq('id', invoiceId).single();
+      if (invRes.error || !invRes.data) return res.status(404).json({ ok: false, error: 'Invoice not found' });
+      const inv = invRes.data as any;
+      let product: any = null;
+      if (inv.product_id) {
+        const p = await supabaseAdmin.from('products').select('id,name,price,images').eq('id', inv.product_id).single();
+        if (!p.error && p.data) product = p.data;
+      }
+      const total = Number(inv.amount || 0) + Number(inv.delivery_fee || 0);
+      return res.status(200).json({
+        ok: true,
+        invoice: {
+          id: inv.id,
+          product: { name: product?.name || 'Product', price: Number(product?.price || inv.amount || 0) },
+          deliveryFee: Number(inv.delivery_fee || 0),
+          deliveryAddress: inv.delivery_address || 'N/A',
+          expectedDelivery: inv.expected_delivery || null,
+          total,
+          paid: inv.status === 'paid',
+          escrowed: inv.status === 'paid',
+        }
+      })
+    }
     if (req.method === 'POST') {
       // create invoice
       const { conversationId, createdBy, productId, amount, deliveryFee, deliveryAddress, expectedDelivery } = req.body || {}
@@ -22,7 +49,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         p_expected_delivery: expectedDelivery || null,
       })
       if (error) return res.status(500).json({ ok: false, error: 'Failed to create invoice' })
-      return res.status(200).json({ ok: true, invoiceId: data })
+      const invoiceId = data as string
+      // also post a message so both parties see the invoice in the chat
+      await supabaseAdmin.rpc('send_message', {
+        p_conversation_id: conversationId,
+        p_sender_id: createdBy,
+        p_sender_role: 'vendor',
+        p_body: `__invoice__:${invoiceId}`,
+        p_product_id: productId || null,
+      })
+      return res.status(200).json({ ok: true, invoiceId })
     }
 
     if (req.method === 'PATCH') {

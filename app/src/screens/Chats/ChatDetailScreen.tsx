@@ -1,7 +1,8 @@
 /// <reference path='../../types/global.d.ts' />
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { StyleSheet, Text, View, Pressable, FlatList, TextInput, KeyboardAvoidingView, Platform, Image, Share, Alert } from 'react-native';
+import { StyleSheet, Text, View, Pressable, FlatList, TextInput, KeyboardAvoidingView, Platform, Image, Share } from 'react-native';
 import { captureRef } from 'react-native-view-shot';
+import * as WebBrowser from 'expo-web-browser';
 import * as Sharing from 'expo-sharing';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -10,9 +11,10 @@ import type { RouteProp } from '@react-navigation/native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { colors } from '../../theme/colors';
 import type { RootStackParamList } from '../../navigation/RootNavigator';
-import { apiGet, apiPost, API_BASE } from '../../services/api';
+import { apiGet, apiPost, apiPatch, API_BASE } from '../../services/api';
 import { userSession } from '../../services/userSession';
 import { getSupabase } from '../../services/realtime';
+import { useGlobalPopup } from '../../store/globalPopup';
 
  type ChatDetailNav = NativeStackNavigationProp<RootStackParamList, 'ChatDetail'>;
  type ChatDetailRoute = RouteProp<RootStackParamList, 'ChatDetail'>;
@@ -56,7 +58,7 @@ import { getSupabase } from '../../services/realtime';
   const productId = route.params?.productId as string | undefined;
 
   // Seed with a product-intent preview only in explicit buyer Buy flow
-  const shouldSeed = !!route.params?.initialSend && role === 'buyer';
+  const shouldSeed = !!route.params?.initialSend && role === 'buyer' && !route.params?.serverSeeded;
   const initialIntent: Message | null = shouldSeed && route.params?.initialText
     ? { id: `m-intent-${Date.now()}`, sender: role, text: route.params.initialText, createdAt: Date.now() }
     : null;
@@ -65,6 +67,7 @@ import { getSupabase } from '../../services/realtime';
   const [loading, setLoading] = useState(false);
   const [otherPartyAvatar, setOtherPartyAvatar] = useState<string | null>(null);
   const sentInitial = useRef<boolean>(false);
+    const popup = useGlobalPopup();
 
   // Load messages and optionally send initial intent
   useEffect(() => {
@@ -108,8 +111,16 @@ import { getSupabase } from '../../services/realtime';
           // Collect unique product IDs and sender IDs to fetch
           const productIds = Array.from(new Set(rows.map((r: any) => r.product_id).filter(Boolean)));
           const senderIds = Array.from(new Set(rows.map((r: any) => r.sender_id).filter(Boolean)));
+          // Collect invoice IDs encoded in system messages
+          const parseInvoiceId = (body?: string): string | null => (typeof body === 'string' && body.startsWith('__invoice__:')) ? body.replace('__invoice__:', '') : null;
+          const invoiceIds = Array.from(new Set(
+            rows
+              .map((r: any) => parseInvoiceId(r.body))
+              .filter((x: string | null): x is string => !!x)
+          ));
           const productMap = new Map();
           const avatarMap = new Map();
+          const invoiceMap = new Map();
           
           // Fetch all product details
           if (productIds.length > 0) {
@@ -151,18 +162,70 @@ import { getSupabase } from '../../services/realtime';
             } catch {}
           }
 
+          // Fetch invoices referenced by messages
+          if (invoiceIds.length > 0) {
+            await Promise.all(
+              invoiceIds.map(async (iid) => {
+                try {
+                  const invResp = await apiGet(`/chats/invoices?invoiceId=${encodeURIComponent(iid)}`);
+                  if (invResp.ok && (invResp.data as any)?.invoice) {
+                    invoiceMap.set(iid, (invResp.data as any).invoice);
+                  }
+                } catch {}
+              })
+            );
+          }
+
           const mapped: Message[] = (rows || []).map((r) => ({
             id: r.id,
             sender: (r.sender_role === 'buyer' || r.sender_role === 'vendor' || r.sender_role === 'bot') ? r.sender_role : 'buyer',
             senderId: r.sender_id,
             senderAvatar: avatarMap.has(r.sender_id) ? avatarMap.get(r.sender_id) : undefined,
-            text: r.body || '',
+            text: (typeof r.body === 'string' && r.body.startsWith('__invoice__:')) ? '' : (r.body || ''),
             createdAt: r.created_at ? new Date(r.created_at).getTime() : Date.now(),
             deleted: !!r.deleted,
             isSystem: r.kind === 'system',
             productAttachment: r.product_id && productMap.has(r.product_id) ? productMap.get(r.product_id) : undefined,
+            invoice: (typeof r.body === 'string' && r.body.startsWith('__invoice__:'))
+              ? invoiceMap.get(r.body.replace('__invoice__:', ''))
+              : undefined,
           }));
-          setMessages(mapped);
+
+          // Merge with existing messages so we don't lose optimistic product attachments
+          setMessages((prev) => {
+            const byId = new Map<string, Message>(prev.map((m) => [m.id, m]));
+            // If we fetched server invoices, drop any optimistic invoice messages with same invoice id
+            const serverInvoiceIds = new Set<string>();
+            for (const m of mapped) if (m.invoice?.id) serverInvoiceIds.add(m.invoice.id);
+            for (const [id, m] of byId) {
+              if (m.invoice?.id && serverInvoiceIds.has(m.invoice.id)) {
+                byId.delete(id);
+              }
+            }
+            const result: Message[] = [];
+            for (const m2 of mapped) {
+              const existing = byId.get(m2.id);
+              if (existing) {
+                const merged: Message = {
+                  ...existing,
+                  ...m2,
+                  // Preserve any existing attachment if server mapping hasn't populated yet
+                  productAttachment: existing.productAttachment || m2.productAttachment,
+                  senderAvatar: existing.senderAvatar || m2.senderAvatar,
+                };
+                result.push(merged);
+                byId.delete(m2.id);
+              } else {
+                result.push(m2);
+              }
+            }
+            // Keep any remaining optimistic messages (e.g., just sent but not in server yet)
+            for (const leftover of byId.values()) {
+              result.push(leftover);
+            }
+            result.sort((a, b) => a.createdAt - b.createdAt);
+            return result;
+          });
           requestAnimationFrame(() => listRef.current?.scrollToEnd({ animated: false }));
         }
       } finally {
@@ -321,51 +384,54 @@ import { getSupabase } from '../../services/realtime';
       deliveryAddress: invAddress.trim() || 'N/A',
       expectedDelivery: invExpectedDate ? invExpectedDate.toISOString() : null,
     });
-    const newId = (resp.ok && (resp.data as any)?.invoiceId) ? (resp.data as any).invoiceId : `inv-${Date.now()}`;
-    const invoice: Invoice = {
-      id: newId,
-      product: { name: invProduct.trim() || 'Product', price: isNaN(priceNum) ? 0 : priceNum },
-      deliveryFee: isNaN(delivNum) ? 0 : delivNum,
-      deliveryAddress: invAddress.trim() || 'N/A',
-      expectedDelivery: invExpectedDate ? invExpectedDate.toISOString() : undefined,
-      total: isNaN(priceNum + delivNum) ? 0 : priceNum + delivNum,
-      paid: false,
-      escrowed: false,
-    };
-    const newMsg: Message = { id: `m-${Date.now()}-inv`, sender: 'vendor', createdAt: Date.now(), invoice };
-    setMessages((prev) => [...prev, newMsg]);
+    if (resp.ok && (resp.data as any)?.invoiceId) {
+      // The server also inserted a chat message; we'll see it on refresh/realtime.
+      // Optimistically show a local invoice card using the same id, to avoid double rendering we won't add a message id collision.
+      const optimistic: Message = {
+        id: `temp-invoice-${Date.now()}`,
+        sender: 'vendor',
+        createdAt: Date.now(),
+        invoice: {
+          id: (resp.data as any).invoiceId,
+          product: { name: invProduct.trim() || 'Product', price: isNaN(priceNum) ? 0 : priceNum },
+          deliveryFee: isNaN(delivNum) ? 0 : delivNum,
+          deliveryAddress: invAddress.trim() || 'N/A',
+          expectedDelivery: invExpectedDate ? invExpectedDate.toISOString() : undefined,
+          total: isNaN(priceNum + delivNum) ? 0 : priceNum + delivNum,
+          paid: false,
+          escrowed: false,
+        },
+      };
+      setMessages((prev) => [...prev, optimistic]);
+    }
     setShowInvoiceForm(false);
     requestAnimationFrame(() => listRef.current?.scrollToEnd({ animated: true }));
   };
 
    const handlePayInvoice = async (invoiceId: string) => {
-     // Persist paid status
-     await fetch(`${API_BASE}/api/chats/invoices`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ invoiceId, status: 'paid' }) }).catch(() => {});
-     setMessages((prev) => prev.map((m) => {
-       if (m.invoice?.id === invoiceId && m.invoice) {
-         const confirmationCode = `SPZ-${Math.floor(100000 + Math.random()*900000)}`;
-         return {
-           ...m,
-           invoice: { ...m.invoice, paid: true, escrowed: true, confirmationCode },
-         };
-       }
-       return m;
-     }));
-
-     // Add bot message acknowledging escrow & reminders
-     setMessages((prev) => [
-       ...prev,
-       {
-         id: `m-${Date.now()}-bot1`,
-         sender: 'bot',
-         createdAt: Date.now(),
-         text: 'Payment received. Funds are now held in escrow. A confirmation link will be sent every 3 hours. Your confirmation code is displayed on the invoice.',
-       }
-     ]);
+     try {
+       const me = await userSession.getCurrentUser();
+       const inv = messages.find((m) => m.invoice?.id === invoiceId)?.invoice;
+       if (!me || !inv) return;
+       // Initialize Paystack via server
+       const init = await apiPost<{ authorizationUrl: string; reference: string }>(
+         '/paystack/init',
+         { invoiceId, amount: inv.total, email: me.email }
+       );
+      if (!init.ok || !init.data?.authorizationUrl) {
+        popup.error(init.error || 'Unable to start payment', 'Payment error');
+        return;
+      }
+      await WebBrowser.openBrowserAsync(init.data.authorizationUrl);
+      // Optional: prompt or refresh after user returns from browser
+      popup.info('Complete your payment in the browser. We will update the invoice when confirmed.', 'Payment opened');
+     } catch (e) {
+      popup.error('Unable to start payment', 'Payment error');
+     }
    };
 
    const handleConfirmDelivery = async (invoiceId: string) => {
-     await fetch(`${API_BASE}/api/chats/invoices`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ invoiceId, status: 'delivered' }) }).catch(() => {});
+     await apiPatch('/chats/invoices', { invoiceId, status: 'delivered' });
      // Post bot message about releasing funds and review link
      setMessages((prev) => [
        ...prev,
@@ -391,17 +457,17 @@ import { getSupabase } from '../../services/realtime';
    };
 
    const handleDeleteInvoice = (invoiceId: string) => {
-     if (role !== 'vendor') return;
-     setMessages((prev) => prev.map((m) => {
-       if (m.invoice?.id === invoiceId) {
-         if (m.invoice.paid) {
-           Alert.alert('Cannot delete', 'Paid invoices cannot be deleted.');
-           return m;
-         }
-         return { ...m, invoice: undefined, text: undefined, deleted: true };
-       }
-       return m;
-     }));
+    if (role !== 'vendor') return;
+    setMessages((prev) => prev.map((m) => {
+      if (m.invoice?.id === invoiceId) {
+        if (m.invoice.paid) {
+          popup.error('Paid invoices cannot be deleted.', 'Cannot delete');
+          return m;
+        }
+        return { ...m, invoice: undefined, text: undefined, deleted: true };
+      }
+      return m;
+    }));
    };
 
    // Save-to-gallery removed per requirements (only Delete/Download needed)
@@ -431,8 +497,8 @@ import { getSupabase } from '../../services/realtime';
          invoice.confirmationCode ? `Confirmation Code: ${invoice.confirmationCode}` : undefined,
        ].filter(Boolean).join('\n');
        await Share.share({ message: lines, title: `Invoice ${invoice.id}` });
-     } catch (e) {
-       Alert.alert('Unable to share invoice');
+    } catch (e) {
+      popup.error('Unable to share invoice');
      }
    };
 
@@ -537,7 +603,7 @@ import { getSupabase } from '../../services/realtime';
       if (item.invoice) {
         if (role !== 'vendor') return;
         if (item.invoice.paid) {
-          Alert.alert('Cannot delete', 'Paid invoices cannot be deleted.');
+          popup.error('Paid invoices cannot be deleted.', 'Cannot delete');
           return;
         }
       }
@@ -700,7 +766,7 @@ import { getSupabase } from '../../services/realtime';
                       if (Platform.OS !== 'ios') setShowDatePicker(false);
                       if (!date) return;
                       if (isPastDate(date)) {
-                        Alert.alert('Wow You cant go back in time in our world, the date is bbehind');
+                        popup.info('Wow, you cannot pick a date in the past.');
                         return;
                       }
                       setInvExpectedDate(date);

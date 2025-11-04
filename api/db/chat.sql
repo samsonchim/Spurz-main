@@ -28,12 +28,14 @@ CREATE TABLE IF NOT EXISTS public.messages (
   sender_role TEXT NOT NULL CHECK (sender_role IN ('buyer','vendor','bot')),
   kind TEXT NOT NULL DEFAULT 'text', -- 'text' | 'system'
   body TEXT,
+  product_id UUID REFERENCES public.products(id) ON DELETE SET NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   deleted BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE INDEX IF NOT EXISTS idx_messages_conversation ON public.messages(conversation_id);
 CREATE INDEX IF NOT EXISTS idx_messages_created_at ON public.messages(created_at);
+CREATE INDEX IF NOT EXISTS idx_messages_product ON public.messages(product_id);
 
 -- Trigger to update timestamps
 CREATE OR REPLACE FUNCTION public.touch_conversation_updated()
@@ -120,14 +122,21 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- RPC: send a message
+DROP FUNCTION IF EXISTS public.send_message(uuid, uuid, text, text, uuid);
 DROP FUNCTION IF EXISTS public.send_message(uuid, uuid, text, text);
-CREATE OR REPLACE FUNCTION public.send_message(p_conversation_id UUID, p_sender_id UUID, p_sender_role TEXT, p_body TEXT)
+CREATE OR REPLACE FUNCTION public.send_message(
+  p_conversation_id UUID, 
+  p_sender_id UUID, 
+  p_sender_role TEXT, 
+  p_body TEXT,
+  p_product_id UUID DEFAULT NULL
+)
 RETURNS UUID AS $$
 DECLARE
   v_id UUID;
 BEGIN
-  INSERT INTO public.messages(conversation_id, sender_id, sender_role, kind, body)
-  VALUES (p_conversation_id, p_sender_id, p_sender_role, 'text', p_body)
+  INSERT INTO public.messages(conversation_id, sender_id, sender_role, kind, body, product_id)
+  VALUES (p_conversation_id, p_sender_id, p_sender_role, 'text', p_body, p_product_id)
   RETURNING id INTO v_id;
   RETURN v_id;
 END;
@@ -142,12 +151,13 @@ RETURNS TABLE(
   sender_role TEXT,
   kind TEXT,
   body TEXT,
+  product_id UUID,
   created_at TIMESTAMPTZ,
   deleted BOOLEAN
 ) AS $$
 BEGIN
   RETURN QUERY
-  SELECT m.id, m.sender_id, m.sender_role, m.kind, m.body, m.created_at, m.deleted
+  SELECT m.id, m.sender_id, m.sender_role, m.kind, m.body, m.product_id, m.created_at, m.deleted
   FROM public.messages m
   WHERE m.conversation_id = p_conversation_id
   ORDER BY m.created_at ASC

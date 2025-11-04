@@ -25,6 +25,7 @@ import OverlayLoading from '../../components/OverlayLoading';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BottomNav from '../../components/BottomNav';
 import { ImageSourcePropType } from 'react-native';
+import { useGlobalPopup } from '../../store/globalPopup';
 
 const { width } = Dimensions.get('window');
 
@@ -58,6 +59,7 @@ interface Outlet {
 }
 
 export default function Dashboard({ navigation }: any) {
+  const popup = useGlobalPopup();
   const [outlet, setOutlet] = useState<Outlet | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -170,17 +172,13 @@ export default function Dashboard({ navigation }: any) {
           const active = p ? (p.is_active ?? (p.status === 'active')) : false;
           const title = active ? 'Hide Product' : 'Unhide Product';
           const message = active ? 'Are you sure you want to hide this product?' : 'Make this product visible again?';
-          Alert.alert(title, message, [
-          { text: 'Cancel', style: 'cancel' },
-            { text: active ? 'Hide' : 'Unhide', onPress: () => hideProduct(productId) }
-          ]);
+          popup.confirm(message, { title, okText: active ? 'Hide' : 'Unhide', cancelText: 'Cancel' })
+            .then((yes) => { if (yes) hideProduct(productId); });
         }
         break;
       case 'delete':
-        Alert.alert('Delete Product', 'Are you sure you want to delete this product? This action cannot be undone.', [
-          { text: 'Cancel', style: 'cancel' },
-          { text: 'Delete', style: 'destructive', onPress: () => deleteProduct(productId) }
-        ]);
+        popup.confirm('Are you sure you want to delete this product? This action cannot be undone.', { title: 'Delete Product', okText: 'Delete', cancelText: 'Cancel', type: 'error' })
+          .then((yes) => { if (yes) deleteProduct(productId); });
         break;
       case 'edit':
         {
@@ -201,6 +199,8 @@ export default function Dashboard({ navigation }: any) {
   };
   const hideProduct = async (productId: string) => {
     try {
+      const user = await userSession.getCurrentUser();
+      const token = await userSession.getToken();
       if (!user || !token) return;
       const current = products.find((p) => p.id === productId);
       const nextStatus = current?.is_active ? 'hidden' : 'active';
@@ -213,10 +213,10 @@ export default function Dashboard({ navigation }: any) {
           ToastAndroid.show(nextStatus === 'active' ? 'Product unhidden' : 'Product hidden', ToastAndroid.SHORT);
         }
       } else {
-        Alert.alert('Update failed', res.error || 'Could not update product');
+        popup.error(res.error || 'Could not update product', 'Update failed');
       }
     } catch (e) {
-      Alert.alert('Error', 'Could not update product');
+      popup.error('Could not update product', 'Error');
     }
   };
 
@@ -234,10 +234,10 @@ export default function Dashboard({ navigation }: any) {
           ToastAndroid.show('Product deleted', ToastAndroid.SHORT);
         }
       } else {
-        Alert.alert('Delete failed', res.error || 'Could not delete product');
+        popup.error(res.error || 'Could not delete product', 'Delete failed');
       }
     } catch (e) {
-      Alert.alert('Error', 'Could not delete product');
+      popup.error('Could not delete product', 'Error');
     }
   };
 
@@ -326,8 +326,8 @@ export default function Dashboard({ navigation }: any) {
   // Image pickers for cover and face
   const pickAndUpload = async (type: 'cover' | 'face' | 'logo') => {
     try {
-      const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (!perm.granted) { Alert.alert('Permission needed', 'Allow media access to pick images.'); return; }
+  const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
+  if (!perm.granted) { popup.info('Allow media access to pick images.', 'Permission needed'); return; }
       const res = await ImagePicker.launchImageLibraryAsync({ quality: 0.9, base64: true });
       if (res.canceled) return;
       const asset = res.assets?.[0]; if (!asset?.base64) return;
@@ -349,10 +349,10 @@ export default function Dashboard({ navigation }: any) {
         if (Platform.OS === 'android') {
           ToastAndroid.show(msg, ToastAndroid.SHORT);
         } else {
-          Alert.alert('Success', msg);
+          popup.success(msg, 'Success');
         }
       } else {
-        Alert.alert('Upload failed', r.error || 'Could not update image');
+        popup.error(r.error || 'Could not update image', 'Upload failed');
       }
     } catch (e) {}
     finally {

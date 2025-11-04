@@ -34,7 +34,7 @@ export type RootStackParamList = {
     tags?: string[];
   };
   CreateProduct: undefined;
-  ChatDetail: { chatId: string; name: string; role?: 'buyer' | 'vendor'; productName?: string; productId?: string; initialText?: string; initialSend?: boolean };
+  ChatDetail: { chatId: string; name: string; role?: 'buyer' | 'vendor'; productName?: string; productId?: string; initialText?: string; initialSend?: boolean; serverSeeded?: boolean };
   Conversations: undefined;
   VendorOnboarding: { email?: string; userId?: string } | undefined;
   FollowingList: undefined;

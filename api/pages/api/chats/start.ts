@@ -14,7 +14,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const { buyerId, productId } = req.body || {}
+  const { buyerId, productId, initialBody } = req.body || {}
     if (!buyerId || !productId) {
       return res.status(400).json({ ok: false, error: 'buyerId and productId are required' })
     }
@@ -32,6 +32,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const row = Array.isArray(data) ? data[0] : data
     if (!row || !row.conversation_id) {
       return res.status(500).json({ ok: false, error: 'Unexpected response from DB' })
+    }
+
+    // Optionally seed the buyer's initial message with product attachment
+    if (initialBody && typeof initialBody === 'string' && initialBody.trim()) {
+      try {
+        await supabaseAdmin.rpc('send_message', {
+          p_conversation_id: row.conversation_id,
+          p_sender_id: buyerId,
+          p_sender_role: 'buyer',
+          p_body: String(initialBody),
+          p_product_id: productId,
+        })
+      } catch (e) {
+        console.warn('start_chat: failed to seed initial message', e)
+      }
     }
 
     return res.status(200).json({

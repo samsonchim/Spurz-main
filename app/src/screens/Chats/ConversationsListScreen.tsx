@@ -31,6 +31,7 @@ export default function ConversationsListScreen() {
   const [readSet, setReadSet] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [filter, setFilter] = useState<'all'|'unread'|'paid'|'unpaid'|'enroute'|'delivered'>('all');
   const userIdRef = useRef<string | null>(null);
 
   const load = useCallback(async () => {
@@ -181,8 +182,30 @@ export default function ConversationsListScreen() {
         <Text style={styles.headerTitle}>Conversations</Text>
         <View style={{ width: 40 }} />
       </View>
+      {/* Filters */}
+      <View style={styles.filters}>
+        {([
+          { key: 'all', label: 'All' },
+          { key: 'unread', label: 'Unread' },
+          { key: 'paid', label: 'Paid' },
+          { key: 'unpaid', label: 'Unpaid' },
+          { key: 'enroute', label: 'Enroute' },
+          { key: 'delivered', label: 'Delivered' },
+        ] as const).map((f) => (
+          <Pressable key={f.key} style={[styles.filterChip, filter === f.key && styles.filterChipActive]} onPress={() => setFilter(f.key)}>
+            <Text style={[styles.filterText, filter === f.key && styles.filterTextActive]}>{f.label}</Text>
+          </Pressable>
+        ))}
+      </View>
       <FlatList
-        data={rows}
+        data={rows.filter((r) => {
+          if (filter === 'all') return true;
+          const meId = userIdRef.current;
+          const meRole: 'buyer' | 'vendor' = meId && r.vendorId === meId ? 'vendor' : 'buyer';
+          const isUnread = !!r.lastMessage && r.lastMessage.senderRole !== meRole && !readSet.has(r.id);
+          if (filter === 'unread') return isUnread;
+          return (r.status || 'unpaid') === filter;
+        })}
         keyExtractor={(r) => r.id}
         renderItem={renderItem}
         contentContainerStyle={styles.list}
@@ -225,4 +248,10 @@ const styles = StyleSheet.create({
   empty: { padding: 24, alignItems: 'center' },
   emptyTitle: { fontSize: 14, fontWeight: '800', color: colors.text, marginBottom: 6 },
   emptySub: { fontSize: 12, color: colors.muted, textAlign: 'center' },
+  // Filters
+  filters: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, paddingHorizontal: 16, paddingTop: 10, paddingBottom: 6, backgroundColor: colors.background },
+  filterChip: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999, borderWidth: 1, borderColor: '#E5E7EB', backgroundColor: 'white' },
+  filterChipActive: { backgroundColor: '#111827', borderColor: '#111827' },
+  filterText: { fontSize: 12, fontWeight: '600', color: '#111827' },
+  filterTextActive: { color: 'white' },
 });

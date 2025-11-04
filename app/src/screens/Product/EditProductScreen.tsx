@@ -11,6 +11,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RouteProp } from '@react-navigation/native';
 import type { RootStackParamList } from '../../navigation/RootNavigator';
+import { useGlobalPopup } from '../../store/globalPopup';
 
 type Nav = NativeStackNavigationProp<RootStackParamList, 'EditProduct'>;
 type Rt = RouteProp<RootStackParamList, 'EditProduct'>;
@@ -18,6 +19,7 @@ type Rt = RouteProp<RootStackParamList, 'EditProduct'>;
 export default function EditProductScreen() {
   const navigation = useNavigation<Nav>();
   const route = useRoute<Rt>();
+  const popup = useGlobalPopup();
   const { productId, name, price, description, images, category: catParam, stockQuantity, tags } = route.params || ({} as any);
 
   const [title, setTitle] = useState(name ?? '');
@@ -31,8 +33,8 @@ export default function EditProductScreen() {
 
   const addPhoto = async () => {
     try {
-      const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (!perm.granted) { Alert.alert('Permission needed', 'Allow media access to pick images.'); return; }
+  const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
+  if (!perm.granted) { popup.info('Allow media access to pick images.', 'Permission needed'); return; }
   const res = await ImagePicker.launchImageLibraryAsync({ quality: 0.9 });
       if (res.canceled) return;
       const uri = res.assets?.[0]?.uri; if (!uri) return;
@@ -42,8 +44,8 @@ export default function EditProductScreen() {
 
   const addPhotoFromCamera = async () => {
     try {
-      const perm = await ImagePicker.requestCameraPermissionsAsync();
-      if (!perm.granted) { Alert.alert('Permission needed', 'Allow camera access to take photos.'); return; }
+  const perm = await ImagePicker.requestCameraPermissionsAsync();
+  if (!perm.granted) { popup.info('Allow camera access to take photos.', 'Permission needed'); return; }
       const res = await ImagePicker.launchCameraAsync({ mediaTypes: ImagePicker.MediaTypeOptions.Images, quality: 0.9 });
       if (res.canceled) return;
       const uri = res.assets?.[0]?.uri; if (!uri) return;
@@ -56,13 +58,13 @@ export default function EditProductScreen() {
   const canSave = useMemo(() => title.trim().length > 0 && !!Number(priceStr) && (quantity === '' || Number(quantity) >= 0), [title, priceStr, quantity]);
 
   const handleSave = async () => {
-    if (!canSave) { Alert.alert('Please fill title and valid price'); return; }
-    if (!productId) { Alert.alert('Error', 'Missing product id'); return; }
+  if (!canSave) { popup.info('Please fill title and enter a valid price'); return; }
+  if (!productId) { popup.error('Missing product id', 'Error'); return; }
     setSaving(true);
     try {
       const user = await userSession.getCurrentUser();
       const token = await userSession.getToken();
-      if (!user || !token) { Alert.alert('Error', 'Please log in'); return; }
+  if (!user || !token) { popup.info('Please log in', 'Error'); return; }
 
       const tags = tagsStr.split(',').map(t => t.trim()).filter(Boolean);
       const payload: any = {
@@ -78,13 +80,14 @@ export default function EditProductScreen() {
 
       const res = await apiPost('/products/update', payload, token);
       if (!res.ok) {
-        Alert.alert('Error', res.error || 'Could not save changes');
+        popup.error(res.error || 'Could not save changes', 'Error');
         return;
       }
       try { await AsyncStorage.setItem('dashboard_needs_refresh', '1'); } catch {}
-      Alert.alert('Saved', 'Product updated successfully.', [{ text: 'OK', onPress: () => navigation.goBack() }]);
+      popup.success('Product updated successfully.', 'Saved');
+      navigation.goBack();
     } catch (e) {
-      Alert.alert('Error', 'Could not save changes.');
+      popup.error('Could not save changes.', 'Error');
     } finally {
       setSaving(false);
     }

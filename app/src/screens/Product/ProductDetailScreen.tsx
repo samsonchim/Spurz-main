@@ -132,21 +132,24 @@ export default function ProductDetailScreen() {
         return;
       }
       const pid = route.params?.productId;
-      const resp = await apiPost('/chats/start', { buyerId: user.id, productId: pid });
+  const initialBody = `Hi! I'm interested in ${product?.name || 'this product'}.`;
+  const resp = await apiPost('/chats/start', { buyerId: user.id, productId: pid, initialBody });
       if (!resp.ok || !resp.data) {
         setErrMessage(resp.error || 'Unable to start chat');
         setErrVisible(true);
         return;
       }
       const { chatId, vendorName, productName } = resp.data as any;
-      navigation.navigate('ChatDetail', {
+  // @ts-ignore
+  navigation.navigate('ChatDetail', {
         chatId,
         name: vendorName || 'Vendor',
         role: 'buyer',
         productName: product?.name || productName || route.params?.productName,
         productId: route.params?.productId,
-        initialText: `Hi! I'm interested in ${product?.name || productName || 'your product'}.`,
-        initialSend: true as any,
+        initialText: initialBody,
+        initialSend: false as any,
+        serverSeeded: true as any,
       });
     } catch (e) {
       setErrMessage('Network error. Please try again.');
